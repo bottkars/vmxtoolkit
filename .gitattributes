@@ -9,7 +9,7 @@
 *.fsproj merge=union
 *.dbproj merge=union
 
-# Standard to msysgit
+to msysgit
 *.doc	 diff=astextplain
 *.DOC	 diff=astextplain
 *.docx diff=astextplain
@@ -20,3 +20,10 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
+# powershell 
+*.ps1  diff=astextplain
+*.PS1  diff=astextplain
+*.psm1  diff=astextplain
+*.PSM1  diff=astextplain
+*.psd1  diff=astextplain
+*.PSD1  diff=astextplain
