@@ -58,6 +58,9 @@ current exposed commands
  Stop-VMX
  Suspend-VMX
 
+Help
+==========
+while commands are self explaining, there is an online help available git get-help [command] -online
 Contributing
 ==========
 Please contribute in any way to the project. Specifically, normalizing differnet image sizes, locations, and intance types would be easy adds to enhance the usefulness of the project.
