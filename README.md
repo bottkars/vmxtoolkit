@@ -8,6 +8,58 @@ you get support for labbuildr on http://labbuildr.com and https://community.emc.
 
 simply follow @hyperv_guy for updates
 
+current exposed commands
+===========
+
+CommandType     Name
+-----------     ----
+Function        Get-VMwareVersion
+Function        Get-VMX
+Function        Get-VMXActivationPreference
+Function        Get-VMXConfig
+Function        Get-VMXConfigVersion
+Function        Get-VMXDisplayName
+Function        Get-VMXGuestOS
+Function        Get-VMXHWVersion
+Function        Get-VMXIdeDisk
+Function        Get-VMXInfo
+Function        Get-VMXIPAddress
+Function        Get-VMXmemory
+Function        Get-VMXNetwork
+Function        Get-VMXNetworkAdapter
+Function        Get-VMXNetworkConnection
+Function        Get-VMXProcessor
+Function        Get-VMXRun
+Function        Get-VMXscenario
+Function        Get-VMXScsiController
+Function        Get-VMXScsiDisk
+Function        Get-VMXSnapshot
+Function        Get-VMXSnapshotconfig
+Function        Get-VMXTemplate
+Function        Get-VMXUUID
+Function        Invoke-VMXPowerShell
+Function        New-VMXClone
+Function        New-VMXLinkedClone
+Function        New-VMXScsiDisk
+Function        New-VMXSnapshot
+Function        remove-vmx
+Function        Remove-VMXserial
+Function        Remove-VMXSnapshot
+Function        Restore-VMXSnapshot
+Function        Search-VMXPattern
+Function        Set-VMXActivationPreference
+Function        Set-VMXDisplayName
+Function        Set-VMXmemory
+Function        Set-VMXNetworkAdapter
+Function        Set-VMXprocessor
+Function        Set-VMXscenario
+Function        Set-VMXserialPipe
+Function        Set-VMXSize
+Function        Set-VMXTemplate
+Function        Set-VMXVnet
+Function        Start-VMX
+Function        Stop-VMX
+Function        Suspend-VMX
 Contributing
 ==========
 Please contribute in any way to the project. Specifically, normalizing differnet image sizes, locations, and intance types would be easy adds to enhance the usefulness of the project.
