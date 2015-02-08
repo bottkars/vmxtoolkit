@@ -1,8 +1,18 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+# *.ps1 text
+# *.psm text
+# *.ps1   text eol=crlf
+# *.psm*   text eol=crlf
+# labbuildr.ps1 text eol=crlf
 
 # Custom for Visual Studio
 *.cs     diff=csharp
+*.sln    merge=union
+*.csproj merge=union
+*.vbproj merge=union
+*.fsproj merge=union
+*.dbproj merge=union
 
 # Standard to msysgit
 *.doc	 diff=astextplain
