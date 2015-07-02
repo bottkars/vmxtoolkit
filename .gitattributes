@@ -3,7 +3,7 @@
 # *.ps1 text
 *.psm1 diff
 *.ps1   text eol=crlf
-# *.psm*   text eol=crlf
+*.psm*   text eol=crlf
 # labbuildr.ps1 text eol=crlf
 
 # Custom for Visual Studio
