@@ -31,7 +31,6 @@ $Global:VMrunErrorCondition = @(
   "Error: VMware Tools are not running in the guest",
   "Error: The VMware Tools are not running in the virtual machine" )
 $Global:vmwareversion = New-Object System.Version($vmwarefileinfo.VersionInfo.ProductMajorPart,$vmwarefileinfo.VersionInfo.ProductMinorPart,$vmwarefileinfo.VersionInfo.ProductBuildPart,$vmwarefileinfo.VersionInfo.ProductVersion.Split("-")[1])
-
 # $Global:vmwareMajor = $vmwarefileinfo.VersionInfo.ProductMajorPart
 # $Global:vmwareMinor = $vmwarefileinfo.VersionInfo.ProductMinorPart
 # $Global:vmwareBuild = $vmwarefileinfo.VersionInfo.ProductBuildPart

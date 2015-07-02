@@ -18,7 +18,6 @@ Author = 'Karsten Bott'
 
 # Unternehmen oder Hersteller dieses Moduls
 CompanyName = 'labbuildr'
-
 # Urheberrechtserklärung für dieses Modul
 Copyright = '(c) 2014 Karsten Bott. Alle Rechte vorbehalten.
       Copyright 2014 Karsten Bott
