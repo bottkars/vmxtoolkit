@@ -1,10 +1,8 @@
 ﻿<#	
 	.SYNOPSIS
 	Get-VMwareversion
-	
 	.DESCRIPTION
 		Displays version Information on installed VMware version
-	
 	.EXAMPLE
 		PS C:\> Get-VMwareversion
 	.NOTES
