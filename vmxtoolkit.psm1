@@ -7,7 +7,6 @@
 	
 	.EXAMPLE
 		PS C:\> Get-VMwareversion
-	
 	.NOTES
 		requires VMXtoolkit loaded
 #>
