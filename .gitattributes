@@ -1,9 +1,13 @@
 # Auto detect text files and perform LF normalization
-* text=auto
-# *.ps1 text
-# *.psm text
-# *.ps1   text eol=crlf
-# *.psm*   text eol=crlf
+# * text=auto
+*.txt text eol=crlf 
+*.ps1 text eol=crlf 
+*.psm1 text eol=crlf 
+*.psd1 text eol=crlf 
+*.cmd text eol=crlf 
+*.md text eol=crlf 
+*.xml text merge=union 
+
 # labbuildr.ps1 text eol=crlf
 
 # Custom for Visual Studio
