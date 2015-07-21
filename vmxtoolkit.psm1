@@ -1596,9 +1596,9 @@ function Get-VMX
 {
 	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/get-vmx/")]
 	param (
-		[Parameter(ParameterSetName = "1",HelpMessage = "Please specify an optional VM Name", Mandatory = $false)]$VMXName,
-		[Parameter(ParameterSetName = "1", Position = 1,HelpMessage = "Please enter an optional root Path to you VMs (default is vmxdir)",Mandatory = $false)]
-		[ValidateScript({ Test-Path -Path $_ })]$Path = $vmxdir,
+		[Parameter(ParameterSetName = "1",HelpMessage = "Please specify an optional VM Name",Mandatory = $false)]$VMXName,
+		[Parameter(ParameterSetName = "1", Position = 1, HelpMessage = "Please enter an optional root Path to you VMs (default is vmxdir)",Mandatory = $false)]
+		$Path = $vmxdir,
 		[Parameter(ParameterSetName = "1",Mandatory = $false)]$UUID
 	
 		
@@ -1607,6 +1607,11 @@ function Get-VMX
 	
     Write-Verbose $MyInvocation.MyCommand
     $vmxrun = Get-VMXRun
+        if (!(Test-path $Path))
+        {
+        Write-Warning "VM Path does currently not exist"
+        # break
+        }
     if (!($Configfiles = Get-ChildItem -Path $path -Recurse -File -Filter "$VMXName*.vmx" -Exclude "*.vmxf" -ErrorAction SilentlyContinue ))
         {
         Write-Warning "$($MyInvocation.MyCommand) : VM does currently not exist"
