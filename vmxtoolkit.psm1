@@ -1596,15 +1596,19 @@ function Get-VMX
 {
 	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/get-vmx/")]
 	param (
-		[Parameter(ParameterSetName = "1",HelpMessage = "Please specify an optional VM Name",Mandatory = $false)]$VMXName,
-		[Parameter(ParameterSetName = "1", Position = 1, HelpMessage = "Please enter an optional root Path to you VMs (default is vmxdir)",Mandatory = $false)]
+		[Parameter(ParameterSetName = "1", Position = 1,HelpMessage = "Please specify an optional VM Name",Mandatory = $false)]$VMXName,
+		[Parameter(ParameterSetName = "1", HelpMessage = "Please enter an optional root Path to you VMs (default is vmxdir)",Mandatory = $false)]
 		$Path = $vmxdir,
 		[Parameter(ParameterSetName = "1",Mandatory = $false)]$UUID
 	
 		
 
 )
-	
+	if ($VMXName)
+        {
+        $VMXName = $VMXName.replace("\","")
+        $VMXName = $VMXName.replace(".","")
+        }
     Write-Verbose $MyInvocation.MyCommand
     $vmxrun = Get-VMXRun
         if (!(Test-path $Path))
