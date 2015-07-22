@@ -1606,8 +1606,9 @@ function Get-VMX
 )
 	if ($VMXName)
         {
-        $VMXName = $VMXName.replace("\","")
-        $VMXName = $VMXName.replace(".","")
+        $VMXName = $VMXName.TrimStart(".\")
+        $VMXName = $VMXName.TrimEnd("\")
+        Write-Verbose $VMXName
         }
     Write-Verbose $MyInvocation.MyCommand
     $vmxrun = Get-VMXRun
@@ -3034,6 +3035,7 @@ begin {
 process {
         
     $returncommand = & $vmwarepath\vmware-vdiskmanager.exe -c -s $NewDiskSize -t 0 $Path\$NewDiskname -a lsilogic  2>&1 | Out-Null
+
     if (!$NewDiskname.EndsWith(".vmdk")) { $NewDiskname = $NewDiskname+".vmdk" }
 
 
