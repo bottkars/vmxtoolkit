@@ -3406,7 +3406,10 @@ end {}
 #>	
 function Invoke-VMXBash
 {
-	[CmdletBinding(DefaultParameterSetName = 1)]
+	[CmdletBinding(DefaultParameterSetName = 1,
+    SupportsShouldProcess=$true,
+    ConfirmImpact="Medium")]
+
 	[OutputType([psobject])]
 	param
 	(
@@ -3417,7 +3420,9 @@ function Invoke-VMXBash
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)][switch]$interactive,
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)][switch]$activewindow, 
         [Parameter(ParameterSetName = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $true)][Alias('gu')]$Guestuser, 
-        [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $true)][Alias('gp')]$Guestpassword
+        [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $true)][Alias('gp')]$Guestpassword,
+        [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $true)][Alias('log')]$logfile
+
 	)
 	begin
     {	
@@ -3435,15 +3440,46 @@ Write-Verbose "Starting $Scriptblock"
 do
     
 	{
-	$cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm /bin/bash  "$Scriptblock")
-	}
-	until ($VMrunErrorCondition -notcontains $cmdresult)
+    $Myresult = 1
+        do
+	        {
+            if ($Logfile) 
+                {
+                $Scriptblock = "$Scriptblock >> $logfile 2>&1"
+                Write-Verbose $Scriptblock
+                }
+	        $cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm /bin/bash $Scriptblock)
+	        }
+	    until ($VMrunErrorCondition -notcontains $cmdresult)
+        Write-Verbose "Exitcode : $Lastexitcode"
+        if ($Lastexitcode -ne 0)
+            {
+            Write-Warning "Script Failure for $Scriptblock with $cmdresult"
+            Write-Verbose "Confirmpreference: $ConfirmPreference"
+            if ($ConfirmPreference -notmatch "none")
+                {
+                $Myresult = Get-yesnoabort -title "Scriptfailure for $Scriptblock" -message "May be VPN Issue, retry ?"
+                Write-Verbose "Question response: $Myresult"
+                If ($Myresult -eq 2)
+                    {
+                    exit
+                    }
+                }
+                else 
+                    {
+                    $Myresult = 0
+                    }
+            }
+        }
+    until ($Myresult -eq 1)
+    Write-Verbose "Myresult: $Myresult"
     $object = New-Object psobject
     $object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
     $object | Add-Member -MemberType 'NoteProperty' -Name Scriptblock -Value $Scriptblock
     $object | Add-Member -MemberType 'NoteProperty' -Name config -Value $config
-
+    $object | Add-Member -MemberType 'NoteProperty' -Name Exitcode -Value $Lastexitcode
     if ($cmdresult){ $object | Add-Member -MemberType 'NoteProperty' -Name Result -Value $cmdresult}
+    else {$object | Add-Member -MemberType 'NoteProperty' -Name Result -Value success}
     Write-Output $Object
 }
 
