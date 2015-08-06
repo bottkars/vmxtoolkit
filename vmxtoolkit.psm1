@@ -165,6 +165,67 @@ function Set-VMXDisconnectIDE
 
 
 
+#$Addcontent += 'annotation = "This is node '+$Nodename+' for domain '+$Domainname+'|0D|0A built on '+(Get-Date -Format "MM-dd-yyyy_hh-mm")+'|0D|0A using labbuildr by @Hyperv_Guy|0D|0A Adminpasswords: Password123! |0D|0A Userpasswords: Welcome1"'
+
+function Set-VMXAnnotation
+{
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	param (
+	[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
+	[Parameter(ParameterSetName = "2", Mandatory = $True, ValueFromPipelineByPropertyName = $True)]$config,
+	[Parameter(ParameterSetName = "2", Mandatory = $True, ValueFromPipelineByPropertyName = $True)]$Line1,
+	[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$Line2,
+	[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$Line3,
+	[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$Line4,
+	[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$Line5,
+	[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][switch]$builddate
+	)
+	begin
+	{
+	}
+	process
+	{
+		switch ($PsCmdlet.ParameterSetName)
+		{
+			"1"
+			{}
+			"2"
+			{}
+		}
+		$VMXConfig = Get-VMXConfig -config $config
+        $VMXConfig = $VMXConfig | where {$_ -NotMatch "annotation"}
+        Write-Verbose -Message "setting Annotation"
+        $date = get-date
+        if ($builddate.IsPresent)
+            {
+            $Line0 = "Builddate: $date"
+            }
+            else
+            {
+            $Line0 ="EditDate: $date"
+            }
+		$VMXConfig += 'annotation = "'+"$Line0|0D|0A"+"$Line1|0D|0A"+"$Line2|0D|0A"+"$Line3|0D|0A"+"$Line4|0D|0A"+"$Line5|0D|0A"+'"'
+        $VMXConfig | Set-Content -Path $config
+		$object = New-Object -TypeName psobject
+		$Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
+		$object | Add-Member -MemberType NoteProperty -Name Config -Value $config
+		$object | Add-Member -MemberType NoteProperty -Name Line0 -Value $Line0
+		$object | Add-Member -MemberType NoteProperty -Name Line1 -Value $Line1
+		$object | Add-Member -MemberType NoteProperty -Name Line2 -Value $Line2
+		$object | Add-Member -MemberType NoteProperty -Name Line3 -Value $Line3
+		$object | Add-Member -MemberType NoteProperty -Name Line4 -Value $Line4
+		$object | Add-Member -MemberType NoteProperty -Name Line5 -Value $Line5
+
+
+
+
+		Write-Output $Object
+	}
+	end { }
+
+}#Set-VMXDisconnectIDE
+
+
 function Get-VMXToolsState
 {
 	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/")]
@@ -4130,7 +4191,7 @@ param (
         [Parameter(ParameterSetName = "2", Mandatory = $true)]$DNSDOMAIN,
         [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$Hostname,
         [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $false)][switch]$suse,
-
+        #[Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $false)][switch]$systemd,
         [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][Alias('gu')]$rootuser, 
         [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][Alias('gp')]$rootpassword
     )
@@ -4174,7 +4235,18 @@ process {
         $vmx | Invoke-VMXBash -Scriptblock "/sbin/netconfig -f update" -Guestuser $rootuser -Guestpassword $rootpassword
         $Scriptblock = "echo '"+$Hostname+"."+$DNSDOMAIN+"'  > /etc/HOSTNAME"
         $vmx | Invoke-VMXBash -Scriptblock $Scriptblock -Guestuser $rootuser -Guestpassword $rootpassword
-        $vmx | Invoke-VMXBash -Scriptblock "/etc/init.d/network restart" -Guestuser $rootuser -Guestpassword $rootpassword
+        $vmx | Invoke-VMXBash -Scriptblock "/sbin/rcnetwork restart" -Guestuser $rootuser -Guestpassword $rootpassword
+
+        <#
+        if ($systemd.IsPresent)
+            {
+            $vmx | Invoke-VMXBash -Scriptblock "/sbin/rcnetwork restart" -Guestuser $rootuser -Guestpassword $rootpassword
+            }
+        else
+            {
+            $vmx | Invoke-VMXBash -Scriptblock "/etc/init.d/network restart" -Guestuser $rootuser -Guestpassword $rootpassword
+            }
+        #>
         }
     else
         {
