@@ -192,38 +192,44 @@ function Set-VMXAnnotation
 			"2"
 			{}
 		}
-		$VMXConfig = Get-VMXConfig -config $config
-        $VMXConfig = $VMXConfig | where {$_ -NotMatch "annotation"}
-        Write-Verbose -Message "setting Annotation"
-        $date = get-date
-        if ($builddate.IsPresent)
+
+        if ((get-vmx -Path $config).state -eq "stopped" )
             {
-            $Line0 = "Builddate: $date"
-            }
+		    $VMXConfig = Get-VMXConfig -config $config
+            $VMXConfig = $VMXConfig | where {$_ -NotMatch "annotation"}
+            Write-Verbose -Message "setting Annotation"
+            $date = get-date
+            if ($builddate.IsPresent)
+                {
+                $Line0 = "Builddate: $date"
+                }
             else
-            {
-            $Line0 ="EditDate: $date"
+                {
+                $Line0 ="EditDate: $date"
+                }
+		    $VMXConfig += 'annotation = "'+"$Line0|0D|0A"+"$Line1|0D|0A"+"$Line2|0D|0A"+"$Line3|0D|0A"+"$Line4|0D|0A"+"$Line5|0D|0A"+'"'
+            $VMXConfig | Set-Content -Path $config
+		    $object = New-Object -TypeName psobject
+		    $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
+		    $object | Add-Member -MemberType NoteProperty -Name Config -Value $config
+		    $object | Add-Member -MemberType NoteProperty -Name Line0 -Value $Line0
+		    $object | Add-Member -MemberType NoteProperty -Name Line1 -Value $Line1
+		    $object | Add-Member -MemberType NoteProperty -Name Line2 -Value $Line2
+		    $object | Add-Member -MemberType NoteProperty -Name Line3 -Value $Line3
+		    $object | Add-Member -MemberType NoteProperty -Name Line4 -Value $Line4
+		    $object | Add-Member -MemberType NoteProperty -Name Line5 -Value $Line5
+		    Write-Output $Object
+                }
+            else
+                {
+            Write-Warning "VM must be in stopped state"
             }
-		$VMXConfig += 'annotation = "'+"$Line0|0D|0A"+"$Line1|0D|0A"+"$Line2|0D|0A"+"$Line3|0D|0A"+"$Line4|0D|0A"+"$Line5|0D|0A"+'"'
-        $VMXConfig | Set-Content -Path $config
-		$object = New-Object -TypeName psobject
-		$Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
-		$object | Add-Member -MemberType NoteProperty -Name Config -Value $config
-		$object | Add-Member -MemberType NoteProperty -Name Line0 -Value $Line0
-		$object | Add-Member -MemberType NoteProperty -Name Line1 -Value $Line1
-		$object | Add-Member -MemberType NoteProperty -Name Line2 -Value $Line2
-		$object | Add-Member -MemberType NoteProperty -Name Line3 -Value $Line3
-		$object | Add-Member -MemberType NoteProperty -Name Line4 -Value $Line4
-		$object | Add-Member -MemberType NoteProperty -Name Line5 -Value $Line5
+	    }
+	    end 
+        {
+        }
 
-
-
-
-		Write-Output $Object
-	}
-	end { }
-
-}#Set-VMXDisconnectIDE
+}#Set-annotatio
 
 
 function Get-VMXToolsState
@@ -1979,6 +1985,9 @@ function New-VMXLinkedClone
 		until ($VMrunErrorCondition -notcontains $cmdresult)
         if ($LASTEXITCODE -eq 0)
             {
+            $Addcontent = @()
+            $Addcontent += 'guestinfo.buildDate = "'+$BuildDate+'"'
+            Add-Content -Path $Cloneconfig -Value $Addcontent
 			$object = New-Object psobject
 			$object | Add-Member -MemberType 'NoteProperty' -Name CloneName -Value $Clonename
 			$object | Add-Member -MemberType 'NoteProperty' -Name Config -Value $Cloneconfig
@@ -3860,6 +3869,44 @@ function Set-VMXprocessor {
 		$object = New-Object -TypeName psobject
 		$Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
 		$object | Add-Member -MemberType NoteProperty -Name Processor -Value $Processorcount
+		Write-Output $Object
+        }
+        else
+        {
+        Write-Warning "VM must be in stopped state"
+        }
+	}
+	end { }
+} 
+
+function Set-VMXToolsReminder {
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/Get-VMXMemory/")]
+	param (
+	[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
+	[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$config,
+	[Parameter(ParameterSetName = "2", Mandatory = $true, ValueFromPipelineByPropertyName = $True)][Switch]$enabled
+	)
+	begin
+	{
+	}
+	process
+	{
+		switch ($PsCmdlet.ParameterSetName)
+		{
+			"1"
+			{ $vmxconfig = Get-VMXConfig -VMXName $VMXname }
+			"2"
+			{ $vmxconfig = Get-VMXConfig -config $config }
+		}
+        if ((get-vmx -Path $config).state -eq "stopped" )
+        {
+        Write-Verbose "We got to set Tools Reminder to $enabled"
+        $vmxconfig = $vmxconfig | where {$_ -NotMatch "tools.remindInstall"}
+        $vmxconfig += 'tools.remindInstall = "'+$enabled+'"'
+        $vmxconfig | Set-Content -Path $config
+		$object = New-Object -TypeName psobject
+		$Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
+		$object | Add-Member -MemberType NoteProperty -Name ToolsReminder -Value $enabled
 		Write-Output $Object
         }
         else
