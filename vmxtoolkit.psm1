@@ -1538,7 +1538,7 @@ function Set-VMXSharedFolder
 
 			"2"
 			{
-             Write-Verbose "Disabling Shared Folder State for $config"
+             Write-Verbose "removing Shared Folder for $config"
                 do 
                     { 
                     $cmdresult = &$vmrun removeSharedFolder $config $Sharename
