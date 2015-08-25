@@ -2683,10 +2683,9 @@ function Set-VMXNetworkAdapter
         Write-Output $object
 		if ($ConnectionType -eq 'custom')
             {
-            Write-Warning "Custom Network selected, you need to connect it to a custom network with Set-VMXVNet" 
+            Write-Warning "Using Custom Network for Ethernet$($Adapter), make sure it is connect to the right VMNet (Set-VMXVNet)" 
             }
         }
-        
 		else
         {
         Write-Warning "VM must be in stopped state"
