@@ -7,6 +7,11 @@ vmxtoolkit is the Base for labbuildr, the automated lab building environment for
 you get support for labbuildr on http://labbuildr.com and https://community.emc.com/blogs/bottk/2014/06/16/announcement-labbuildr-released
 
 simply follow @hyperv_guy on twitter for updates
+===========
+Installation   
+Simply extract the toolkit into a folder where your VM´s reside.
+Per Default, vmxtoolkit searches from that path
+Otherwise, specifythe path to your vm when doing a get-vmx
 
 current exposed commands
 ===========
