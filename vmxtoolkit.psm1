@@ -846,6 +846,50 @@ function Get-VMXIdeDisk{
             }
 	}
 	end { }
+
+}
+
+####
+#scsi0.virtualDev = "pvscsi"
+function Set-VMXScsiController {
+
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/Set-VMXScsiController/")]
+param (
+
+	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
+	[Parameter(ParameterSetName = "1", Mandatory = $True, ValueFromPipelineByPropertyName = $True)]$config,
+    [Parameter(Mandatory=$false)][ValidateRange(0,3)]$SCSIController=0,
+    [Parameter(Mandatory=$false)][ValidateSet('pvscsi','lsisas1068')]$Type="pvscsi"
+	)
+	begin
+	{
+	}
+	process
+		{
+        if ((get-vmx -Path $config).state -eq "stopped")
+
+            { 
+            $vmxconfig = Get-VMXConfig -config $config
+    
+            $Content = $vmxconfig -notmatch "scsi$SCSIController.virtualDev"
+		    $Content = $Content += 'scsi'+$SCSIController+'.virtualDev = "'+$Type+'"'
+            $Content | Set-Content -Path $config
+            $object = New-Object -TypeName psobject
+            $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXname
+            $object | Add-Member -MemberType NoteProperty -Name SCSIController -Value $SCSIController
+            $object | Add-Member -MemberType NoteProperty -Name Config -Value $config
+            $object | Add-Member -MemberType NoteProperty -Name Type -Value $Type
+            Write-Output $Object
+            }
+		else
+            {
+            Write-Warning "VM must be in stopped state"
+            }
+	}
+	end
+	{
+	}
+
 }#end Get-VMXIDEDisk
 
 <#	
@@ -2947,6 +2991,8 @@ function Set-VMXVnet
 		$object = New-Object psobject
    		$object | Add-Member -MemberType 'NoteProperty' -Name Adapter -Value "ethernet$Adapter"
 		$object | Add-Member -MemberType 'NoteProperty' -Name VirtualNet -Value $vnet
+		$object | Add-Member -MemberType 'NoteProperty' -Name Config -Value $config
+
 		Write-Output $object
         }
 		else
@@ -4617,7 +4663,7 @@ function New-VMX
 	param (
 	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
     [Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateSet('Server2016','Server2012','Hyper-V')]$Type,
-    [Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $true)][ValidateSet('BIOS','UEFI')]$Firmware = 'BIOS',
+    [Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $true)][ValidateSet('BIOS','EFI')][string]$Firmware = 'BIOS',
     [Parameter(ParameterSetName = "1", HelpMessage = "Please enter an optional root Path to you VMs (default is vmxdir)",Mandatory = $false)]
 	$Path = $vmxdir
     )
@@ -4632,7 +4678,8 @@ function New-VMX
         {
         New-Item -ItemType Directory -Path $VMXpath | Out-Null
         }
-            $VMXConfig =@('.encoding = "windows-1252"
+    $Firmware = $Firmware.ToLower()
+    $VMXConfig =@('.encoding = "windows-1252"
 config.version = "8"
 virtualHW.version = "11"
 numvcpus = "2"
