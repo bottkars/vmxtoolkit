@@ -1667,9 +1667,6 @@ function Get-VMX
 		[Parameter(ParameterSetName = "1", HelpMessage = "Please enter an optional root Path to you VMs (default is vmxdir)",Mandatory = $false)]
 		$Path = $vmxdir,
 		[Parameter(ParameterSetName = "1",Mandatory = $false)]$UUID
-	
-		
-
 )
 	if ($VMXName)
         {
@@ -2242,13 +2239,19 @@ function Remove-VMXSnapshot
 #>
 function Start-VMX
 {
-	[CmdletBinding(DefaultParameterSetName = '2',HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/")]
 	param (
-		[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $True)]
-		[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
-		[Alias('Clonename')][string]$VMXName,
-		[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $True)][Alias('VMXUUID')][string]$UUID,
-		[Parameter(ParameterSetName = "2", Mandatory = $true, Position = 2, ValueFromPipelineByPropertyName = $True)]$Path
+		[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		#[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
+		[Parameter(ParameterSetName = "3", Mandatory = $false)]		
+        [Alias('Clonename')][string]$VMXName,
+		[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(ParameterSetName = "3", Mandatory = $false, ValueFromPipelineByPropertyName = $true)][Alias('VMXUUID')][string]$UUID,
+       # [Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
+        [Parameter(ParameterSetName = "3", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$config,
+        [Parameter(Mandatory=$false)]$Path,
+        [Parameter(Mandatory=$false)][Switch]$nowait
+
 		
 	)
 	begin
@@ -2262,11 +2265,22 @@ function Start-VMX
 			switch ($PsCmdlet.ParameterSetName)
 			{
 				"1"
-				{ $vmx = Get-VMX -VMXName $VMXname -UUID $UUID }
+				{
+                Write-Verbose $_ 
+                $vmx = Get-VMX -VMXName $VMXname -UUID $UUID
+                }
 				
 				"2"
-				{ $vmx = Get-VMX -Path $path
+				{
+                Write-Verbose $_ 
+                $vmx = Get-VMX -Path $path
                 }
+				"3"
+				{
+                Write-Verbose " by config with $_ "
+                $vmx = Get-VMX -Path $config
+                }
+
 				
 			}
 		
@@ -2298,12 +2312,19 @@ function Start-VMX
               #  $content += 'guestinfo.vmwarebuild = "' + $Global:vmwarebuild + '"'
 	    		set-Content -Path $vmx.config -Value $content -Force
 		    	Write-Verbose "Starting VM $vmxname"
-		    	do
-		    	{
+		    	if ($nowait.IsPresent)
+                    {
+                    Start-Process -FilePath $vmrun -ArgumentList "start $($vmx.config)" -NoNewWindow
+                    }
+                else
+                    {
+                    do
+		    	        {
 		    		
-		    		($cmdresult = &$vmrun start $vmx.config) #  2>&1 | Out-Null
-		    	}
-    			until ($VMrunErrorCondition -notcontains $cmdresult)
+		    		    $cmdresult = &$vmrun start $vmx.config #  2>&1 | Out-Null
+		    	        }
+    			    until ($VMrunErrorCondition -notcontains $cmdresult)
+                    }
                 if ($LASTEXITCODE -eq 0) 
                 {
 	    		    $object = New-Object psobject
@@ -2680,6 +2701,8 @@ function Set-VMXNetworkAdapter
 		$object | Add-Member -MemberType NoteProperty -Name Adapter -Value "Ethernet$Adapter"
 		$object | Add-Member -MemberType NoteProperty -Name AdapterType -Value $AdapterType
 		$object | Add-Member -MemberType NoteProperty -Name ConnectionType -Value $ConnectionType
+		$object | Add-Member -MemberType NoteProperty -Name Config -Value $Config
+
         Write-Output $object
 		if ($ConnectionType -eq 'custom')
             {
@@ -2747,6 +2770,63 @@ function Connect-VMXNetworkAdapter
 		    $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
 		    $object | Add-Member -MemberType NoteProperty -Name Adapter -Value "Ethernet$Adapter"
 		    $object | Add-Member -MemberType NoteProperty -Name Connected -Value True
+            Write-Output $object
+            }
+        }
+        
+		else
+        {
+        Write-Warning "VM must be in stopped state"
+        }
+
+	}
+	End
+	{
+		
+	}
+}
+
+
+function Connect-VMXcdromImage
+{
+	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	param
+	(
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')][string]$VMXName,
+		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]$config,
+		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]$ISOfile,
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)][ValidateSet('IDE','SATA')]$Contoller = 'SATA'
+	)
+	
+	Begin
+	{
+		
+	}
+	Process
+	{
+        if ((get-vmx -Path $config).state -eq "stopped")
+        {
+		$Content = Get-Content -Path $config
+		Write-verbose "Checking for $($Contoller)0.present"
+		if (!($Content -match "$($Contoller)0.present"))
+             {
+             Write-Warning "Controller $($Contoller)0 not present"
+             }
+        else
+            {
+            $Content = $Content -notmatch "sata0:1"
+            $Content += 'sata0:1.present = "TRUE"'
+            $Content += 'sata0:1.autodetect = "TRUE"'
+            $Content += 'sata0:1.deviceType = "cdrom-image"'
+            $Content += 'sata0:1.startConnected = "TRUE"'
+            $Content += 'sata0:1.fileName = "'+$ISOfile+'"'
+            $Content | Set-Content -Path $config
+            $object = New-Object -TypeName psobject
+		    $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
+		    $object | Add-Member -MemberType 'NoteProperty' -Name Config -Value $config
+		    # $object | Add-Member -MemberType 'NoteProperty' -Name Path -Value $Path
+		    $object | Add-Member -MemberType NoteProperty -Name Controller -Value "$($Contoller)0"
+		    $object | Add-Member -MemberType NoteProperty -Name ISO -Value $ISOfile
             Write-Output $object
             }
         }
@@ -3088,33 +3168,36 @@ function New-VMXScsiDisk
 {
 [CmdletBinding()]
 param (
-	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$NewDiskSize,	
+	[Parameter(ParameterSetName = "1",
+                HelpMessage = "Please specify a Size between 2GB and 2000GB",
+                Mandatory = $true, ValueFromPipelineByPropertyName = $True)][validaterange(2MB,8192GB)][int64]$NewDiskSize,	
 	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)][string]$NewDiskname,
 	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
-	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$Path
-#	[Parameter(ParameterSetName = "3", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$vmxconfig
-
-
+	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$Path,
+	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $true)][Alias('Config')]$vmxconfig
 
 )
 begin {
-
-
        }
 process {
-        
-    $returncommand = & $vmwarepath\vmware-vdiskmanager.exe -c -s $NewDiskSize -t 0 $Path\$NewDiskname -a lsilogic  2>&1 | Out-Null
+    if (!$NewDiskname.EndsWith(".vmdk")) { $NewDiskname = $NewDiskname+".vmdk" }    
+    $returncommand = & $vmwarepath\vmware-vdiskmanager.exe -c -s "$($NewDiskSize/1MB)MB" -t 0 $Path\$NewDiskname -a lsilogic  2>&1 
+    if ($LASTEXITCODE -eq 0)
+        {
+        $object = New-Object -TypeName psobject
+        $object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
+        $object | Add-Member -MemberType NoteProperty -Name Disktype -Value "lsilogic"
+        $object | Add-Member -MemberType NoteProperty -Name Diskname -Value $NewDiskname
+        $object | Add-Member -MemberType NoteProperty -Name Size -Value "$($NewDiskSize/1GB)GB"
+        $object | Add-Member -MemberType NoteProperty -Name Path -Value $Path
+        $object | Add-Member -MemberType NoteProperty -Name Config -Value $vmxconfig
 
-    if (!$NewDiskname.EndsWith(".vmdk")) { $NewDiskname = $NewDiskname+".vmdk" }
-
-
-    $object = New-Object -TypeName psobject
-    $object | Add-Member -MemberType NoteProperty -Name Disktype -Value "lsilogic"
-    $object | Add-Member -MemberType NoteProperty -Name Diskname -Value $NewDiskname
-    $object | Add-Member -MemberType NoteProperty -Name Size -Value $NewDiskSize
-    $object | Add-Member -MemberType NoteProperty -Name Path -Value $Path
-    Write-Output $object
-
+        Write-Output $object
+        }
+    else 
+        {
+        $returncommand
+        }
     }
 end {
     
@@ -3129,7 +3212,7 @@ function Add-VMXScsiDisk
 param (
 	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)][string][Alias('Filenme')]$Diskname,
 	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
-	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$config,
+	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)][Alias('VMXconfig')]$config,
 	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$LUN,
 	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$Controller
 
@@ -3151,10 +3234,12 @@ process
     $vmxConfig += $AddDrives
     $vmxConfig | set-Content -Path $config
     $object = New-Object -TypeName psobject
+    $object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
     $object | Add-Member -MemberType NoteProperty -Name Disktype -Value "lsilogic"
-    $object | Add-Member -MemberType NoteProperty -Name Filename -Value $Filename
+    $object | Add-Member -MemberType NoteProperty -Name Filename -Value $Diskname
     $object | Add-Member -MemberType NoteProperty -Name Cotroller -Value $Controller
     $object | Add-Member -MemberType NoteProperty -Name LUN -Value $LUN
+    $object | Add-Member -MemberType NoteProperty -Name Config -Value $Config
     Write-Output $object
     }
 end {
@@ -4523,3 +4608,107 @@ function Get-VMXAnnotation {
 	end { }
 	
 } #end Get-VMXAnnotation
+
+
+
+function New-VMX
+{
+    [CmdletBinding(DefaultParametersetName = "2",HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki/Commands/New-VMX")]
+	param (
+	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
+    [Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateSet('Server2016','Server2012','Hyper-V')]$Type,
+    [Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $true)][ValidateSet('BIOS','UEFI')]$Firmware = 'BIOS',
+    [Parameter(ParameterSetName = "1", HelpMessage = "Please enter an optional root Path to you VMs (default is vmxdir)",Mandatory = $false)]
+	$Path = $vmxdir
+    )
+    $VMXpath = Join-Path $Path $VMXName
+    Write-Verbose $VMXpath
+    if (get-vmx -Path $VMXpath | Out-Null)
+        {
+        Write-Warning "Vm Already Exists" 
+        break
+        }
+    if (!(Test-Path $VMXpath))
+        {
+        New-Item -ItemType Directory -Path $VMXpath | Out-Null
+        }
+            $VMXConfig =@('.encoding = "windows-1252"
+config.version = "8"
+virtualHW.version = "11"
+numvcpus = "2"
+vcpu.hotadd = "TRUE"
+scsi0.present = "TRUE"
+scsi0.virtualDev = "lsisas1068"
+sata0.present = "TRUE"
+memsize = "2048"
+mem.hotadd = "TRUE"
+sata0:1.present = "TRUE"
+sata0:1.autodetect = "TRUE"
+sata0:1.deviceType = "cdrom-raw"
+sata0:1.startConnected = "FALSE"
+usb.present = "TRUE"
+ehci.present = "TRUE"
+ehci.pciSlotNumber = "0"
+usb_xhci.present = "TRUE"
+serial0.present = "TRUE"
+serial0.fileType = "thinprint"
+pciBridge0.present = "TRUE"
+pciBridge4.present = "TRUE"
+pciBridge4.virtualDev = "pcieRootPort"
+pciBridge4.functions = "8"
+pciBridge5.present = "TRUE"
+pciBridge5.virtualDev = "pcieRootPort"
+pciBridge5.functions = "8"
+pciBridge6.present = "TRUE"
+pciBridge6.virtualDev = "pcieRootPort"
+pciBridge6.functions = "8"
+pciBridge7.present = "TRUE"
+pciBridge7.virtualDev = "pcieRootPort"
+pciBridge7.functions = "8"
+vmci0.present = "TRUE"
+hpet0.present = "TRUE"
+virtualHW.productCompatibility = "hosted"
+powerType.powerOff = "soft"
+powerType.powerOn = "soft"
+powerType.suspend = "soft"
+powerType.reset = "soft"
+floppy0.present = "FALSE"
+tools.remindInstall = "FALSE"')       
+    switch ($Type)
+    {
+    "Server2016"
+        {
+        $guestOS = "windows9srv-64"
+        Write-Verbose "Creating new vm as $_ with $guestOS"
+        $VMXConfig += 'guestOS = "'+$guestOS+'"'        
+        }   
+    
+    "Server2012"
+        {
+        $guestOS = "windows8srv-64"
+        Write-Verbose "Creating new vm as $_ with $guestOS"
+        $VMXConfig += 'guestOS = "'+$guestOS+'"'        
+        }
+    "Hyper-V"
+        {
+        $guestOS = "winhyperv"
+        Write-Verbose "Creating new vm as $_ with $guestOS"
+        $VMXConfig += 'guestOS = "'+$guestOS+'"'        
+        }
+    "Default"
+        {
+        Write-Warning "No valid Type Specified"
+        break
+        }
+    }# end switch
+    $VMXConfig += 'extendedConfigFile = "'+$vmxname+'.vmxf"'        
+    $VMXConfig += 'nvram = "'+$VMXName+'.nvram"'
+    $VMXConfig += 'firmware = "'+$Firmware+'"'
+    $Config = join-path $VMXpath "$VMXName.vmx"
+    $VMXConfig | Set-Content -Path $Config
+    $object = New-Object -TypeName psobject
+    $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
+    $object | Add-Member -MemberType NoteProperty -Name Config -Value $Config
+    $object | Add-Member -MemberType NoteProperty -Name Path -Value $VMXpath
+    Write-Output $object
+}
