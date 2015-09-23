@@ -3177,12 +3177,12 @@ function remove-vmx {
 				{ $vmx = Get-VMX -VMXName $VMXname }# -UUID $UUID }
 				
 				"2"
-				{ }
+				{$VMX = get-vmx -Path $config }
 				
 			}
 		
 		Write-Verbose "Testing VM $VMXname Exists and stopped or suspended"
-		if ((get-vmx -Path $config).state -eq "running")
+		if ($vmx.state -eq "running")
 		{
 			Write-Verbose "Checking State for $vmxname : $state"
 			Write-Verbose $config
@@ -3193,7 +3193,7 @@ function remove-vmx {
 	do
 	{
 		$cmdresult = &$vmrun deleteVM "$config" # 2>&1 | Out-Null
-		write-verbose "$Origin deleteVM $vmname $cmdresult"
+        		write-verbose "$Origin deleteVM $vmname $cmdresult"
         write-verbose $LASTEXITCODE
 	}
 	until ($VMrunErrorCondition -notcontains $cmdresult)
@@ -3209,6 +3209,7 @@ function remove-vmx {
         }
     else       
         {
+        Remove-Item -Path $vmx.Path -Recurse -Force -Confirm:$false
 	    $object = New-Object psobject
 	    $object | Add-Member -Type 'NoteProperty' -Name VMXname -Value $VMXname
 	    $object | Add-Member -Type 'NoteProperty' -Name Status -Value "removed"
