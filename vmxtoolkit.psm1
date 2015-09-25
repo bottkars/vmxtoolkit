@@ -435,6 +435,41 @@ function Repair-VMXDisk
 
 }#end get-vmxConfigVersion
 
+
+
+
+function import-VMXOVATemplate
+{
+ [CmdletBinding(DefaultParameterSetName='Parameter Set 1',
+    HelpUri = "https://github.com/bottkars/LABbuildr/wiki/LABtools#Expand-LABZip")]
+	param (
+        [string]$OVA,
+        [string]$destination=$vmxdir
+        #[String]$Folder
+        )
+	$Origin = $MyInvocation.MyCommand
+	if (test-path($OVA))
+	{
+        $OVAPath = Get-ChildItem -Path $OVA -Recurse -Filter "*.ova" |Sort-Object -Descending
+        $OVAPath = $OVApath[0]
+        Write-Warning "Creating Template from OVA for $($ovaPath.Basename), may take a while"
+        & $global:vmwarepath\OVFTool\ovftool.exe --lax --skipManifestCheck --name=$($ovaPath.Basename) $ovaPath.FullName $vmxdir  #
+        $MasterVMX = get-vmx -path ".\$($ovaPath.Basename)"
+        if (!$MasterVMX.Template) 
+            {
+            write-verbose "Templating Master VMX"
+            $MasterVMX | Set-VMXTemplate
+            }
+        }
+	}
+
+
+
+
+
+
+
+
 <#	
 	.SYNOPSIS
 	    Get-VMXInfo
@@ -3971,6 +4006,46 @@ function Set-VMXmemory {
 		$object = New-Object -TypeName psobject
 		$Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
 		$object | Add-Member -MemberType NoteProperty -Name Memory -Value $MemoryMB
+		Write-Output $Object
+        }
+        else
+        {
+        Write-Warning "VM must be in stopped state"
+        }
+	}
+	end { }
+} 
+
+
+
+function Set-VMXHWversion {
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/Get-VMXMemory/")]
+	param (
+	[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
+	[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$config,
+	[Parameter(ParameterSetName = "2", Mandatory = $true, ValueFromPipelineByPropertyName = $True)][Validaterange(3,11)][int]$HWversion
+	)
+	begin
+	{
+	}
+	process
+	{
+		switch ($PsCmdlet.ParameterSetName)
+		{
+			"1"
+			{ $vmxconfig = Get-VMXConfig -VMXName $VMXname }
+			"2"
+			{ $vmxconfig = Get-VMXConfig -config $config }
+		}
+        if ((get-vmx -Path $config).state -eq "stopped" )
+        {
+        Write-Verbose "We got to set $MemoryMB MB"
+        $vmxconfig = $vmxconfig | where {$_ -NotMatch "virtualhw.version"}
+        $vmxconfig += 'virtualhw.version = "'+$HWversion+'"'
+        $vmxconfig | Set-Content -Path $config
+		$object = New-Object -TypeName psobject
+		$Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
+		$object | Add-Member -MemberType NoteProperty -Name HWVersion -Value $HWversion
 		Write-Output $Object
         }
         else
