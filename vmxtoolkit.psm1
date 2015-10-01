@@ -2739,7 +2739,9 @@ function Set-VMXNetworkAdapter
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]$config,
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateRange(0,9)][int]$Adapter,
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateSet('nat', 'bridged','custom','hostonly')]$ConnectionType,
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateSet('e1000e','vmxnet3','e1000')]$AdapterType
+		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateSet('e1000e','vmxnet3','e1000')]$AdapterType,
+		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][int]$PCISlot
+
 	)
 	
 	Begin
@@ -2750,7 +2752,10 @@ function Set-VMXNetworkAdapter
 	{
         if ((get-vmx -Path $config).state -eq "stopped")
         {
-		$PCISlot = ((1+$Adapter) * 64)
+		if (!$PCISlot)
+            {
+            $PCISlot = ((1+$Adapter) * 64)
+            }
 		$Content = Get-Content -Path $config
 		Write-verbose "ethernet$Adapter.present"
 		if (!($Content -match "ethernet$Adapter.present")) { Write-Warning "Adapter not present, will be added" }
