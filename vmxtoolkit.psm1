@@ -449,26 +449,13 @@ function import-VMXOVATemplate
         )
 	$Origin = $MyInvocation.MyCommand
 	if (test-path($OVA))
-	{
+	    {
         $OVAPath = Get-ChildItem -Path $OVA -Recurse -Filter "*.ova" |Sort-Object -Descending
         $OVAPath = $OVApath[0]
         Write-Warning "Creating Template from OVA for $($ovaPath.Basename), may take a while"
         & $global:vmwarepath\OVFTool\ovftool.exe --lax --skipManifestCheck --name=$($ovaPath.Basename) $ovaPath.FullName $vmxdir  #
-        $MasterVMX = get-vmx -path ".\$($ovaPath.Basename)"
-        if (!$MasterVMX.Template) 
-            {
-            write-verbose "Templating Master VMX"
-            $MasterVMX | Set-VMXTemplate
-            }
         }
 	}
-
-
-
-
-
-
-
 
 <#	
 	.SYNOPSIS
