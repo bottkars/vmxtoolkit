@@ -2316,7 +2316,9 @@ function Start-VMX
        # [Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
         [Parameter(ParameterSetName = "3", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$config,
         [Parameter(Mandatory=$false)]$Path,
-        [Parameter(Mandatory=$false)][Switch]$nowait
+        [Parameter(Mandatory=$false)][Switch]$nowait,
+        [Parameter(Mandatory=$false)][Switch]$nogui
+
 
 		
 	)
@@ -2380,14 +2382,27 @@ function Start-VMX
 		    	Write-Verbose "Starting VM $vmxname"
 		    	if ($nowait.IsPresent)
                     {
-                    Start-Process -FilePath $vmrun -ArgumentList "start $($vmx.config)" -NoNewWindow
+                    if ($nogui.IsPresent)
+                        {
+                        Start-Process -FilePath $vmrun -ArgumentList "start $($vmx.config) nogui" -NoNewWindow
+                        }
+                    else
+                        {
+                        Start-Process -FilePath $vmrun -ArgumentList "start $($vmx.config) " -NoNewWindow
+                        }
                     }
                 else
                     {
                     do
 		    	        {
-		    		
-		    		    $cmdresult = &$vmrun start $vmx.config #  2>&1 | Out-Null
+		    		    if ($nogui.IsPresent)
+                            {
+                            $cmdresult = &$vmrun start $vmx.config nogui #  2>&1 | Out-Null
+                            }
+                        else
+                            {
+		    		        $cmdresult = &$vmrun start $vmx.config #  2>&1 | Out-Null
+                            }
 		    	        }
     			    until ($VMrunErrorCondition -notcontains $cmdresult)
                     }
