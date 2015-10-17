@@ -2307,8 +2307,8 @@ function Start-VMX
 {
 	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/")]
 	param (
-		[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
-		#[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
+		[Parameter(ParameterSetName = "1", Position = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		#[Parameter(ParameterSetName = "2",Position = 2,Mandatory = $true, ValueFromPipelineByPropertyName = $True)]
 		[Parameter(ParameterSetName = "3", Mandatory = $false)]		
         [Alias('Clonename')][string]$VMXName,
 		[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
@@ -2372,12 +2372,6 @@ function Start-VMX
 	    		$content += 'guestinfo.powerontime = "' + $VMXStarttime + '"'
                 $content = $content |where { $_ -NotMatch "guestinfo.vmwareversion" }
                 $content += 'guestinfo.vmwareversion = "' + $Global:vmwareversion + '"'
-              #  $content = $content |where { $_ -NotMatch "guestinfo.vmwaremajor" }
-              #  $content += 'guestinfo.vmwaremajor = "' + $Global:vmwaremajor + '"'
-              #  $content = $content |where { $_ -NotMatch "guestinfo.vmwareminor" }
-              #  $content += 'guestinfo.vmwareminor = "' + $Global:vmwareminor + '"'
-              #  $content = $content |where { $_ -NotMatch "guestinfo.vmwarebuild" }
-              #  $content += 'guestinfo.vmwarebuild = "' + $Global:vmwarebuild + '"'
 	    		set-Content -Path $vmx.config -Value $content -Force
 		    	Write-Verbose "Starting VM $vmxname"
 		    	if ($nowait.IsPresent)
