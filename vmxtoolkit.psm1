@@ -1989,7 +1989,7 @@ function Restore-VMXSnapshot
 		Synopsis
 
 	.DESCRIPTION
-		Create a linked Clone rom a Snapshot
+		Create a linked Clone from a Snapshot
 
 	.PARAMETER  BaseSnapshot
 		Based Snapshot to Link from
