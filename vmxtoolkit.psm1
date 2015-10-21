@@ -8,6 +8,31 @@
 	.NOTES
 		requires VMXtoolkit loaded
 #>
+
+
+function Get-yesno
+{
+    [CmdletBinding(DefaultParameterSetName='Parameter Set 1', 
+                  SupportsShouldProcess=$true, 
+                  PositionalBinding=$false,
+                  HelpUri = 'http://labbuildr.com/',
+                  ConfirmImpact='Medium')]
+    Param
+    (
+$title = "Delete Files",
+$message = "Do you want to delete the remaining files in the folder?",
+$Yestext = "Yestext",
+$Notext = "notext"
+    )
+$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes","$Yestext"
+$no = New-Object System.Management.Automation.Host.ChoiceDescription "&No","$Notext"
+$options = [System.Management.Automation.Host.ChoiceDescription[]]($no, $yes)
+$result = $host.ui.PromptForChoice($title, $message, $options, 0)
+return ($result)
+}
+
+
+
 function Get-VMwareVersion
 {
 	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/get-vmwareversion/")]
@@ -444,16 +469,22 @@ function import-VMXOVATemplate
     HelpUri = "https://github.com/bottkars/LABbuildr/wiki/LABtools#Expand-LABZip")]
 	param (
         [string]$OVA,
-        [string]$destination=$vmxdir
+        [string]$destination=$vmxdir,
+        [string]$Name
         #[String]$Folder
         )
 	$Origin = $MyInvocation.MyCommand
+    
 	if (test-path($OVA))
 	    {
         $OVAPath = Get-ChildItem -Path $OVA -Recurse -Filter "*.ova" |Sort-Object -Descending
         $OVAPath = $OVApath[0]
+        if (!$Name)
+        {
+            $Name = $($ovaPath.Basename)
+        }
         Write-Warning "Creating Template from OVA for $($ovaPath.Basename), may take a while"
-        & $global:vmwarepath\OVFTool\ovftool.exe --lax --skipManifestCheck --name=$($ovaPath.Basename) $ovaPath.FullName $vmxdir  #
+        & $global:vmwarepath\OVFTool\ovftool.exe --lax --skipManifestCheck --name=$Name $ovaPath.FullName $vmxdir  #
         }
 	}
 
@@ -3190,7 +3221,8 @@ function remove-vmx {
 	#>
 
 
-	[CmdletBinding(DefaultParametersetName = "2")]
+	[CmdletBinding(DefaultParametersetName = "2",
+                    ConfirmImpact='Medium')]
 	param (
 #	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]
 	[Parameter(ParameterSetName = "2", Mandatory = $true, ValueFromPipelineByPropertyName = $True)][Alias('VMNAME''NAME','CloneName')]$VMXName,	
@@ -3225,32 +3257,61 @@ function remove-vmx {
 			Write-Verbose -Message "Stopping vm $vmxname"
 			stop-vmx -config $config -VMXName $VMXName  -mode hard #-state $vmx.state
 		}
-		
-	do
-	{
-		$cmdresult = &$vmrun deleteVM "$config" # 2>&1 | Out-Null
-        		write-verbose "$Origin deleteVM $vmname $cmdresult"
-        write-verbose $LASTEXITCODE
-	}
-	until ($VMrunErrorCondition -notcontains $cmdresult)
-    if ($cmdresult -match "Error: This VM is in use.")
-        {
-        write-warning "$cmdresult Please close VMX $VMXName in Vmware UI and try again"
+	#####
+
+    $commit = 0
+    if ($ConfirmPreference -match "low")
+        { 
+        $commit = 1 
         }
+    else
+        {
+        $commit = Get-yesno -title "Confirm VMX Deletion" -message "This will remove the VM $VMXNAME Completely"
+        }
+    Switch ($commit)
+        {
+            1
+                {
+	            do
+	                {
+		            $cmdresult = &$vmrun deleteVM "$config" # 2>&1 | Out-Null
+        		    write-verbose "$Origin deleteVM $vmname $cmdresult"
+                    write-verbose $LASTEXITCODE
+	                }
+	            until ($VMrunErrorCondition -notcontains $cmdresult)
+                if ($cmdresult -match "Error: This VM is in use.")
+                    {
+                    write-warning "$cmdresult Please close VMX $VMXName in Vmware UI and try again"
+                    }
         
-    if ($LASTEXITCODE -ne 0)
-        {
-        Write-Warning $VMXname
-        Write-Warning $cmdresult
+                if ($LASTEXITCODE -ne 0)
+                    {
+                    Write-Warning $VMXname
+                    Write-Warning $cmdresult
+                    }
+                else       
+                    {
+                    Remove-Item -Path $vmx.Path -Recurse -Force -Confirm:$false -ErrorAction SilentlyContinue | Out-Null
+	                $object = New-Object psobject
+	                $object | Add-Member -Type 'NoteProperty' -Name VMXname -Value $VMXname
+	                $object | Add-Member -Type 'NoteProperty' -Name Status -Value "removed"
+	                Write-Output $object
+                    }
+                }
+            0
+                {
+                Write-Warning "VMX Deletion refused by user for VMX $VMXNAME"
+                break
+                }      
         }
-    else       
-        {
-        Remove-Item -Path $vmx.Path -Recurse -Force -Confirm:$false
-	    $object = New-Object psobject
-	    $object | Add-Member -Type 'NoteProperty' -Name VMXname -Value $VMXname
-	    $object | Add-Member -Type 'NoteProperty' -Name Status -Value "removed"
-	    Write-Output $object
-        }
+
+
+
+
+
+######	
+
+
 }#end process
 	
 	
