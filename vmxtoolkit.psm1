@@ -3222,6 +3222,7 @@ function remove-vmx {
 
 
 	[CmdletBinding(DefaultParametersetName = "2",
+                    SupportsShouldProcess=$true,
                     ConfirmImpact='Medium')]
 	param (
 #	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]
