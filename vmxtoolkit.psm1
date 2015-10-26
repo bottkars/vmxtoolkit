@@ -1778,7 +1778,7 @@ function Get-VMX
         Write-Warning "VM Path does currently not exist"
         # break
         }
-    if (!($Configfiles = Get-ChildItem -Path $path -Recurse -File -Filter "$VMXName*.vmx" -Exclude "*.vmxf" -ErrorAction SilentlyContinue ))
+    if (!($Configfiles = Get-ChildItem -Path $path -Recurse -File -Filter "$VMXName.vmx" -Exclude "*.vmxf" -ErrorAction SilentlyContinue ))
         {
         Write-Warning "$($MyInvocation.MyCommand) : VM does currently not exist"
         # break
