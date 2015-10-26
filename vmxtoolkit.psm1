@@ -1760,37 +1760,71 @@ function Get-VMX
 {
 	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/get-vmx/")]
 	param (
-		[Parameter(ParameterSetName = "1", Position = 1,HelpMessage = "Please specify an optional VM Name",Mandatory = $false)]$VMXName,
+		[Parameter(ParameterSetName = "1", Position = 1,HelpMessage = "Please specify an optional VM Name",Mandatory = $false)]
+        [Parameter(ParameterSetName = "2",Mandatory = $false)]$VMXName,
 		[Parameter(ParameterSetName = "1", HelpMessage = "Please enter an optional root Path to you VMs (default is vmxdir)",Mandatory = $false)]
 		$Path = $vmxdir,
-		[Parameter(ParameterSetName = "1",Mandatory = $false)]$UUID
-)
-	if ($VMXName)
-        {
-        $VMXName = $VMXName.TrimStart(".\")
-        $VMXName = $VMXName.TrimEnd("\")
-        Write-Verbose $VMXName
-        }
-    Write-Verbose $MyInvocation.MyCommand
-    $vmxrun = Get-VMXRun
-        if (!(Test-path $Path))
-        {
-        Write-Warning "VM Path does currently not exist"
-        # break
-        }
-    if (!($Configfiles = Get-ChildItem -Path $path -Recurse -File -Filter "$VMXName.vmx" -Exclude "*.vmxf" -ErrorAction SilentlyContinue ))
-        {
-        Write-Warning "$($MyInvocation.MyCommand) : VM does currently not exist"
-        # break
-        }
+		[Parameter(ParameterSetName = "1",Mandatory = $false)]$UUID,
+        [Parameter(ParameterSetName = "2", Position = 2,HelpMessage = "Please specify a config to vmx",Mandatory = $true)]$config
 
-	#$Configfiles = Get-ChildItem -Path $path -Recurse -File -Filter "$VMXName*.vmx" -Exclude "*master*", "*.vmxf" -ErrorAction SilentlyContinue
-    $VMX = @()
-	foreach ($Config in $Configfiles)
-	{
-		Write-Verbose "Configfile: $($config.FullName)"
-		if ($Config.Extension -eq ".vmx")
-        {
+)
+
+begin
+    {}
+process
+		{
+        $vmxrun = Get-VMXRun
+		switch ($PsCmdlet.ParameterSetName)
+			{
+			"1"
+				{ 
+                Write-Verbose "Getting vmxname"
+                if ($VMXName)
+                    {
+                    $VMXName = $VMXName.TrimStart(".\")
+                    $VMXName = $VMXName.TrimEnd("\")
+                    Write-Verbose $VMXName
+                    }
+                else
+                    { 
+                    $VMXName = "*"
+                    }
+                Write-Verbose $MyInvocation.MyCommand
+                if (!(Test-path $Path))
+                    {
+                    Write-Warning "VM Path does currently not exist"
+                    # break
+                    }
+                if (!($Configfiles = Get-ChildItem -Path $path -Recurse -File -Filter "$VMXName.vmx" -Exclude "*.vmxf" -ErrorAction SilentlyContinue ))
+                {
+                 Write-Warning "$($MyInvocation.MyCommand) : VM does currently not exist"
+                # break
+                }
+
+            	}
+				
+				"2"
+				{
+                $VMXName = (Split-Path -Leaf $config) -replace ".vmx",""
+                if (!($Configfiles = Get-Item -Path $config -Filter "vmx" -ErrorAction SilentlyContinue ))
+                    {
+                    Write-Warning "$($MyInvocation.MyCommand) : VM Config specified does currently not exist"
+                    # break
+                    }
+                }
+				
+			}
+
+
+
+
+	    #$Configfiles = Get-ChildItem -Path $path -Recurse -File -Filter "$VMXName*.vmx" -Exclude "*master*", "*.vmxf" -ErrorAction SilentlyContinue
+        $VMX = @()
+	    foreach ($Config in $Configfiles)
+	        {
+		    Write-Verbose "Configfile: $($config.FullName)"
+		    if ($Config.Extension -eq ".vmx")
+                {
 		# if ((Get-VMXTemplate -config $config).template -ne $true) {
 		
 			if ($UUID)
@@ -1855,7 +1889,11 @@ function Get-VMX
             
 		     
 	}
-}# end get-vmx
+}
+
+end {}
+}
+# end get-vmx
 
 ### new-*
 
@@ -2477,9 +2515,11 @@ function Stop-VMX{
 	[CmdletBinding(DefaultParameterSetName = '2',HelpUri = "http://labbuildr.bottnet.de/modules/")]
 	param (
 		[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $True)]
-        [Parameter(ParameterSetName = "2", Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')][string]$VMXName,
-		[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $True)][Alias('VMXUUID')][string]$UUID,
-		[Parameter(ParameterSetName = "2", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$config,
+        [Parameter(ParameterSetName = "2", Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $True)]
+        [Alias('NAME','CloneName')][string]$VMXName,
+		[Parameter(ParameterSetName = "1", Mandatory = $false,ValueFromPipelineByPropertyName = $True)]
+        [Alias('VMXUUID')][string]$UUID,
+		[Parameter(ParameterSetName = "2", Mandatory = $true,ValueFromPipelineByPropertyName = $True)]$config,
 		[Parameter(HelpMessage = "Valid modes are Soft ( shutdown ) or Stop (Poweroff)", Mandatory = $false)]
 		[ValidateSet('Soft', 'Hard')]$Mode
 		)
@@ -2494,14 +2534,17 @@ function Stop-VMX{
 			switch ($PsCmdlet.ParameterSetName)
 			{
 				"1"
-				{ $vmx = Get-VMX -VMXName $VMXname -UUID $UUID  -Path $config
+				{ 
+                Write-Verbose "Getting vmx by Config and UUID"
+                $vmx = Get-VMX -VMXName $VMXname -UUID $UUID  -Path $config
 				$state = $VMX.state
             	}
 				
 				"2"
 				{
-                
-                $state = (get-vmx -Path $config).state
+                Write-Verbose "Parameter Set 2"
+                Write-Verbose "Config: $config"
+                $state = (get-vmx -config $config).state
                 }
 				
 			}
