@@ -2403,7 +2403,12 @@ function Start-VMX
 			{
 				"1"
 				{
-                Write-Verbose $_ 
+                Write-Verbose $_
+                if ($VMXName -match "\*")
+                    {
+                    Write-Warning "Wildcard names are not allowed, use get-vmx $VMXName | start-vmx instead"
+                    break
+                    }
                 $vmx = Get-VMX -VMXName $VMXname -UUID $UUID
                 }
 				
@@ -2415,14 +2420,14 @@ function Start-VMX
 				"3"
 				{
                 Write-Verbose " by config with $_ "
-                $vmx = Get-VMX -Path $config
+                $vmx = Get-VMX -config $config
                 }
 
 				
 			}
 		
-		
-		
+		if ($VMX)
+		{
 		Write-Verbose "Testing VM $VMXname Exists and stopped or suspended"
 		if (($vmx) -and ($vmx.state -ne "running"))
 		{
@@ -2487,7 +2492,7 @@ function Start-VMX
 		elseif ($vmx.state -eq "running") { Write-Verbose "VM $VMXname already running" } # end elseif
 		
 		else { Write-Verbose "VM $VMXname not found" } # end if-vmx
-		
+	}	
 	}# end process
 	end { }
 }#end start-vmx
