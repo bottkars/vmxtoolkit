@@ -1764,13 +1764,9 @@ function Get-VMX
         [Parameter(ParameterSetName = "2",Mandatory = $false)]$VMXName,
 		[Parameter(ParameterSetName = "1", HelpMessage = "Please enter an optional root Path to you VMs (default is vmxdir)",Mandatory = $false)]
 		$Path = $vmxdir,
-<<<<<<< HEAD
-		[Parameter(ParameterSetName = "1",Mandatory = $false)]$UUID
-=======
 		[Parameter(ParameterSetName = "1",Mandatory = $false)]$UUID,
         [Parameter(ParameterSetName = "2", Position = 2,HelpMessage = "Please specify a config to vmx",Mandatory = $true)]$config
 
->>>>>>> harmony
 )
 
 begin
@@ -2380,13 +2376,8 @@ function Start-VMX
 {
 	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/")]
 	param (
-<<<<<<< HEAD
-		[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
-		#[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
-=======
 		[Parameter(ParameterSetName = "1", Position = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
 		#[Parameter(ParameterSetName = "2",Position = 2,Mandatory = $true, ValueFromPipelineByPropertyName = $True)]
->>>>>>> harmony
 		[Parameter(ParameterSetName = "3", Mandatory = $false)]		
         [Alias('Clonename')][string]$VMXName,
 		[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
@@ -2394,13 +2385,9 @@ function Start-VMX
        # [Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
         [Parameter(ParameterSetName = "3", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$config,
         [Parameter(Mandatory=$false)]$Path,
-<<<<<<< HEAD
-        [Parameter(Mandatory=$false)][Switch]$nowait
-=======
         [Parameter(Mandatory=$false)][Switch]$nowait,
         [Parameter(Mandatory=$false)][Switch]$nogui
 
->>>>>>> harmony
 
 		
 	)
@@ -2416,16 +2403,12 @@ function Start-VMX
 			{
 				"1"
 				{
-<<<<<<< HEAD
-                Write-Verbose $_ 
-=======
                 Write-Verbose $_
                 if ($VMXName -match "\*")
                     {
                     Write-Warning "Wildcard names are not allowed, use get-vmx $VMXName | start-vmx instead"
                     break
                     }
->>>>>>> harmony
                 $vmx = Get-VMX -VMXName $VMXname -UUID $UUID
                 }
 				
@@ -2437,11 +2420,7 @@ function Start-VMX
 				"3"
 				{
                 Write-Verbose " by config with $_ "
-<<<<<<< HEAD
-                $vmx = Get-VMX -Path $config
-=======
                 $vmx = Get-VMX -config $config
->>>>>>> harmony
                 }
 
 				
@@ -2471,9 +2450,6 @@ function Start-VMX
 		    	Write-Verbose "Starting VM $vmxname"
 		    	if ($nowait.IsPresent)
                     {
-<<<<<<< HEAD
-                    Start-Process -FilePath $vmrun -ArgumentList "start $($vmx.config)" -NoNewWindow
-=======
                     if ($nogui.IsPresent)
                         {
                         Start-Process -FilePath $vmrun -ArgumentList "start $($vmx.config) nogui" -NoNewWindow
@@ -2482,16 +2458,11 @@ function Start-VMX
                         {
                         Start-Process -FilePath $vmrun -ArgumentList "start $($vmx.config) " -NoNewWindow
                         }
->>>>>>> harmony
                     }
                 else
                     {
                     do
 		    	        {
-<<<<<<< HEAD
-		    		
-		    		    $cmdresult = &$vmrun start $vmx.config #  2>&1 | Out-Null
-=======
 		    		    if ($nogui.IsPresent)
                             {
                             $cmdresult = &$vmrun start $vmx.config nogui #  2>&1 | Out-Null
@@ -2500,7 +2471,6 @@ function Start-VMX
                             {
 		    		        $cmdresult = &$vmrun start $vmx.config #  2>&1 | Out-Null
                             }
->>>>>>> harmony
 		    	        }
     			    until ($VMrunErrorCondition -notcontains $cmdresult)
                     }
@@ -3336,26 +3306,12 @@ function remove-vmx {
 			Write-Verbose -Message "Stopping vm $vmxname"
 			stop-vmx -config $config -VMXName $VMXName  -mode hard #-state $vmx.state
 		}
-<<<<<<< HEAD
-		
-	do
-	{
-		$cmdresult = &$vmrun deleteVM "$config" # 2>&1 | Out-Null
-        		write-verbose "$Origin deleteVM $vmname $cmdresult"
-        write-verbose $LASTEXITCODE
-	}
-	until ($VMrunErrorCondition -notcontains $cmdresult)
-    if ($cmdresult -match "Error: This VM is in use.")
-        {
-        write-warning "$cmdresult Please close VMX $VMXName in Vmware UI and try again"
-=======
 	#####
 
     $commit = 0
     if ($ConfirmPreference -match "low")
         { 
         $commit = 1 
->>>>>>> harmony
         }
     else
         {
@@ -3363,13 +3319,6 @@ function remove-vmx {
         }
     Switch ($commit)
         {
-<<<<<<< HEAD
-        Remove-Item -Path $vmx.Path -Recurse -Force -Confirm:$false
-	    $object = New-Object psobject
-	    $object | Add-Member -Type 'NoteProperty' -Name VMXname -Value $VMXname
-	    $object | Add-Member -Type 'NoteProperty' -Name Status -Value "removed"
-	    Write-Output $object
-=======
             1
                 {
 	            do
@@ -3403,7 +3352,6 @@ function remove-vmx {
                 Write-Warning "VMX Deletion refused by user for VMX $VMXNAME"
                 break
                 }      
->>>>>>> harmony
         }
 
 
@@ -5010,8 +4958,4 @@ tools.remindInstall = "FALSE"')
     $object | Add-Member -MemberType NoteProperty -Name Config -Value $Config
     $object | Add-Member -MemberType NoteProperty -Name Path -Value $VMXpath
     Write-Output $object
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> harmony
