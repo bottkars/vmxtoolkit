@@ -3715,8 +3715,9 @@ process
         $Myresult = 1
         do
 	        {
-	        $cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runPrograminGuest $config -activewindow "$nowait_parm" $interactive_parm c:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe "$ScriptPath\$Script" "$Parameter")
-	        }
+	        $cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runPrograminGuest $config -activewindow "$nowait_parm" $interactive_parm c:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe "'$ScriptPath\$Script'" "$Parameter")
+	        $cmdresult
+            }
 	    until ($VMrunErrorCondition -notcontains $cmdresult)
         Write-Verbose "Exitcode : $Lastexitcode"
         if ($Lastexitcode -ne 0)
