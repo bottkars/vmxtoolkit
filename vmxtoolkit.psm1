@@ -3709,12 +3709,13 @@ function Invoke-VMXPowerShell
 
 process
     {
-    Write-Verbose "Starting $Script"	
+    Write-Verbose "Starting $Script in $ScriptPath with paraeterset $Parameter"	
     do
         {
         $Myresult = 1
         do
 	        {
+            Write-Verbose "c:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe '$ScriptPath\$Script' $Parameter"
 	        $cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runPrograminGuest $config -activewindow "$nowait_parm" $interactive_parm c:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe "'$ScriptPath\$Script'" "$Parameter")
 	        $cmdresult
             }
