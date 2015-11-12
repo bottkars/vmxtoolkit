@@ -3420,8 +3420,8 @@ param (
 	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
 	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)][Alias('VMXconfig')]$config,
 	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$LUN,
-	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$Controller
-
+	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$Controller,
+	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][switch]$Shared
 )
 begin {
 
@@ -3430,13 +3430,19 @@ begin {
 process 
     {
     $vmxConfig = Get-VMXConfig -config $config
-    $cmxconfig = $vmxconfig | where {$_ -notmatch "'scsi'+$Controller+':'+$LUN+'"}
+    $vmxconfig = $vmxconfig | where {$_ -notmatch "'scsi'+$Controller+':'+$LUN+'"}
     Write-Verbose "Adding Disk #$Disk with $Diskname to $VMXName as lun $lun controller $Controller"
     $AddDrives  = @('scsi'+$Controller+':'+$LUN+'.present = "TRUE"')
     $AddDrives += @('scsi'+$Controller+':'+$LUN+'.deviceType = "disk"')
     $AddDrives += @('scsi'+$Controller+':'+$LUN+'.fileName = "'+$diskname+'"')
     $AddDrives += @('scsi'+$Controller+':'+$LUN+'.mode = "persistent"')
     $AddDrives += @('scsi'+$Controller+':'+$LUN+'.writeThrough = "false"')
+    if ($Shared.IsPresent)
+        {
+        $vmxconfig = $vmxconfig | where {$_ -notmatch "disk.locking"}
+        $AddDrives += @('disk.locking = "false"')
+        $AddDrives += @('scsi'+$Controller+':'+$LUN+'.shared = "true"')
+        }
     $vmxConfig += $AddDrives
     $vmxConfig | set-Content -Path $config
     $object = New-Object -TypeName psobject
@@ -3446,6 +3452,7 @@ process
     $object | Add-Member -MemberType NoteProperty -Name Cotroller -Value $Controller
     $object | Add-Member -MemberType NoteProperty -Name LUN -Value $LUN
     $object | Add-Member -MemberType NoteProperty -Name Config -Value $Config
+    $object | Add-Member -MemberType NoteProperty -Name Shared -Value $Shared.IsPresent
     Write-Output $object
     }
 end {
