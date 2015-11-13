@@ -923,10 +923,10 @@ param (
 
             { 
             $vmxconfig = Get-VMXConfig -config $config
-            $Content = $vmxconfig -notmatch "scsi$SCSIController.ispresent"
+            $Content = $vmxconfig -notmatch "scsi$SCSIController.present"
             $Content = $vmxconfig -notmatch "scsi$SCSIController.virtualDev"
 		    $Content = $Content += 'scsi'+$SCSIController+'.virtualDev = "'+$Type+'"'
-		    $Content = $Content += 'scsi'+$SCSIController+'.ispresent = "TRUE"'
+		    $Content = $Content += 'scsi'+$SCSIController+'.present = "TRUE"'
             $Content | Set-Content -Path $config
             $object = New-Object -TypeName psobject
             $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXname
