@@ -3431,7 +3431,7 @@ begin {
 process 
     {
     $vmxConfig = Get-VMXConfig -config $config
-    $vmxconfig = $vmxconfig | where {$_ -notmatch "'scsi'+$Controller+':'+$LUN+'"}
+    $vmxconfig = $vmxconfig | where {$_ -notmatch "scsi$($Controller):$($LUN)"}
     Write-Verbose "Adding Disk #$Disk with $Diskname to $VMXName as lun $lun controller $Controller"
     $AddDrives  = @('scsi'+$Controller+':'+$LUN+'.present = "TRUE"')
     $AddDrives += @('scsi'+$Controller+':'+$LUN+'.deviceType = "disk"')
