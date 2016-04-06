@@ -463,14 +463,15 @@ function Repair-VMXDisk
 
 
 
-function import-VMXOVATemplate
+function Import-VMXOVATemplate
 {
  [CmdletBinding(DefaultParameterSetName='Parameter Set 1',
-    HelpUri = "https://github.com/bottkars/LABbuildr/wiki/LABtools#Expand-LABZip")]
+    HelpUri = "https://github.com/bottkars/LABbuildr/wiki/LABtools#Import-VMXOVATemplate")]
 	param (
         [string]$OVA,
         [string]$destination=$vmxdir,
-        [string]$Name
+        [string]$Name,
+        [switch]$acceptAllEulas 
         #[String]$Folder
         )
 	$Origin = $MyInvocation.MyCommand
@@ -483,9 +484,39 @@ function import-VMXOVATemplate
         {
             $Name = $($ovaPath.Basename)
         }
-        Write-Warning "Creating Template from OVA for $($ovaPath.Basename), may take a while"
-        & $global:vmwarepath\OVFTool\ovftool.exe --lax --skipManifestCheck --name=$Name $ovaPath.FullName $vmxdir  #
+        Write-Host -ForegroundColor Magenta " ==>Importing from from OVA $($ovaPath.Basename), may take a while"
+        if ($acceptAllEulas.IsPresent)
+            {
+            & $global:vmwarepath\OVFTool\ovftool.exe --lax --skipManifestCheck --acceptAllEulas --name=$Name $ovaPath.FullName $vmxdir #| out-null #
+            }
+        else
+            {
+            & $global:vmwarepath\OVFTool\ovftool.exe --lax --skipManifestCheck --name=$Name $ovaPath.FullName $vmxdir #| Out-Null #
+            }
+        switch ($LASTEXITCODE)
+            {
+            0
+                {
+		        $object = New-Object -TypeName psobject
+		        $Object | Add-Member -MemberType NoteProperty -Name OVA -Value $OVAPath.BaseName
+		        $object | Add-Member -MemberType NoteProperty -Name VMname -Value $Name
+                $object | Add-Member -MemberType NoteProperty -Name Success -Value $true
+                }
+            default
+                {
+                Write-Warning "Error $LASTEXITCODE when importing $OVAPath"
+                $object = New-Object -TypeName psobject
+		        $Object | Add-Member -MemberType NoteProperty -Name OVA -Value $OVAPath.BaseName
+		        $object | Add-Member -MemberType NoteProperty -Name VMname -Value $Name
+                $object | Add-Member -MemberType NoteProperty -Name Success -Value $false
+                }
+            }
+            Write-Output $object
         }
+        Else
+            {
+            Write-Host "$OVA not found"
+            }
 	}
 
 <#	
@@ -746,7 +777,10 @@ function Get-VMXScsiDisk{
 		switch ($PsCmdlet.ParameterSetName)
 		{
 			"1"
-			{ $vmxconfig = Get-VMXConfig -VMXName $VMXname }
+			    { 
+                $vmxconfig = Get-VMXConfig -VMXName $VMXname
+                $config = $vmxconfig.config
+                }
 			"2"
 			{ $vmxconfig = Get-VMXConfig -config $config }
 		}
@@ -754,7 +788,6 @@ function Get-VMXScsiDisk{
 
 		$Patterntype = ".fileName"
 		$ObjectType = "SCSIDisk"
-		
 		$ErrorActionPreference = "silentlyContinue"
 		Write-Verbose -Message $ObjectType
 		$Value = Search-VMXPattern -Pattern "scsi\d{1,2}:\d{1,2}.fileName" -vmxconfig $vmxconfig -name "SCSIAddress" -value "Disk" -patterntype $Patterntype
@@ -763,6 +796,8 @@ function Get-VMXScsiDisk{
 			$object = New-Object -TypeName psobject
 			$object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
 			$object | Add-Member -MemberType NoteProperty -Name SCSIAddress -Value $Disk.ScsiAddress
+            $object | Add-Member -MemberType NoteProperty -Name Controller -Value ($Disk.ScsiAddress.Split(":")[0]).replace("scsi","")
+            $object | Add-Member -MemberType NoteProperty -Name LUN -Value $Disk.ScsiAddress.Split(":")[1]
 			$object | Add-Member -MemberType NoteProperty -Name Disk -Value $Disk.disk
             If ($PsCmdlet.ParameterSetName -eq 2)
                 {
@@ -771,6 +806,7 @@ function Get-VMXScsiDisk{
                 $object | Add-Member -MemberType NoteProperty -Name SizeonDiskMB -Value ([System.Math]::Round((get-item $Diskfile).length/1MB,2))
                 $object | Add-Member -MemberType NoteProperty -Name DiskPath -Value $Diskpath
                 }
+            $object | Add-Member -MemberType NoteProperty -Name Config -Value $config
 			Write-Output $Object
 		}
 	}
@@ -1793,12 +1829,12 @@ process
                 Write-Verbose $MyInvocation.MyCommand
                 if (!(Test-path $Path))
                     {
-                    Write-Warning "VM Path does currently not exist"
+                    Write-Warning "VM Path $Path does currently not exist"
                     # break
                     }
                 if (!($Configfiles = Get-ChildItem -Path $path -Recurse -File -Filter "$VMXName.vmx" -Exclude "*.vmxf" -ErrorAction SilentlyContinue ))
                 {
-                 Write-Warning "$($MyInvocation.MyCommand) : VM does currently not exist"
+                 Write-Warning "$($MyInvocation.MyCommand) : VM $VMXName does currently not exist"
                 # break
                 }
 
@@ -1809,7 +1845,7 @@ process
                 $VMXName = (Split-Path -Leaf $config) -replace ".vmx",""
                 if (!($Configfiles = Get-Item -Path $config -Filter "vmx" -ErrorAction SilentlyContinue ))
                     {
-                    Write-Warning "$($MyInvocation.MyCommand) : VM Config specified does currently not exist"
+                    Write-Warning "$($MyInvocation.MyCommand) : VM Config for $config does currently not exist"
                     # break
                     }
                 }
@@ -3411,8 +3447,54 @@ end {
     }
 } 
 
+###
+function Remove-VMXScsiDisk
+{
+[CmdletBinding()]
+param (
+	#[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)][string][Alias('Filenme')]$Diskname,
+	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
+	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)][Alias('VMXconfig')]$config,
+	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$LUN,
+	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$Controller
+)
+
+###
 
 
+
+
+begin {
+
+    
+       }
+process 
+    {
+   if ((get-vmx -Path $config).state -eq "stopped")
+        {
+        $vmxConfig = Get-VMXConfig -config $config
+        $vmxconfig = $vmxconfig | where {$_ -notmatch "scsi$($Controller):$($LUN)"}
+        Write-Verbose "Removing Disk #$Disk lun $lun from controller $Controller"
+        $vmxConfig | set-Content -Path $config
+        $object = New-Object -TypeName psobject
+        $object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
+        $object | Add-Member -MemberType NoteProperty -Name Cotroller -Value $Controller
+        $object | Add-Member -MemberType NoteProperty -Name LUN -Value $LUN
+        $object | Add-Member -MemberType NoteProperty -Name Status -Value "removed"
+        Write-Output $object
+        }
+    else
+        {
+        Write-Warning "VM must be in stopped state"
+        }
+    }
+end {
+    
+    }
+} 
+
+
+###
 function Add-VMXScsiDisk
 {
 [CmdletBinding()]
