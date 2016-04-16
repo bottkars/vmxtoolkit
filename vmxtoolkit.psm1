@@ -3308,7 +3308,7 @@ function remove-vmx {
 
 	[CmdletBinding(DefaultParametersetName = "2",
                     SupportsShouldProcess=$true,
-                    ConfirmImpact='Medium')]
+                    ConfirmImpact='high')]
 	param (
 #	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]
 	[Parameter(ParameterSetName = "2", Mandatory = $true, ValueFromPipelineByPropertyName = $True)][Alias('VMNAME''NAME','CloneName')]$VMXName,	
@@ -3346,7 +3346,7 @@ function remove-vmx {
 	#####
 
     $commit = 0
-    if ($ConfirmPreference -match "low")
+    if ($ConfirmPreference -match "none")
         { 
         $commit = 1 
         }
