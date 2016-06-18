@@ -2142,7 +2142,7 @@ function New-VMXLinkedClone
 	Process
 	{
 		#foreach ($config in $getconfig)
-		if (!$Clonepath) { $Clonepath = Split-Path -Path $Path -Parent }
+		if (!$Clonepath) { $Clonepath = $env:vmxdir } #Split-Path -Path $Path -Parent }
 		Write-Verbose $ClonePath
         $Targetpath = Join-Path $Clonepath $CloneName 
 		$CloneConfig = "$Targetpath\$CloneName.vmx"
