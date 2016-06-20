@@ -471,8 +471,8 @@ function Import-VMXOVATemplate
         [string]$OVA,
         [string]$destination=$vmxdir,
         [string]$Name,
-        [switch]$acceptAllEulas 
-        #[String]$Folder
+        [switch]$acceptAllEulas,
+        [Switch]$AllowExtraConfig
         )
 	$Origin = $MyInvocation.MyCommand
     
@@ -484,15 +484,20 @@ function Import-VMXOVATemplate
         {
             $Name = $($ovaPath.Basename)
         }
+        $ovfparam = "--skipManifestCheck"
         Write-Host -ForegroundColor Magenta " ==>Importing from from OVA $($ovaPath.Basename), may take a while"
         if ($acceptAllEulas.IsPresent)
             {
-            & $global:vmwarepath\OVFTool\ovftool.exe --lax --skipManifestCheck --acceptAllEulas --name=$Name $ovaPath.FullName $vmxdir #| out-null #
+            $ovfparam = "$ovfparam --acceptAllEulas"
             }
-        else
+        if ($AllowExtraConfig.IsPresent)
             {
-            & $global:vmwarepath\OVFTool\ovftool.exe --lax --skipManifestCheck --name=$Name $ovaPath.FullName $vmxdir #| Out-Null #
+            $ovfparam = "$ovfparam --allowExtraConfig"
             }
+
+        Start-Process -FilePath  $global:vmwarepath\OVFTool\ovftool.exe -ArgumentList "--lax $ovfparam --name=$Name $($ovaPath.FullName) $destination" -NoNewWindow -Wait
+       # & $global:vmwarepath\OVFTool\ovftool.exe --lax $ovfparam --name=$Name $ovaPath.FullName $vmxdir #| Out-Null #
+
         switch ($LASTEXITCODE)
             {
             0
