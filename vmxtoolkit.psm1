@@ -3439,12 +3439,12 @@ process {
         $object | Add-Member -MemberType NoteProperty -Name Size -Value "$($NewDiskSize/1GB)GB"
         $object | Add-Member -MemberType NoteProperty -Name Path -Value $Path
         $object | Add-Member -MemberType NoteProperty -Name Config -Value $vmxconfig
-
         Write-Output $object
         }
     else 
         {
-        $returncommand
+        Write-Error "Error creating disk"
+        return
         }
     }
 end {
