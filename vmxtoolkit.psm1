@@ -3430,6 +3430,15 @@ begin {
 process {
     if (!$NewDiskname.EndsWith(".vmdk")) { $NewDiskname = $NewDiskname+".vmdk" }    
     $returncommand = & $vmwarepath\vmware-vdiskmanager.exe -c -s "$($NewDiskSize/1MB)MB" -t 0 $Path\$NewDiskname -a lsilogic  2>&1 
+    if ($PSCmdlet.MyInvocation.BoundParameters["debug"].IsPresent)
+    {
+    write-host "Debug message start"
+    Write-Host -ForegroundColor White $returncommand
+    Write-Host -ForegroundColor 
+    Write-Host "Debug Message end"
+    pause
+    }
+
     if ($LASTEXITCODE -eq 0)
         {
         $object = New-Object -TypeName psobject
@@ -3444,6 +3453,7 @@ process {
     else 
         {
         Write-Error "Error creating disk"
+        Write-Host $returncommand
         return
         }
     }
