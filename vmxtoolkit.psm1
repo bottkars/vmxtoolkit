@@ -3432,10 +3432,10 @@ process {
     $returncommand = & $vmwarepath\vmware-vdiskmanager.exe -c -s "$($NewDiskSize/1MB)MB" -t 0 $Path\$NewDiskname -a lsilogic  2>&1 
     if ($PSCmdlet.MyInvocation.BoundParameters["debug"].IsPresent)
     {
-    write-host "Debug message start"
+    write-host -ForegroundColor Cyan "Debug message start"
     Write-Host -ForegroundColor White $returncommand
     Write-Host -ForegroundColor White $LASTEXITCODE
-    Write-Host "Debug Message end"
+    Write-Host -ForegroundColor Cyan "Debug Message end"
     pause
     }
 
@@ -3449,6 +3449,11 @@ process {
         $object | Add-Member -MemberType NoteProperty -Name Path -Value $Path
         $object | Add-Member -MemberType NoteProperty -Name Config -Value $vmxconfig
         Write-Output $object
+        if ($PSCmdlet.MyInvocation.BoundParameters["debug"].IsPresent)
+            {
+            Write-Host -ForegroundColor White $object
+            }
+
         }
     else 
         {
