@@ -3429,7 +3429,7 @@ begin {
        }
 process {
     if (!$NewDiskname.EndsWith(".vmdk")) { $NewDiskname = $NewDiskname+".vmdk" }    
-    $returncommand = & $vmwarepath\vmware-vdiskmanager.exe -c -s "$($NewDiskSize/1MB)MB" -t 0 $Path\$NewDiskname -a lsilogic  2>&1 
+    $returncommand = & $vmwarepath\vmware-vdiskmanager.exe -c -s "$($NewDiskSize/1MB)MB" -t 0 $Path\$NewDiskname -a lsilogic # 2>&1 
     if ($PSCmdlet.MyInvocation.BoundParameters["debug"].IsPresent)
     {
     write-host -ForegroundColor Cyan "Debug message start"
