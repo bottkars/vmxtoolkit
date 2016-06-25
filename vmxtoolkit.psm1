@@ -2154,7 +2154,7 @@ function New-VMXLinkedClone
         Write-Verbose "Creating Linked Clone  $Clonename for $Basesnapshot in $Cloneconfig"
 		do
 			{
-		    $cmdresult = &$vmrun clone $config  $Cloneconfig linked $BaseSnapshot $Clonename  2>&1 | Out-Null
+		    $cmdresult = &$vmrun clone $config $Cloneconfig linked $BaseSnapshot $Clonename  2>&1 | Out-Null
 			}
 		until ($VMrunErrorCondition -notcontains $cmdresult)
         if ($LASTEXITCODE -eq 0)
