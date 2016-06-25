@@ -3460,7 +3460,7 @@ process {
     else 
         {
         Write-Error "Error creating disk"
-        Write-Host $returncommand
+        Write-Host -ForegroundColor White "Command Returned: $returncommand"
         return
         }
     }
