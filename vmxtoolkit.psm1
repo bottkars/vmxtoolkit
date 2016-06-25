@@ -3433,11 +3433,10 @@ process {
     if ($PSCmdlet.MyInvocation.BoundParameters["debug"].IsPresent)
     {
     write-host -ForegroundColor Cyan "Debug message start"
-    Write-Host -ForegroundColor White $returncommand
-    Write-Host -ForegroundColor White $LASTEXITCODE
-    Write-Host -ForegroundColor White $Global:vmwareversion
-    Write-Host -ForegroundColor White $Global:vmxdir
-    Write-Host -ForegroundColor White $Global:VMrunErrorCondition
+    Write-Host -ForegroundColor White "Command Returned: $returncommand"
+    Write-Host -ForegroundColor White "Exitcode: $LASTEXITCODE"
+    Write-Host -ForegroundColor White "Running $Global:vmwareversion"
+    Write-Host -ForegroundColor White "Machines Dir $Global:vmxdir"
     Write-Host -ForegroundColor Cyan "Debug Message end"
     pause
     }
