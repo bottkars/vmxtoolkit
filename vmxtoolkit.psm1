@@ -3435,6 +3435,9 @@ process {
     write-host -ForegroundColor Cyan "Debug message start"
     Write-Host -ForegroundColor White $returncommand
     Write-Host -ForegroundColor White $LASTEXITCODE
+    Write-Host -ForegroundColor White $Global:vmwareversion
+    Write-Host -ForegroundColor White $Global:vmxdir
+    Write-Host -ForegroundColor White $Global:VMrunErrorCondition
     Write-Host -ForegroundColor Cyan "Debug Message end"
     pause
     }
