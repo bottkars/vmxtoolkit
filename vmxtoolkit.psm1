@@ -3434,7 +3434,7 @@ process {
     {
     write-host "Debug message start"
     Write-Host -ForegroundColor White $returncommand
-    Write-Host -ForegroundColor 
+    Write-Host -ForegroundColor White $LASTEXITCODE
     Write-Host "Debug Message end"
     pause
     }
