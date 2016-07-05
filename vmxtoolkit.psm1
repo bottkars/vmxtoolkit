@@ -3429,17 +3429,21 @@ begin {
        }
 process {
     if (!$NewDiskname.EndsWith(".vmdk")) { $NewDiskname = $NewDiskname+".vmdk" }    
-    $returncommand = & $vmwarepath\vmware-vdiskmanager.exe -c -s "$($NewDiskSize/1MB)MB" -t 0 $Path\$NewDiskname -a lsilogic # 2>&1 
     if ($PSCmdlet.MyInvocation.BoundParameters["debug"].IsPresent)
-    {
-    write-host -ForegroundColor Cyan "Debug message start"
-    Write-Host -ForegroundColor White "Command Returned: $returncommand"
-    Write-Host -ForegroundColor White "Exitcode: $LASTEXITCODE"
-    Write-Host -ForegroundColor White "Running $Global:vmwareversion"
-    Write-Host -ForegroundColor White "Machines Dir $Global:vmxdir"
-    Write-Host -ForegroundColor Cyan "Debug Message end"
-    pause
-    }
+        {
+        $returncommand = & $vmwarepath\vmware-vdiskmanager.exe -c -s "$($NewDiskSize/1MB)MB" -t 0 $Path\$NewDiskname -a lsilogic # 2>&1 
+        write-host -ForegroundColor Cyan "Debug message start"
+        Write-Host -ForegroundColor White "Command Returned: $returncommand"
+        Write-Host -ForegroundColor White "Exitcode: $LASTEXITCODE"
+        Write-Host -ForegroundColor White "Running $Global:vmwareversion"
+        Write-Host -ForegroundColor White "Machines Dir $Global:vmxdir"
+        Write-Host -ForegroundColor Cyan "Debug Message end"
+        pause
+        }
+    else
+        {
+        $returncommand = & $vmwarepath\vmware-vdiskmanager.exe -c -s "$($NewDiskSize/1MB)MB" -t 0 $Path\$NewDiskname -a lsilogic 2>&1 
+        }
 
     if ($LASTEXITCODE -eq 0)
         {
