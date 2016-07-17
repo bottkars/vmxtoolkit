@@ -3826,7 +3826,7 @@ function Invoke-VMXPowerShell
 process
     {
     $myscript = ".'$ScriptPath\$Script'"
-    Write-Verbose "Starting $myscript with paraeterset $Parameter"
+    Write-Host -ForegroundColor Gray "Starting $myscript with parameterset $Parameter" -NoNewline
     do
         {
         $Myresult = 1
@@ -3839,6 +3839,7 @@ process
         Write-Verbose "Exitcode : $Lastexitcode"
         if ($Lastexitcode -ne 0)
             {
+			Write-Host -ForegroundColor Red "[failed]"
             Write-Warning "Script Failure for $Script with $cmdresult"
             Write-Verbose "Confirmpreference: $ConfirmPreference"
             if ($ConfirmPreference -notmatch "none")
@@ -3857,6 +3858,7 @@ process
             }
         }
     until ($Myresult -eq 1)
+	Write-Host  -ForegroundColor Green [success]
     Write-Verbose "Myresult: $Myresult"
     $object = New-Object psobject
     $object | Add-Member -MemberType 'NoteProperty' -Name config -Value $config
