@@ -3916,19 +3916,18 @@ function Invoke-VMXBash
 
 
 process
-{	
-Write-Verbose "Starting $Scriptblock"	
+{
+if ($Logfile) 
+    {
+    $Scriptblock = "$Scriptblock >> $logfile 2>&1"
+    }
+	
+Write-host -ForegroundColor Gray " ==> running $Scriptblock for $VMXName " -NoNewline	
 do
-    
 	{
     $Myresult = 1
         do
 	        {
-            if ($Logfile) 
-                {
-                $Scriptblock = "$Scriptblock >> $logfile 2>&1"
-                Write-Verbose $Scriptblock
-                }
 	        $cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm /bin/bash $Scriptblock)
 	        }
 	    until ($VMrunErrorCondition -notcontains $cmdresult)
@@ -3943,6 +3942,7 @@ do
                 Write-Verbose "Question response: $Myresult"
                 If ($Myresult -eq 2)
                     {
+                    Write-Host -ForegroundColor Red "[failed]"
                     exit
                     }
                 }
@@ -3958,6 +3958,7 @@ do
             }
         }
     until ($Myresult -eq 1)
+    Write-Host -ForegroundColor Green "[success]"
     Write-Verbose "Myresult: $Myresult"
     $object = New-Object psobject
     $object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
