@@ -3826,7 +3826,9 @@ function Invoke-VMXPowerShell
 process
     {
     $myscript = ".'$ScriptPath\$Script'"
-    Write-Host -ForegroundColor Gray "Starting '$Script $Parameter'" -NoNewline
+    Write-Host -ForegroundColor Gray "Starting '$Script $Parameter' on " -NoNewline
+    Write-Host  -ForegroundColor Magenta $VMXName -NoNewline
+
     do
         {
         $Myresult = 1
@@ -3922,7 +3924,8 @@ if ($Logfile)
     $Scriptblock = "$Scriptblock >> $logfile 2>&1"
     }
 	
-Write-host -ForegroundColor Gray " ==> running $Scriptblock for $VMXName " -NoNewline	
+Write-host -ForegroundColor Gray " ==> running $Scriptblock on: " -NoNewline
+Write-Host -ForegroundColor Magenta $VMXName -NoNewline
 do
 	{
     $Myresult = 1
