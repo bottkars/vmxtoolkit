@@ -485,7 +485,7 @@ function Import-VMXOVATemplate
             $Name = $($ovaPath.Basename)
         }
         $ovfparam = "--skipManifestCheck"
-        Write-Host -ForegroundColor Magenta " ==>Importing from from OVA $($ovaPath.Basename), may take a while"
+        Write-Host -ForegroundColor Magenta " ==>Importing from OVA $($ovaPath.Basename), may take a while"
         if ($acceptAllEulas.IsPresent)
             {
             $ovfparam = "$ovfparam --acceptAllEulas"
