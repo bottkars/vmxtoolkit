@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>virtualmachineinfo</Name>
+      <ViewSelectedBy>
+        <TypeName>virtualmachineinfo</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>VMXName</Label>
+            <!--<AutoSize/>-->
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>DisplayName</Label>
+            <!--<AutoSize/>-->
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>GuestOS</Label>
+            <!--<AutoSize/>-->
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Processorcount</Label>
+            <!--<AutoSize/>-->
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Memory in MB</Label>
+            <!--<AutoSize/>-->
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Network</Label>
+            <!--<AutoSize/>-->
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+
+
+          <TableColumnHeader>
+            <Label>Configuration File</Label>
+            <!--<AutoSize/>-->
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>vmxname</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>displayname</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>guestos</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>processor</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>memory</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>network</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>configfile</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

@@ -585,6 +585,7 @@ function Get-VMXInfo {
 					write-verbose "processing objects for $vmxname"
 					$vmxconfig = Get-VMXConfig -config $config
 					$object = New-Object psobject
+					$object.pstypenames.insert(0,'virtualmachineinfo')
 					$object | Add-Member VMXName ([string]$vmxname)
 					$object | Add-Member DisplayName (Get-VMXDisplayName -vmxconfig $vmxconfig).DisplayName
 					$object | Add-Member GuestOS (Get-VMXGuestOS -vmxconfig $vmxconfig).GuestOs
@@ -1908,15 +1909,15 @@ process
 		    Write-Verbose "Configfile: $($config.FullName)"
 		    if ($Config.Extension -eq ".vmx")
                 {
-		# if ((Get-VMXTemplate -config $config).template -ne $true) {
-		
 			if ($UUID)
 			{
 				Write-Verbose $UUID
 				$VMXUUID = Get-VMXUUID -config $Config.fullname
 				If ($VMXUUID.uuid -eq $UUID) {
 					$object = New-Object -TypeName psobject
+					$object.pstypenames.insert(0,'virtualmachine')
 					$object | Add-Member -MemberType NoteProperty -Name VMXName -Value ([string]($Config.BaseName))
+
                     if ($vmxrun -contains $config.FullName)
 					{
 						$object | Add-Member State ("running")
@@ -1936,7 +1937,6 @@ process
 					$object | Add-Member -MemberType NoteProperty -Name Config -Value ([string]($Config.FullName))
 					$object | Add-Member -MemberType NoteProperty -Name Path -Value ([string]($Config.Directory))
                     $object | Add-Member -MemberType NoteProperty -Name VMXSnapConfig -Value ([string](Get-ChildItem -Path $Config.Directory -Filter "*.vmsd").Fullname)
- 
                     Write-Verbose "Config Fullname $($Config.Fullname)"
 					Write-Output $object
 				}# end if
@@ -1945,6 +1945,7 @@ process
 			if (!($UUID))
 			{				
 				$object = New-Object -TypeName psobject
+				$object.pstypenames.insert(0,'virtualmachine')
 				$object | Add-Member -MemberType NoteProperty -Name VMXName -Value ([string]($Config.BaseName))
 				if ($vmxrun -contains $config.fullname)
 				{

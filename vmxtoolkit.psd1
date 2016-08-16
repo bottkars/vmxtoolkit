@@ -69,7 +69,10 @@ ScriptsToProcess = @(".\vmxtoolkitinit.ps1")
 # TypesToProcess = @()
 
 # Die Formatdateien (.ps1xml), die beim Importieren dieses Moduls geladen werden sollen
-# FormatsToProcess = @()
+FormatsToProcess = @(
+'.\Formats\vmxtoolkit.virtualmachine.Format.ps1xml',
+'.\Formats\vmxtoolkit.virtualmachineinfo.Format.ps1xml'
+)
 
 # Die Module, die als geschachtelte Module des in "RootModule/ModuleToProcess" angegebenen Moduls importiert werden sollen.
 # NestedModules = @()
