@@ -4,9 +4,12 @@ vmxtoolkit
 vmxtoolkit is the Powershell extension to VMware Workstation
 vmxtoolkit is community-driven
 vmxtoolkit is the Base for labbuildr, the automated lab building environment for vmware workstation on windows
-you get support for labbuildr on http://labbuildr.com and https://community.emc.com/blogs/bottk/2014/06/16/announcement-labbuildr-released
+you get support for labbuildr on github
+https://github.com/bottkars/labbuildr/wiki
 
-simply follow @hyperv_guy on twitter for updates
+![logo](https://cloud.githubusercontent.com/assets/8255007/17695850/ce034d40-63aa-11e6-8cb7-69a9b914334d.gif)
+
+simply follow @sddc_guy on twitter for updates
 Installation  
 ===========
  
