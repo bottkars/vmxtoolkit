@@ -10,7 +10,7 @@
 # RootModule = ''
 ModuletoProcess = "vmxtoolkit.psm1"
 # Die Versionsnummer dieses Moduls
-ModuleVersion = '3.0'
+ModuleVersion = '3.1'
 # ID zur eindeutigen Kennzeichnung dieses Moduls
 GUID = 'abe3797c-5a42-4e80-a1fb-9e648872ee14'
 # Autor dieses Moduls
@@ -71,7 +71,8 @@ ScriptsToProcess = @(".\vmxtoolkitinit.ps1")
 # Die Formatdateien (.ps1xml), die beim Importieren dieses Moduls geladen werden sollen
 FormatsToProcess = @(
 '.\Formats\vmxtoolkit.virtualmachine.Format.ps1xml',
-'.\Formats\vmxtoolkit.virtualmachineinfo.Format.ps1xml'
+'.\Formats\vmxtoolkit.virtualmachineinfo.Format.ps1xml',
+'.\Formats\vmxtoolkit.vmxscsidisk.Format.ps1xml'
 )
 
 # Die Module, die als geschachtelte Module des in "RootModule/ModuleToProcess" angegebenen Moduls importiert werden sollen.

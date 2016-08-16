@@ -800,7 +800,8 @@ function Get-VMXScsiDisk{
 		foreach ($Disk in $value)
 		{
 			$object = New-Object -TypeName psobject
-			$object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
+			$object.pstypenames.insert(0,'vmxscsidisk')
+		$object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
 			$object | Add-Member -MemberType NoteProperty -Name SCSIAddress -Value $Disk.ScsiAddress
             $object | Add-Member -MemberType NoteProperty -Name Controller -Value ($Disk.ScsiAddress.Split(":")[0]).replace("scsi","")
             $object | Add-Member -MemberType NoteProperty -Name LUN -Value $Disk.ScsiAddress.Split(":")[1]
@@ -1898,11 +1899,6 @@ process
                 }
 				
 			}
-
-
-
-
-	    #$Configfiles = Get-ChildItem -Path $path -Recurse -File -Filter "$VMXName*.vmx" -Exclude "*master*", "*.vmxf" -ErrorAction SilentlyContinue
         $VMX = @()
 	    foreach ($Config in $Configfiles)
 	        {
@@ -3315,7 +3311,7 @@ function Set-VMXserialPipe
 	}
 	end { }
 }
-function remove-vmx {
+function Remove-vmx {
 	<#
 		.SYNOPSIS
 			A brief description of the function.
@@ -4510,7 +4506,7 @@ function Set-VMXSize {
 
 
 
-function convert-VMXdos2unix
+function Convert-VMXdos2unix
 {
 	param (
 	[Parameter(ParameterSetName = "2", Mandatory = $true)]$Sourcefile
