@@ -4533,7 +4533,7 @@ function Set-VMXSize {
             $Processor  = 4
             }
             }
-        Write-Host -ForegroundColor Gray " ==>adjusting VM to size  $Size with $Processor CPU and $Memory MB"
+        Write-Host -ForegroundColor Gray " ==>adjusting VM to size $Size with $Processor CPU and $Memory MB"
         $cpuout = (Set-VMXprocessor -VMXName $config -Processorcount $Processor -config $config).Processor
         $memout = (Set-VMXmemory -VMXName $config -MemoryMB $Memory -config $config).Memory 
 		$object = New-Object -TypeName psobject
