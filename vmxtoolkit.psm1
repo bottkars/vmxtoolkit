@@ -83,7 +83,7 @@ return ($result)
 #>
 function Get-VMXProcessesInGuest
 {
-	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param (
 	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
 	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$config,
@@ -154,7 +154,7 @@ function Get-VMXHWVersion
 
 function Set-VMXDisconnectIDE
 {
-	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param (
 	[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
 	[Parameter(ParameterSetName = "2", Mandatory = $True, ValueFromPipelineByPropertyName = $True)]$config
@@ -189,12 +189,63 @@ function Set-VMXDisconnectIDE
 }#Set-VMXDisconnectIDE
 
 
+function Set-VMXIDECDrom
+{
+	[CmdletBinding(DefaultParametersetName = "file",HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
+	param (
+	[Parameter(ParameterSetName = "file", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
+	[Alias('NAME','CloneName')]$VMXName,
+	[Parameter(ParameterSetName = "file", Mandatory = $True, ValueFromPipelineByPropertyName = $True)]
+	$config,
+	[Parameter(ParameterSetName = "file", Mandatory = $True, ValueFromPipelineByPropertyName = $True)]
+	[ValidateSet('0','1')]$IDEcontroller,
+	[Parameter(ParameterSetName = "file", Mandatory = $True, ValueFromPipelineByPropertyName = $True)]
+	[ValidateSet('0','1')]$IDElun,
+	[Parameter(ParameterSetName = "file", Mandatory = $True, ValueFromPipelineByPropertyName = $True)]
+	$ISOfile
+	)
+	begin
+	{
+	}
+	process
+		{
+		$VMXConfig = Get-VMXConfig -config $config
+		$IDEdevice = "ide$($IDEcontroller):$($IDElun)"
+        $VMXConfig = $VMXConfig | where {$_ -NotMatch $IDEdevice}
+        Write-Host -ForegroundColor Gray " ==>configuring $IDEdevice"		
+		$object = New-Object -TypeName psobject
+		$Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
+		$object | Add-Member -MemberType NoteProperty -Name Config -Value $config
+		switch ($PsCmdlet.ParameterSetName)
+		{
+			"file"
+			{
+			$VMXConfig += $IDEdevice +'.startConnected = "TRUE"'
+			$VMXConfig += $IDEdevice +'.present = "TRUE"'
+			$VMXConfig += $IDEdevice +'.fileName = "'+$ISOfile+'"'
+			$VMXConfig += $IDEdevice +'.deviceType = "cdrom-image"'
+			$object | Add-Member -MemberType NoteProperty -Name "$($IDEdevice).present" -Value True
+			$object | Add-Member -MemberType NoteProperty -Name "$($IDEdevice).startconnected" -Value True
+			$object | Add-Member -MemberType NoteProperty -Name "$($IDEdevice).type" -Value file
+			$object | Add-Member -MemberType NoteProperty -Name "$($IDEdevice).file" -Value $ISOfile
+			}
+			"raw"
+			{}
+		}
+
+        $VMXConfig | Set-Content -Path $config
+		Write-Output $Object
+	}
+	end { }
+
+}#Set-VMXDisconnectIDE
+
 
 #$Addcontent += 'annotation = "This is node '+$Nodename+' for domain '+$Domainname+'|0D|0A built on '+(Get-Date -Format "MM-dd-yyyy_hh-mm")+'|0D|0A using labbuildr by @Hyperv_Guy|0D|0A Adminpasswords: Password123! |0D|0A Userpasswords: Welcome1"'
 
 function Set-VMXAnnotation
 {
-	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param (
 	[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
 	[Parameter(ParameterSetName = "2", Mandatory = $True, ValueFromPipelineByPropertyName = $True)]$config,
@@ -259,7 +310,7 @@ function Set-VMXAnnotation
 
 function Get-VMXToolsState
 {
-	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param (
 	[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
 	[Parameter(ParameterSetName = "2", Mandatory = $True, ValueFromPipelineByPropertyName = $True)]$config
@@ -1586,7 +1637,7 @@ function Set-VMXUUID
 #>
 function Set-VMXSharedFolderState
 {
-	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param
 	(
 		[Parameter(Mandatory = $false, ParameterSetName = 1, ValueFromPipelineByPropertyName = $True)]
@@ -1677,7 +1728,7 @@ addSharedFolder          Path to vmx file     Add a Host-Guest shared folder
 #>
 function Set-VMXSharedFolder
 {
-	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param
 	(
 		[Parameter(Mandatory = $false, ParameterSetName = 1, ValueFromPipelineByPropertyName = $True)]
@@ -1747,7 +1798,7 @@ function Set-VMXSharedFolder
 
 function Get-VMXUUID
 {
-	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param (
 		[Parameter(ParameterSetName = "1", Mandatory = $true, Position = 1, ValueFromPipelineByPropertyName = $True)]
 		[Parameter(ParameterSetName = "2", Mandatory = $false, Position = 1, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
@@ -2003,7 +2054,7 @@ end {}
 #>
 function New-VMXSnapshot
 {
-	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param
 	(
 		#[Parameter(Mandatory = $true, ParameterSetName = 1, ValueFromPipelineByPropertyName = $True)]
@@ -2078,7 +2129,7 @@ function New-VMXSnapshot
 #>
 function Restore-VMXSnapshot
 {
-	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param
 	(
 		#[Parameter(Mandatory = $true, ParameterSetName = 1, ValueFromPipelineByPropertyName = $True)]
@@ -2160,7 +2211,7 @@ function Restore-VMXSnapshot
 #>
 function New-VMXLinkedClone
 {
-	[CmdletBinding(DefaultParameterSetName = '1',HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(DefaultParameterSetName = '1',HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	[OutputType([psobject])]
 	param
 	(
@@ -2222,7 +2273,7 @@ function New-VMXLinkedClone
 
 function New-VMXClone
 {
-	[CmdletBinding(DefaultParameterSetName = '1',HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(DefaultParameterSetName = '1',HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	[OutputType([psobject])]
 	param
 	(
@@ -2387,7 +2438,7 @@ function Get-VMXSnapshot
 #>
 function Remove-VMXSnapshot
 {
-	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param
 	(
 		[Parameter(Mandatory = $false, ParameterSetName = 2, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')][string]$VMXName,
@@ -2454,7 +2505,7 @@ function Remove-VMXSnapshot
 #>
 function Start-VMX
 {
-	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param (
 		[Parameter(ParameterSetName = "1", Position = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
 		#[Parameter(ParameterSetName = "2",Position = 2,Mandatory = $true, ValueFromPipelineByPropertyName = $True)]
@@ -2597,7 +2648,7 @@ function Start-VMX
 		Additional information about the function.
 #>
 function Stop-VMX{
-	[CmdletBinding(DefaultParameterSetName = '2',HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(DefaultParameterSetName = '2',HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param (
 		[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $True)]
         [Parameter(ParameterSetName = "2", Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $True)]
@@ -2681,7 +2732,7 @@ function Stop-VMX{
 #>
 function Suspend-VMX
 {
-	[CmdletBinding(DefaultParameterSetName = '2',HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(DefaultParameterSetName = '2',HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param
 	(
 
@@ -2764,7 +2815,7 @@ function Suspend-VMX
 #>
 function Set-VMXTemplate
 {
-	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param (
 		[Parameter( Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('vmxconfig')]$config,
         [Parameter(Mandatory = $false)][switch]$unprotect
@@ -2847,7 +2898,7 @@ function Set-VMXTemplate
 #>
 function Get-VMXTemplate
 {
-	[CmdletBinding(DefaultParameterSetName = '1',HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(DefaultParameterSetName = '1',HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	[OutputType([psobject])]
 	param
 	(
@@ -2900,7 +2951,7 @@ function Get-VMXTemplate
 #>
 function Set-VMXNetworkAdapter
 {
-	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param
 	(
         [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')][string]$VMXName,
@@ -2981,7 +3032,7 @@ function Set-VMXNetworkAdapter
 #>
 function Connect-VMXNetworkAdapter
 {
-	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param
 	(
         [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')][string]$VMXName,
@@ -3028,7 +3079,7 @@ function Connect-VMXNetworkAdapter
 
 function Connect-VMXcdromImage
 {
-	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param
 	(
         [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')][string]$VMXName,
@@ -3117,7 +3168,7 @@ function Connect-VMXcdromImage
 #>
 function Disconnect-VMXNetworkAdapter
 {
-	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param
 	(
         [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')][string]$VMXName,
@@ -4130,7 +4181,7 @@ end {}
 #>
 function Get-VMXSnapshotconfig
 {
-	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/")]
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param
 	(
 		[Parameter(Mandatory = $false, ParameterSetName = 2, ValueFromPipelineByPropertyName = $True)][Alias('TemplateName')][string]$VMXName,
@@ -4759,7 +4810,7 @@ function New-VMXGuestPath
         $vmx | Set-VMXLinuxNetwork -ipaddress 192.168.2.110 -network 192.168.2.0 -netmask 255.255.255.0 -gateway 192.168.2.10 -device eth0 -Peerdns -DNS1 192.168.2.10 -DNSDOMAIN labbuildr.local -Hostname centos3 -rootuser root -rootpassword Password123!
         #>
 function Set-VMXLinuxNetwork {
-[CmdletBinding(DefaultParametersetName = "1",HelpUri = "http://labbuildr.bottnet.de/modules/")]
+[CmdletBinding(DefaultParametersetName = "1",HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 
 param (
 	    [Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]
@@ -4932,7 +4983,7 @@ end {}
         $vmx | Set-VMXLinuxDNS -rootuser root -rootpassword Password123! -Verbose -device eth0
 #>
 function Set-VMXLinuxDNS {
-[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/")]
+[CmdletBinding(DefaultParametersetName = "2",HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 param (
 	    [Parameter(ParameterSetName = "2", Mandatory = $true, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
 	    [Parameter(ParameterSetName = "2", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$config,
