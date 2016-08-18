@@ -1619,7 +1619,7 @@ function Set-VMXGuestOS
 				   'vmkernel5','vmkernel6',
 				   'winhyperv','windows8srv-64',
 				   'other26xlinux','sles11-64')]
-				   [Alias('Value')]$guestos
+				   [Alias('Value')]$GuestOS
 	)
 	
 	Begin
@@ -1631,14 +1631,14 @@ function Set-VMXGuestOS
 	{
         if ((get-vmx -Path $config).state -eq "stopped")
         {
-        $guestos = $guestos.replace(" ","_")
+		Write-Host -ForegroundColor Gray " ==>Setting GuestOS $GuestOS"
 		$Content = Get-Content $config | where { $_ -ne "" }
 		$Content = $content | where { $_ -NotMatch "guestos" }
-		$content += 'guestos = "' + $guestos + '"'
+		$content += 'guestos = "' + $GuestOS + '"'
 		Set-Content -Path $config -Value $content -Force
 		$object = New-Object -TypeName psobject
 		$Object | Add-Member -MemberType NoteProperty -Name Config -Value $config
-		$object | Add-Member -MemberType NoteProperty -Name guestos -Value $guestos
+		$object | Add-Member -MemberType NoteProperty -Name GuestOS -Value $GuestOS
 		Write-Output $Object
         }
 		else
