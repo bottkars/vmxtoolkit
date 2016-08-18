@@ -1695,8 +1695,8 @@ function Set-VMXVTBit
         {
 		Write-Host -ForegroundColor Gray " ==>Setting Virtual VTbit to $($VTBit.IsPresent.ToString())"
 		$Content = Get-Content $config | where { $_ -ne "" }
-		$Content = $content | where { $_ -NotMatch "vhv.enabled" }
-		$content += 'vhv.enabled = "' + $VTBit.IsPresent.ToString() + '"'
+		$Content = $content | where { $_ -NotMatch "vhv.enable" }
+		$content += 'vhv.enable = "' + $VTBit.IsPresent.ToString() + '"'
 		Set-Content -Path $config -Value $content -Force
 		$object = New-Object -TypeName psobject
 		$Object | Add-Member -MemberType NoteProperty -Name Config -Value $config
