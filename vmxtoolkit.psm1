@@ -1423,10 +1423,10 @@ function Get-VMXGuestOS{
 
 <#	
 	.SYNOPSIS
-		A brief description of the Get-VMXDisplayName function.
+		A brief description of the Get-VMXVTBit function.
 	
 	.DESCRIPTION
-		A detailed description of the Get-VMXDisplayName function.
+		A detailed description of the Get-VMXVTBit function.
 	
 	.PARAMETER config
 		A description of the config parameter.
@@ -1438,16 +1438,18 @@ function Get-VMXGuestOS{
 		A description of the vmxconfig parameter.
 	
 	.EXAMPLE
-		PS C:\> Get-VMXDisplayName -config $value1 -Name $value2
+		PS C:\> Get-VMXVTBit -config $value1 -Name $value2
 	
 	.NOTES
 		Additional information about the function.
 #>
-function Get-VMXDisplayName
+function Get-VMXVTBit
 {
-	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/Get-VMXDisplayName/")]
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://github.com/bottkars/vmxtoolkit/wiki/Get-VMXVTBit")]
 	param (
-		[Parameter(ParameterSetName = "1", Mandatory = $true, Position = 1, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
+		[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
+		[Parameter(ParameterSetName = "1", Mandatory = $true, Position = 1, ValueFromPipelineByPropertyName = $True)]
+		[Alias('NAME','CloneName')]$VMXName,
 		[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]
 		[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$config,
 		[Parameter(ParameterSetName = "3", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$vmxconfig
@@ -1460,23 +1462,36 @@ function Get-VMXDisplayName
 		switch ($PsCmdlet.ParameterSetName)
 		{
 			"1"
-			{ $vmxconfig = Get-VMXConfig -VMXName $VMXname $config }
+			{ $vmxconfig = Get-VMXConfig -VMXName $VMXname  }
 			"2"
-			{ $vmxconfig = Get-VMXConfig -config $config }
-		}	$ObjectType = "Displayname"
+			{ 
+			$vmxconfig = Get-VMXConfig -config $config
+			}
+		}	
+		$ObjectType = "vhv"
 		$ErrorActionPreference = "silentlyContinue"
 		Write-Verbose -Message "getting $ObjectType"
-		$patterntype = "displayname"
-		$Value = Search-VMXPattern -Pattern "$patterntype" -vmxconfig $vmxconfig -value $patterntype -patterntype $patterntype
+		$patterntype = ".enable"
+		$Value = Search-VMXPattern -Pattern "$ObjectType$patterntype" -vmxconfig $vmxconfig -name "Type" -value $ObjectType -patterntype $patterntype
+		#$Value = Search-VMXPattern  -Pattern "uuid.bios" -vmxconfig $vmxconfig -Name "Type" -value $ObjectType -patterntype $patterntype -nospace
+
 		$object = New-Object -TypeName psobject
 		# $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
-		$object | Add-Member -MemberType NoteProperty -Name $ObjectType -Value $Value.displayname
+		$object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXName
+		if (!$Value.vhv)
+			{
+			$object | Add-Member -MemberType NoteProperty -Name VTbit -Value False
+			}
+		else
+			{
+			$object | Add-Member -MemberType NoteProperty -Name VTbit -Value $($Value.vhv)
+			}
+
 		$object | Add-Member -MemberType NoteProperty -Name Config -Value (Get-ChildItem -Path $Config)
-		
 		Write-Output $Object
 	}
 	end { }
-	}#end Get-VMXDisplayName
+	}#end Get-VMXVTBit
 
 function Get-VMXIPAddress
 {
