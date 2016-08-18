@@ -523,7 +523,9 @@ function Import-VMXOVATemplate
         [string]$destination=$vmxdir,
         [string]$Name,
         [switch]$acceptAllEulas,
-        [Switch]$AllowExtraConfig
+        [Switch]$AllowExtraConfig,
+        [Switch]$Quiet
+
         )
 	$Origin = $MyInvocation.MyCommand
     
@@ -537,6 +539,11 @@ function Import-VMXOVATemplate
         }
         $ovfparam = "--skipManifestCheck"
         Write-Host -ForegroundColor Magenta " ==>Importing from OVA $($ovaPath.Basename), may take a while"
+        if ($Quiet.IsPresent)
+            {
+            $ovfparam = "$ovfparam --quiet"
+            }
+
         if ($acceptAllEulas.IsPresent)
             {
             $ovfparam = "$ovfparam --acceptAllEulas"
@@ -1576,6 +1583,75 @@ function Set-VMXDisplayName
 		
 	}
 }
+
+<#
+	.SYNOPSIS
+		A brief description of the Set-VMXguestos function.
+
+	.DESCRIPTION
+		Sets the VMX Friendly guestos
+
+	.PARAMETER  config
+		Please Specify Valid Config File
+
+	.EXAMPLE
+		PS C:\> Set-VMXguestos -config $value1
+		'This is the output'
+		This example shows how to call the Set-VMXguestos function with named parameters.
+
+	.NOTES
+		Additional information about the function or script.
+
+#>
+function Set-VMXGuestOS
+{
+	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/Set-VMXguestos")]
+	param
+	(
+		[Parameter(Mandatory = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   HelpMessage = 'Please Specify Valid Config File')]$config,
+		[Parameter(Mandatory = $false,
+				   ValueFromPipelineByPropertyName = $False,
+				   HelpMessage = 'Please Specify New Value for guestos')]
+				   [ValidateSet(
+				   'other-64','winhyperv','centos-64',
+				   'vmkernel5','vmkernel6',
+				   'winhyperv','windows8srv-64',
+				   'other26xlinux','sles11-64')]
+				   [Alias('Value')]$guestos
+	)
+	
+	Begin
+	{
+		
+		
+	}
+	Process
+	{
+        if ((get-vmx -Path $config).state -eq "stopped")
+        {
+        $guestos = $guestos.replace(" ","_")
+		$Content = Get-Content $config | where { $_ -ne "" }
+		$Content = $content | where { $_ -NotMatch "guestos" }
+		$content += 'guestos = "' + $guestos + '"'
+		Set-Content -Path $config -Value $content -Force
+		$object = New-Object -TypeName psobject
+		$Object | Add-Member -MemberType NoteProperty -Name Config -Value $config
+		$object | Add-Member -MemberType NoteProperty -Name guestos -Value $guestos
+		Write-Output $Object
+        }
+		else
+        {
+        Write-Warning "VM must be in stopped state"
+        }
+	}
+	End
+	{
+		
+	}
+}
+
 
 function Set-VMXUUID
 {
