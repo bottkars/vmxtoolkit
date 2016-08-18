@@ -1652,6 +1652,67 @@ function Set-VMXGuestOS
 	}
 }
 
+<#
+	.SYNOPSIS
+		A brief description of the Set-VMXVTBitfunction.
+
+	.DESCRIPTION
+		Sets the VMX VTBit
+
+	.PARAMETER  config
+		Please Specify Valid Config File
+
+	.EXAMPLE
+		PS C:\> Set-VMXVTBit -config $value1
+		'This is the output'
+		This example shows how to call the Set-VMXVTBit function with named parameters.
+
+	.NOTES
+		Additional information about the function or script.
+
+#>
+function Set-VMXVTBit
+{
+	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/Set-VMXVTBit")]
+	param
+	(
+		[Parameter(Mandatory = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   HelpMessage = 'Please Specify Valid Config File')]$config,
+		[Parameter(Mandatory = $false,
+				   ValueFromPipelineByPropertyName = $False)]
+				   [switch]$VTBit
+	)
+	
+	Begin
+	{
+		
+		
+	}
+	Process
+	{
+        if ((get-vmx -Path $config).state -eq "stopped")
+        {
+		Write-Host -ForegroundColor Gray " ==>Setting Virtual VTbit to $($VTBit.IsPresent.ToString())"
+		$Content = Get-Content $config | where { $_ -ne "" }
+		$Content = $content | where { $_ -NotMatch "vhv.enabled" }
+		$content += 'vhv.enabled = "' + $VTBit.IsPresent.ToString() + '"'
+		Set-Content -Path $config -Value $content -Force
+		$object = New-Object -TypeName psobject
+		$Object | Add-Member -MemberType NoteProperty -Name Config -Value $config
+		$object | Add-Member -MemberType NoteProperty -Name "Virtual VTBit" -Value $VTBit.IsPresent.ToString()
+		Write-Output $Object
+        }
+		else
+        {
+        Write-Warning "VM must be in stopped state"
+        }
+	}
+	End
+	{
+		
+	}
+}
 
 function Set-VMXUUID
 {
