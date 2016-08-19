@@ -3390,16 +3390,15 @@ function Set-VMXVnet
 		if (!($Content -match "ethernet$Adapter.present")) { write-error "Adapter not present " }
 		$Content = ($Content -notmatch "ethernet$Adapter.vnet")
 		$Content = ($Content -notmatch "ethernet$Adapter.connectionType")
-		
 		Set-Content -Path $config -Value $Content
 		$Addcontent = 'ethernet' + $Adapter + '.vnet = "' + $vnet + '"'
-		
 		#, 'ethernet' + $Adapter + '.connectionType = "custom"', 'ethernet' + $Adapter + '.wakeOnPcktRcv = "FALSE"', 'ethernet' + $Adapter + '.pciSlotNumber = "' + $PCISlot + '"', 'ethernet' + $Adapter + '.virtualDev = "e1000e"')
 		Write-Verbose "Setting $Addcontent"
 		$Addcontent | Add-Content -Path $config
 		$AddContent = 'Ethernet'+$Adapter+'.connectionType = "custom"'
 		Write-Verbose "Setting $Addcontent"
 		$Addcontent | Add-Content -Path $config
+		Write-Host -ForegroundColor Gray "Setting ethernet$Adapter do $Vnet"
 		$object = New-Object psobject
    		$object | Add-Member -MemberType 'NoteProperty' -Name Adapter -Value "ethernet$Adapter"
 		$object | Add-Member -MemberType 'NoteProperty' -Name VirtualNet -Value $vnet
