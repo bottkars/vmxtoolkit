@@ -3689,7 +3689,7 @@ process {
     if ($LASTEXITCODE -eq 0)
         {
         $object = New-Object -TypeName psobject
-		Write-Host -ForegroundColor Gray " ==> Creating new $($NewDiskSize/1GB)GB SCSI Disk $NewDiskName at $Path"
+		Write-Host -ForegroundColor Gray " ==>Creating new $($NewDiskSize/1GB)GB SCSI Disk $NewDiskName at $Path"
         $object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
         $object | Add-Member -MemberType NoteProperty -Name Disktype -Value "lsilogic"
         $object | Add-Member -MemberType NoteProperty -Name Diskname -Value $NewDiskname
@@ -3796,7 +3796,7 @@ process
         }
     $vmxConfig += $AddDrives
     $vmxConfig | set-Content -Path $config
-	Write-Host -ForegroundColor Gray " ==> Adding Disk $Diskname to $VMXName at Controller $Controller LUN $LUN"
+	Write-Host -ForegroundColor Gray " ==>Adding Disk $Diskname to $VMXName at Controller $Controller LUN $LUN"
     $object = New-Object -TypeName psobject
     $object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
     $object | Add-Member -MemberType NoteProperty -Name Disktype -Value "lsilogic"
@@ -4167,7 +4167,7 @@ if ($Logfile)
     $Scriptblock = "$Scriptblock >> $logfile 2>&1"
     }
 	
-Write-host -ForegroundColor Gray " ==> running $Scriptblock on: " -NoNewline
+Write-host -ForegroundColor Gray " ==>running $Scriptblock on: " -NoNewline
 Write-Host -ForegroundColor Magenta $VMXName -NoNewline
 do
 	{
