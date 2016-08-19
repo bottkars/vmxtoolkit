@@ -3130,6 +3130,7 @@ function Set-VMXNetworkAdapter
 		$Content = Get-Content -Path $config
 		Write-verbose "ethernet$Adapter.present"
 		if (!($Content -match "ethernet$Adapter.present")) { Write-Warning "Adapter not present, will be added" }
+		Write-Host -ForegroundColor Gray " ==>Configuring Ethernet$Adapter as $AdapterType with $ConnectionType for $VMXName"
 		$Content = $Content -notmatch "ethernet$Adapter"
         $Addnic = @('ethernet'+$Adapter+'.present = "TRUE"')
         $Addnic += @('ethernet'+$Adapter+'.connectionType = "'+$ConnectionType+'"')
