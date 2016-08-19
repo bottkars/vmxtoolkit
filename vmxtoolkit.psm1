@@ -3399,7 +3399,7 @@ function Set-VMXVnet
 		$AddContent = 'Ethernet'+$Adapter+'.connectionType = "custom"'
 		Write-Verbose "Setting $Addcontent"
 		$Addcontent | Add-Content -Path $config
-		Write-Host -ForegroundColor Gray "Setting ethernet$Adapter to $Vnet for $VMXName"
+		Write-Host -ForegroundColor Gray " ==>Setting ethernet$Adapter to $Vnet for $VMXName"
 		$object = New-Object psobject
 		$object | Add-Member -MemberType 'NoteProperty' -Name VMXname -Value $VMXName
    		$object | Add-Member -MemberType 'NoteProperty' -Name Adapter -Value "ethernet$Adapter"
