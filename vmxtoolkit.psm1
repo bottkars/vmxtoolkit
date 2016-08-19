@@ -3373,6 +3373,7 @@ function Set-VMXVnet
 	(
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
 		$config,
+		[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateRange(0, 19)][int]$Adapter,
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateSet('vmnet1','vmnet2','vmnet3','vmnet4','vmnet5','vmnet6','vmnet7','vmnet9','vmnet10','vmnet11','vmnet12','vmnet13','vmnet14','vmnet15','vmnet16','vmnet17','vmnet18','vmnet19')][Alias('VMnet')]$Vnet
 	)
@@ -3398,8 +3399,9 @@ function Set-VMXVnet
 		$AddContent = 'Ethernet'+$Adapter+'.connectionType = "custom"'
 		Write-Verbose "Setting $Addcontent"
 		$Addcontent | Add-Content -Path $config
-		Write-Host -ForegroundColor Gray "Setting ethernet$Adapter do $Vnet"
+		Write-Host -ForegroundColor Gray "Setting ethernet$Adapter to $Vnet for $VMXName"
 		$object = New-Object psobject
+		$object | Add-Member -MemberType 'NoteProperty' -Name VMXname -Value $VMXName
    		$object | Add-Member -MemberType 'NoteProperty' -Name Adapter -Value "ethernet$Adapter"
 		$object | Add-Member -MemberType 'NoteProperty' -Name VirtualNet -Value $vnet
 		$object | Add-Member -MemberType 'NoteProperty' -Name Config -Value $config
