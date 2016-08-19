@@ -3798,7 +3798,7 @@ process
         }
     $vmxConfig += $AddDrives
     $vmxConfig | set-Content -Path $config
-	Write-Host -ForegroundColor Gray " ==>Adding Disk $Diskname to $VMXName at Controller $Controller LUN $LUN"
+	Write-Host -ForegroundColor Gray " ==>Adding Disk $Diskname at Controller $Controller LUN $LUN to $VMXName"
     $object = New-Object -TypeName psobject
     $object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
     $object | Add-Member -MemberType NoteProperty -Name Disktype -Value "lsilogic"
