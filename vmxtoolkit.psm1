@@ -2389,8 +2389,9 @@ function New-VMXLinkedClone
 		Write-Verbose $ClonePath
 		$Targetpath = Join-Path $Clonepath $CloneName 
 		$CloneConfig = "$Targetpath\$CloneName.vmx"
-		Write-Verbose "Creating Linked Clone $Clonename from $Basesnapshot in $Cloneconfig"
-		Write-Host -ForegroundColor Gray " ==>Creating Linked Clone from $Basesnapshot in $Cloneconfig for " -NoNewline
+		$TemplateVM = Split-Path -Leaf $config
+		Write-Verbose "Creating Linked Clone $Clonename from $TemplateVM $Basesnapshot in $Cloneconfig"
+		Write-Host -ForegroundColor Gray " ==>Creating Linked Clone from $TemplateVM $Basesnapshot for " -NoNewline
 		Write-Host -ForegroundColor Magenta $Clonename -NoNewline
 		Write-Host -ForegroundColor Green "[success]"
 		do
