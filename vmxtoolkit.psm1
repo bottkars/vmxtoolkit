@@ -3787,7 +3787,7 @@ begin {
 process 
     {
 	Write-Host -ForegroundColor Gray " ==>Adding Disk $Diskname at Controller $Controller LUN $LUN to " -NoNewline
-	Write-Host -ForegroundColor Magenta $VMXName
+	Write-Host -ForegroundColor Magenta $VMXName -NoNewline
     $vmxConfig = Get-VMXConfig -config $config
     $vmxconfig = $vmxconfig | where {$_ -notmatch "scsi$($Controller):$($LUN)"}
     Write-Verbose "Adding Disk #$Disk with $Diskname to $VMXName as lun $lun controller $Controller"
