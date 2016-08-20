@@ -2376,9 +2376,6 @@ function New-VMXLinkedClone
 		$CloneName,
 		[Parameter(Mandatory = $false)][ValidateScript({ Test-Path -Path $_ })]$Clonepath,
 		[Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]$Path
-		
-	
-		
 	)
 
 	Begin
@@ -2393,6 +2390,9 @@ function New-VMXLinkedClone
         $Targetpath = Join-Path $Clonepath $CloneName 
 		$CloneConfig = "$Targetpath\$CloneName.vmx"
         Write-Verbose "Creating Linked Clone  $Clonename for $Basesnapshot in $Cloneconfig"
+		Write-Host -ForegroundColor Gray " ==>Creating Linked Clone from $Basesnapshot for" -NoNewline
+		Write-Host -ForegroundColor Green $Clonenam
+
 		do
 			{
 		    $cmdresult = &$vmrun clone $config $Cloneconfig linked $BaseSnapshot $Clonename  2>&1 | Out-Null
@@ -3783,6 +3783,8 @@ begin {
        }
 process 
     {
+	Write-Host -ForegroundColor Gray " ==>Adding Disk $Diskname at Controller $Controller LUN $LUN to " -NoNewline
+	Write-Host -ForegroundColor Green $VMXName
     $vmxConfig = Get-VMXConfig -config $config
     $vmxconfig = $vmxconfig | where {$_ -notmatch "scsi$($Controller):$($LUN)"}
     Write-Verbose "Adding Disk #$Disk with $Diskname to $VMXName as lun $lun controller $Controller"
