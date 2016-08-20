@@ -2391,7 +2391,7 @@ function New-VMXLinkedClone
 		$CloneConfig = "$Targetpath\$CloneName.vmx"
         Write-Verbose "Creating Linked Clone  $Clonename for $Basesnapshot in $Cloneconfig"
 		Write-Host -ForegroundColor Gray " ==>Creating Linked Clone from $Basesnapshot for" -NoNewline
-		Write-Host -ForegroundColor Green $Clonename
+		Write-Host -ForegroundColor Magenta $Clonename
 
 		do
 			{
@@ -3400,7 +3400,7 @@ function Set-VMXVnet
 		Write-Verbose "Setting $Addcontent"
 		$Addcontent | Add-Content -Path $config
 		Write-Host -ForegroundColor Gray -NoNewline " ==>Setting ethernet$Adapter to $Vnet for "
-		Write-Host -ForegroundColor Green $VMXName
+		Write-Host -ForegroundColor Magenta $VMXName
 		$object = New-Object psobject
 		$object | Add-Member -MemberType 'NoteProperty' -Name VMXname -Value $VMXName
    		$object | Add-Member -MemberType 'NoteProperty' -Name Adapter -Value "ethernet$Adapter"
@@ -3784,7 +3784,7 @@ begin {
 process 
     {
 	Write-Host -ForegroundColor Gray " ==>Adding Disk $Diskname at Controller $Controller LUN $LUN to " -NoNewline
-	Write-Host -ForegroundColor Green $VMXName
+	Write-Host -ForegroundColor Magenta $VMXName
     $vmxConfig = Get-VMXConfig -config $config
     $vmxconfig = $vmxconfig | where {$_ -notmatch "scsi$($Controller):$($LUN)"}
     Write-Verbose "Adding Disk #$Disk with $Diskname to $VMXName as lun $lun controller $Controller"
@@ -3802,7 +3802,7 @@ process
     $vmxConfig += $AddDrives
     $vmxConfig | set-Content -Path $config
 	Write-Host -ForegroundColor Gray " ==>Adding Disk $Diskname at Controller $Controller LUN $LUN to " -NoNewline
-	Write-Host -ForegroundColor Green $VMXName
+	Write-Host -ForegroundColor Magenta $VMXName
     $object = New-Object -TypeName psobject
     $object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
     $object | Add-Member -MemberType NoteProperty -Name Disktype -Value "lsilogic"
