@@ -4102,7 +4102,8 @@ process
     {
     $myscript = ".'$ScriptPath\$Script'"
     Write-Host -ForegroundColor Gray " ==>starting '$Script $Parameter' on " -NoNewline
-    Write-Host  -ForegroundColor Magenta (Split-Path -Leaf $config ).Replace(".vmx","") -NoNewline
+    Write-Host -ForegroundColor Magenta $VMXName -NoNewline
+  #  Write-Host  -ForegroundColor Magenta (Split-Path -Leaf $config ).Replace(".vmx","") -NoNewline
 
     do
         {
@@ -4116,7 +4117,7 @@ process
         Write-Verbose "Exitcode : $Lastexitcode"
         if ($Lastexitcode -ne 0)
             {
-			Write-Host -ForegroundColor Red " [failed]"
+			Write-Host -ForegroundColor Red "[failed]"
             Write-Warning "Script Failure for $Script with $cmdresult"
             Write-Verbose "Confirmpreference: $ConfirmPreference"
             if ($ConfirmPreference -notmatch "none")
@@ -4135,7 +4136,7 @@ process
             }
         }
     until ($Myresult -eq 1)
-	Write-Host  -ForegroundColor Green " [success]"
+	Write-Host  -ForegroundColor Green "[success]"
     Write-Verbose "Myresult: $Myresult"
     $object = New-Object psobject
     $object | Add-Member -MemberType 'NoteProperty' -Name config -Value $config
