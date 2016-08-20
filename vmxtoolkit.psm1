@@ -2387,12 +2387,12 @@ function New-VMXLinkedClone
 		#foreach ($config in $getconfig)
 		if (!$Clonepath) { $Clonepath = $global:vmxdir } #Split-Path -Path $Path -Parent }
 		Write-Verbose $ClonePath
-        $Targetpath = Join-Path $Clonepath $CloneName 
+		$Targetpath = Join-Path $Clonepath $CloneName 
 		$CloneConfig = "$Targetpath\$CloneName.vmx"
-        Write-Verbose "Creating Linked Clone  $Clonename for $Basesnapshot in $Cloneconfig"
+		Write-Verbose "Creating Linked Clone  $Clonename for $Basesnapshot in $Cloneconfig"
 		Write-Host -ForegroundColor Gray " ==>Creating Linked Clone from $Basesnapshot for" -NoNewline
-		Write-Host -ForegroundColor Magenta $Clonename
-
+		Write-Host -ForegroundColor Magenta $Clonename -NoNewline
+		Write-Host -ForegroundColor Green "[success]"
 		do
 			{
 		    $cmdresult = &$vmrun clone $config $Cloneconfig linked $BaseSnapshot $Clonename  2>&1 | Out-Null
@@ -2670,9 +2670,6 @@ function Start-VMX
         [Parameter(Mandatory=$false)]$Path,
         [Parameter(Mandatory=$false)][Switch]$nowait,
         [Parameter(Mandatory=$false)][Switch]$nogui
-
-
-		
 	)
 	begin
 	{
@@ -2731,6 +2728,8 @@ function Start-VMX
                 $content += 'guestinfo.vmwareversion = "' + $Global:vmwareversion + '"'
 	    		set-Content -Path $vmx.config -Value $content -Force
 		    	Write-Verbose "Starting VM $vmxname"
+				Write-Host -ForegroundColor Gray " ==>STarting Virtual Machine " -NoNewline
+				Write-Host -ForegroundColor Magenta $VMX.vmxname -NoNewline
 		    	if ($nowait.IsPresent)
                     {
                     if ($nogui.IsPresent)
@@ -2758,7 +2757,8 @@ function Start-VMX
     			    until ($VMrunErrorCondition -notcontains $cmdresult)
                     }
                 if ($LASTEXITCODE -eq 0) 
-                {
+	                {
+					Write-Host -ForegroundColor Green "[success]"
 	    		    $object = New-Object psobject
 	    		    $object | Add-Member -Type 'NoteProperty' -Name VMXname -Value $VMX.VMXname
 	    		    $object | Add-Member -Type 'NoteProperty' -Name Status -Value "Started"
@@ -3400,7 +3400,8 @@ function Set-VMXVnet
 		Write-Verbose "Setting $Addcontent"
 		$Addcontent | Add-Content -Path $config
 		Write-Host -ForegroundColor Gray -NoNewline " ==>Setting ethernet$Adapter to $Vnet for "
-		Write-Host -ForegroundColor Magenta $VMXName
+		Write-Host -ForegroundColor Magenta $VMXName -NoNewline
+	    Write-Host -ForegroundColor Green "[success]"
 		$object = New-Object psobject
 		$object | Add-Member -MemberType 'NoteProperty' -Name VMXname -Value $VMXName
    		$object | Add-Member -MemberType 'NoteProperty' -Name Adapter -Value "ethernet$Adapter"
@@ -3802,7 +3803,8 @@ process
     $vmxConfig += $AddDrives
     $vmxConfig | set-Content -Path $config
 	Write-Host -ForegroundColor Gray " ==>Adding Disk $Diskname at Controller $Controller LUN $LUN to " -NoNewline
-	Write-Host -ForegroundColor Magenta $VMXName
+	Write-Host -ForegroundColor Magenta $VMXName -NoNewline
+    Write-Host -ForegroundColor Green "[success]"
     $object = New-Object -TypeName psobject
     $object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
     $object | Add-Member -MemberType NoteProperty -Name Disktype -Value "lsilogic"
