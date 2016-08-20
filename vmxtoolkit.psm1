@@ -1657,6 +1657,7 @@ function Set-VMXGuestOS
 		$content += 'guestos = "' + $GuestOS + '"'
 		Set-Content -Path $config -Value $content -Force
 		$object = New-Object -TypeName psobject
+		$object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXName
 		$Object | Add-Member -MemberType NoteProperty -Name Config -Value $config
 		$object | Add-Member -MemberType NoteProperty -Name GuestOS -Value $GuestOS
 		Write-Output $Object
@@ -1724,6 +1725,7 @@ function Set-VMXVTBit
 		$content += 'vhv.enable = "' + $VTBit.IsPresent.ToString() + '"'
 		Set-Content -Path $config -Value $content -Force
 		$object = New-Object -TypeName psobject
+		$object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXName
 		$Object | Add-Member -MemberType NoteProperty -Name Config -Value $config
 		$object | Add-Member -MemberType NoteProperty -Name "Virtual VTBit" -Value $VTBit.IsPresent.ToString()
 		Write-Output $Object
