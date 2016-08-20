@@ -2389,8 +2389,8 @@ function New-VMXLinkedClone
 		Write-Verbose $ClonePath
 		$Targetpath = Join-Path $Clonepath $CloneName 
 		$CloneConfig = "$Targetpath\$CloneName.vmx"
-		Write-Verbose "Creating Linked Clone  $Clonename for $Basesnapshot in $Cloneconfig"
-		Write-Host -ForegroundColor Gray " ==>Creating Linked Clone from $Basesnapshot for" -NoNewline
+		Write-Verbose "Creating Linked Clone $Clonename from $Basesnapshot in $Cloneconfig"
+		Write-Host -ForegroundColor Gray " ==>Creating Linked Clone from $Basesnapshot in $Cloneconfig for " -NoNewline
 		Write-Host -ForegroundColor Magenta $Clonename -NoNewline
 		Write-Host -ForegroundColor Green "[success]"
 		do
@@ -2728,7 +2728,7 @@ function Start-VMX
                 $content += 'guestinfo.vmwareversion = "' + $Global:vmwareversion + '"'
 	    		set-Content -Path $vmx.config -Value $content -Force
 		    	Write-Verbose "Starting VM $vmxname"
-				Write-Host -ForegroundColor Gray " ==>STarting Virtual Machine " -NoNewline
+				Write-Host -ForegroundColor Gray " ==>Starting Virtual Machine " -NoNewline
 				Write-Host -ForegroundColor Magenta $VMX.vmxname -NoNewline
 		    	if ($nowait.IsPresent)
                     {
@@ -3802,8 +3802,6 @@ process
         }
     $vmxConfig += $AddDrives
     $vmxConfig | set-Content -Path $config
-	Write-Host -ForegroundColor Gray " ==>Adding Disk $Diskname at Controller $Controller LUN $LUN to " -NoNewline
-	Write-Host -ForegroundColor Magenta $VMXName -NoNewline
     Write-Host -ForegroundColor Green "[success]"
     $object = New-Object -TypeName psobject
     $object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
