@@ -3399,7 +3399,8 @@ function Set-VMXVnet
 		$AddContent = 'Ethernet'+$Adapter+'.connectionType = "custom"'
 		Write-Verbose "Setting $Addcontent"
 		$Addcontent | Add-Content -Path $config
-		Write-Host -ForegroundColor Gray " ==>Setting ethernet$Adapter to $Vnet for $VMXName"
+		Write-Host -ForegroundColor Gray -NoNewline " ==>Setting ethernet$Adapter to $Vnet for "
+		Write-Host -ForegroundColor Green $VMXName
 		$object = New-Object psobject
 		$object | Add-Member -MemberType 'NoteProperty' -Name VMXname -Value $VMXName
    		$object | Add-Member -MemberType 'NoteProperty' -Name Adapter -Value "ethernet$Adapter"
@@ -3798,7 +3799,8 @@ process
         }
     $vmxConfig += $AddDrives
     $vmxConfig | set-Content -Path $config
-	Write-Host -ForegroundColor Gray " ==>Adding Disk $Diskname at Controller $Controller LUN $LUN to $VMXName"
+	Write-Host -ForegroundColor Gray " ==>Adding Disk $Diskname at Controller $Controller LUN $LUN to " -NoNewline
+	Write-Host -ForegroundColor Green $VMXName
     $object = New-Object -TypeName psobject
     $object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
     $object | Add-Member -MemberType NoteProperty -Name Disktype -Value "lsilogic"
