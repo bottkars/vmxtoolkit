@@ -1646,7 +1646,9 @@ function Set-VMXGuestOS
 	{
         if ((get-vmx -Path $config).state -eq "stopped")
         {
-		Write-Host -ForegroundColor Gray " ==>Setting GuestOS $GuestOS"
+		Write-Host -ForegroundColor Gray " ==>Setting GuestOS $GuestOS for " -NoNewlinen
+		Write-Host -ForegroundColor Magenta $vmxname -NoNewline
+		Write-Host -ForegroundColor Green "[success]"
 		$Content = Get-Content $config | where { $_ -ne "" }
 		$Content = $content | where { $_ -NotMatch "guestos" }
 		$content += 'guestos = "' + $GuestOS + '"'
@@ -1708,7 +1710,9 @@ function Set-VMXVTBit
 	{
         if ((get-vmx -Path $config).state -eq "stopped")
         {
-		Write-Host -ForegroundColor Gray " ==>Setting Virtual VTbit to $($VTBit.IsPresent.ToString())"
+		Write-Host -ForegroundColor Gray " ==>Setting Virtual VTbit to $($VTBit.IsPresent.ToString()) for " -NoNewline
+		Write-Host -ForegroundColor Magenta $vmxname -NoNewline
+		Write-Host -ForegroundColor Green "[success]"
 		$Content = Get-Content $config | where { $_ -ne "" }
 		$Content = $content | where { $_ -NotMatch "vhv.enable" }
 		$content += 'vhv.enable = "' + $VTBit.IsPresent.ToString() + '"'
