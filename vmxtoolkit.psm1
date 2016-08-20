@@ -1651,7 +1651,7 @@ function Set-VMXGuestOS
 	{
         if ((get-vmx -Path $config).state -eq "stopped")
         {
-		Write-Host -ForegroundColor Gray " ==>Setting GuestOS $GuestOS for " -NoNewline
+		Write-Host -ForegroundColor Gray " ==>setting GuestOS $GuestOS for " -NoNewline
 		Write-Host -ForegroundColor Magenta $vmxname -NoNewline
 		Write-Host -ForegroundColor Green "[success]"
 		$Content = Get-Content $config | where { $_ -ne "" }
@@ -1719,7 +1719,7 @@ function Set-VMXVTBit
 	{
         if ((get-vmx -Path $config).state -eq "stopped")
         {
-		Write-Host -ForegroundColor Gray " ==>Setting Virtual VTbit to $($VTBit.IsPresent.ToString()) for " -NoNewline
+		Write-Host -ForegroundColor Gray " ==>setting Virtual VTbit to $($VTBit.IsPresent.ToString()) for " -NoNewline
 		Write-Host -ForegroundColor Magenta $vmxname -NoNewline
 		Write-Host -ForegroundColor Green "[success]"
 		$Content = Get-Content $config | where { $_ -ne "" }
@@ -1828,34 +1828,37 @@ function Set-VMXSharedFolderState
 		{
 			"1"
 			   {
-                Write-Verbose "Enabling Shared Folder State for $config"
+				Write-Host -ForegroundColor Gray " ==>enabling shared folders (hgfs) for " -NoNewline
+				Write-Host -ForegroundColor Magenta $VMXName -NoNewline
+                Write-Verbose "enabling Shared Folder State for $config"
                 do 
                     { 
                     $cmdresult = &$vmrun enableSharedFolders $config
                     }
                 until ($VMrunErrorCondition -notcontains $cmdresult)
                 $object | Add-Member -MemberType 'NoteProperty' -Name State -Value "enabled"
-                
                 }
-                
-
 			"2"
 			{
-             Write-Verbose "Disabling Shared Folder State for $config"
-                do 
-                    { 
-                    $cmdresult = &$vmrun disableSharedFolders $config
-                    }
-                until ($VMrunErrorCondition -notcontains $cmdresult)
-		        $object | Add-Member -MemberType 'NoteProperty' -Name State -Value "disabled"
+			Write-Host -ForegroundColor Gray " ==>disabling shared folders (hgfs) for " -NoNewline
+			Write-Host -ForegroundColor Magenta $VMXName -NoNewline
+            Write-Verbose "Disabling Shared Folder State for $config"
+            do 
+                { 
+                $cmdresult = &$vmrun disableSharedFolders $config
+                }
+            until ($VMrunErrorCondition -notcontains $cmdresult)
+		    $object | Add-Member -MemberType 'NoteProperty' -Name State -Value "disabled"
 			}
 		}
         if ($LASTEXITCODE -eq 0)
             {
+			Write-Host -ForegroundColor Green "[success]"
             Write-Output $Object
 			}
         else
             {
+			Write-Host -ForegroundColor Red "[failed]"
             Write-Warning "exit with status $LASTEXITCODE $cmdresult"
             }
 	}
@@ -1924,7 +1927,9 @@ function Set-VMXSharedFolder
 		{
 			"1"
 			   {
-                Write-Verbose "Adding Shared $Sharename for Folder $Folder for $config"
+				Write-Host -ForegroundColor Gray " ==>adding Share $Sharename for Folder $Folder to " -NoNewline
+				Write-Host -ForegroundColor Magenta $VMXName -NoNewline                
+				Write-Verbose "adding Share $Sharename for Folder $Folder for $config"
                 do 
                     { 
                     $cmdresult = &$vmrun addSharedFolder $config $Sharename $Folder
@@ -1933,11 +1938,11 @@ function Set-VMXSharedFolder
                 $object | Add-Member -MemberType 'NoteProperty' -Name Share -Value $Sharename
                 $object | Add-Member -MemberType 'NoteProperty' -Name Folder -Value $Folder
                 }
-                
-
 			"2"
-			{
-             Write-Verbose "removing Shared Folder for $config"
+				{
+				Write-Host -ForegroundColor Gray " ==>removing Share $Sharename for Folder $Folder to " -NoNewline
+				Write-Host -ForegroundColor Magenta $VMXName -NoNewline                
+				Write-Verbose "removing Shared Folder for $config"
                 do 
                     { 
                     $cmdresult = &$vmrun removeSharedFolder $config $Sharename
@@ -1948,11 +1953,14 @@ function Set-VMXSharedFolder
 		}
         if ($LASTEXITCODE -eq 0)
             {
+			Write-Host -ForegroundColor Green "[success]"
             Write-Output $Object
 			}
         else
             {
-            Write-Warning "exit with status $LASTEXITCODE $cmdresult"
+			Write-Host -ForegroundColor Red "[failed]"
+            Write-Error "exit with status $LASTEXITCODE $cmdresult"
+			Break
             }
 	}
 	End
@@ -2240,8 +2248,8 @@ function New-VMXSnapshot
 		
 			}
 		}
-	    Write-Verbose "Creating Snapshot $Snapshotname for $vmxname"
-		Write-Host -ForegroundColor Gray " ==>Creating new Snapshot $Snapshotname for " -NoNewline
+	    Write-Verbose "creating Snapshot $Snapshotname for $vmxname"
+		Write-Host -ForegroundColor Gray " ==>creating new Snapshot $Snapshotname for " -NoNewline
 		Write-Host -ForegroundColor Magenta $VMXName -NoNewline
         do
             {
@@ -2403,8 +2411,8 @@ function New-VMXLinkedClone
 		$CloneConfig = "$Targetpath\$CloneName.vmx"
 		$TemplateVM = Split-Path -Leaf $config
 		$Templatevm = $TemplateVM -replace ".vmx",""
-		Write-Verbose "Creating Linked Clone $Clonename from $TemplateVM $Basesnapshot in $Cloneconfig"
-		Write-Host -ForegroundColor Gray " ==>Creating Linked Clone from $TemplateVM $Basesnapshot for " -NoNewline
+		Write-Verbose "creating Linked Clone $Clonename from $TemplateVM $Basesnapshot in $Cloneconfig"
+		Write-Host -ForegroundColor Gray " ==>creating Linked Clone from $TemplateVM $Basesnapshot for " -NoNewline
 		Write-Host -ForegroundColor Magenta $Clonename -NoNewline
 		do
 			{
@@ -2465,9 +2473,9 @@ function New-VMXClone
 		$TemplateVM = Split-Path -Leaf $config
 		$Templatevm = $TemplateVM -replace ".vmx",""
 		Write-Verbose $CloneConfig
-		Write-Host -ForegroundColor Gray " ==>Creating Fullclone from $TemplateVM $Basesnapshot for " -NoNewline
+		Write-Host -ForegroundColor Gray " ==>creating Fullclone from $TemplateVM $Basesnapshot for " -NoNewline
 		Write-Host -ForegroundColor Magenta $Clonename -NoNewline
-		Write-Verbose "Creating Full Clone  $Clonename for $Basesnapshot in $Cloneconfig"
+		Write-Verbose "creating Full Clone  $Clonename for $Basesnapshot in $Cloneconfig"
 		do
 			{
 			($cmdresult = &$vmrun clone $config $Cloneconfig full $BaseSnapshot $Clonename) #  2>&1 | Out-Null
@@ -2724,9 +2732,9 @@ function Start-VMX
             if ($vmxHWversion -le $vmwareversion.major)
             {
                 Write-Verbose "Checking State for $vmxname : $($vmx.vmxname)  : $($vmx.state)"
-                Write-Verbose "Creating Backup of $($vmx.config)"
+                Write-Verbose "creating Backup of $($vmx.config)"
                 Copy-Item -Path $vmx.config -Destination "$($vmx.config).bak" 
-	    		Write-Verbose -Message "Setting Startparameters for $vmxname"
+	    		Write-Verbose -Message "setting Startparameters for $vmxname"
 	    		$VMXStarttime = Get-Date -Format "MM.dd.yyyy hh:mm:ss"
 	    		$content = Get-Content $vmx.config | where { $_ -ne "" }
 	    		$content = $content | where { $_ -NotMatch "guestinfo.hypervisor" }
@@ -2736,8 +2744,8 @@ function Start-VMX
                 $content = $content |where { $_ -NotMatch "guestinfo.vmwareversion" }
                 $content += 'guestinfo.vmwareversion = "' + $Global:vmwareversion + '"'
 	    		set-Content -Path $vmx.config -Value $content -Force
-		    	Write-Verbose "Starting VM $vmxname"
-				Write-Host -ForegroundColor Gray " ==>Starting Virtual Machine " -NoNewline
+		    	Write-Verbose "starting VM $vmxname"
+				Write-Host -ForegroundColor Gray " ==>starting Virtual Machine " -NoNewline
 				Write-Host -ForegroundColor Magenta $VMX.vmxname -NoNewline
 		    	if ($nowait.IsPresent)
                     {
@@ -3145,7 +3153,7 @@ function Set-VMXNetworkAdapter
 		$Content = Get-Content -Path $config
 		Write-verbose "ethernet$Adapter.present"
 		if (!($Content -match "ethernet$Adapter.present")) { Write-Warning "Adapter not present, will be added" }
-		Write-Host -ForegroundColor Gray " ==>Configuring Ethernet$Adapter as $AdapterType with $ConnectionType for " -NoNewline
+		Write-Host -ForegroundColor Gray " ==>configuring Ethernet$Adapter as $AdapterType with $ConnectionType for " -NoNewline
 		write-host -ForegroundColor Magenta $VMXName -NoNewline
 		Write-Host -ForegroundColor Green "[success]"
 		$Content = $Content -notmatch "ethernet$Adapter"
@@ -3411,12 +3419,12 @@ function Set-VMXVnet
 		Set-Content -Path $config -Value $Content
 		$Addcontent = 'ethernet' + $Adapter + '.vnet = "' + $vnet + '"'
 		#, 'ethernet' + $Adapter + '.connectionType = "custom"', 'ethernet' + $Adapter + '.wakeOnPcktRcv = "FALSE"', 'ethernet' + $Adapter + '.pciSlotNumber = "' + $PCISlot + '"', 'ethernet' + $Adapter + '.virtualDev = "e1000e"')
-		Write-Verbose "Setting $Addcontent"
+		Write-Verbose "setting $Addcontent"
 		$Addcontent | Add-Content -Path $config
 		$AddContent = 'Ethernet'+$Adapter+'.connectionType = "custom"'
-		Write-Verbose "Setting $Addcontent"
+		Write-Verbose "setting $Addcontent"
 		$Addcontent | Add-Content -Path $config
-		Write-Host -ForegroundColor Gray -NoNewline " ==>Setting ethernet$Adapter to $Vnet for "
+		Write-Host -ForegroundColor Gray -NoNewline " ==>setting ethernet$Adapter to $Vnet for "
 		Write-Host -ForegroundColor Magenta $VMXName -NoNewline
 	    Write-Host -ForegroundColor Green "[success]"
 		$object = New-Object psobject
@@ -3690,7 +3698,7 @@ param (
 begin {
        }
 process {
-	Write-Host -ForegroundColor Gray " ==>Creating new $($NewDiskSize/1GB)GB SCSI Disk $NewDiskName at $Path" -NoNewline
+	Write-Host -ForegroundColor Gray " ==>creating new $($NewDiskSize/1GB)GB SCSI Disk $NewDiskName at $Path" -NoNewline
     if (!$NewDiskname.EndsWith(".vmdk")) { $NewDiskname = $NewDiskname+".vmdk" }    
     if ($PSCmdlet.MyInvocation.BoundParameters["debug"].IsPresent)
         {
@@ -3802,8 +3810,8 @@ begin {
        }
 process 
     {
-    Write-Verbose "Adding Disk #$Disk with $Diskname to $VMXName as lun $lun controller $Controller"
-	Write-Host -ForegroundColor Gray " ==>Adding Disk $Diskname at Controller $Controller LUN $LUN to " -NoNewline
+    Write-Verbose "adding Disk #$Disk with $Diskname to $VMXName as lun $lun controller $Controller"
+	Write-Host -ForegroundColor Gray " ==>adding Disk $Diskname at Controller $Controller LUN $LUN to " -NoNewline
 	Write-Host -ForegroundColor Magenta $VMXName -NoNewline
     $vmxConfig = Get-VMXConfig -config $config
     $vmxconfig = $vmxconfig | where {$_ -notmatch "scsi$($Controller):$($LUN)"}
@@ -4093,7 +4101,7 @@ function Invoke-VMXPowerShell
 process
     {
     $myscript = ".'$ScriptPath\$Script'"
-    Write-Host -ForegroundColor Gray "Starting '$Script $Parameter' on " -NoNewline
+    Write-Host -ForegroundColor Gray " ==>starting '$Script $Parameter' on " -NoNewline
     Write-Host  -ForegroundColor Magenta (Split-Path -Leaf $config ).Replace(".vmx","") -NoNewline
 
     do
@@ -4271,7 +4279,7 @@ function Invoke-VMXexpect
 
 process
 {	
-Write-Verbose "Starting $Scriptblock"	
+Write-Verbose "starting $Scriptblock"	
 do
     
 	{
@@ -4329,7 +4337,7 @@ function Invoke-VMXexpect
 
 process
 {	
-Write-Verbose "Starting $Scriptblock"	
+Write-Verbose "starting $Scriptblock"	
 do
     
 	{
@@ -5027,7 +5035,7 @@ process {
             Write-Warning "VMwareTool must be installed and Running"
             break
         }
-        Write-Verbose "Configuring $device"
+        Write-Verbose "configuring $device"
         if ($suse.IsPresent)
             {
             $File = "/etc/sysconfig/network/ifcfg-$device"
@@ -5132,7 +5140,7 @@ process {
             }
         if ($Hostname)
             {
-            Write-Verbose "Setting Hostname $Hostname"
+            Write-Verbose "setting Hostname $Hostname"
             $Scriptblock = "sed -i -- '/HOSTNAME/c\HOSTNAME=$Hostname' /etc/sysconfig/network"
             Write-Verbose "Invoking $Scriptblock"
             $vmx | Invoke-VMXBash -Scriptblock $scriptblock -Guestuser $rootuser -Guestpassword $rootpassword
@@ -5358,20 +5366,20 @@ tools.remindInstall = "FALSE"')
     "Server2016"
         {
         $guestOS = "windows9srv-64"
-        Write-Verbose "Creating new vm as $_ with $guestOS"
+        Write-Verbose "creating new vm as $_ with $guestOS"
         $VMXConfig += 'guestOS = "'+$guestOS+'"'        
         }   
     
     "Server2012"
         {
         $guestOS = "windows8srv-64"
-        Write-Verbose "Creating new vm as $_ with $guestOS"
+        Write-Verbose "creating new vm as $_ with $guestOS"
         $VMXConfig += 'guestOS = "'+$guestOS+'"'        
         }
     "Hyper-V"
         {
         $guestOS = "winhyperv"
-        Write-Verbose "Creating new vm as $_ with $guestOS"
+        Write-Verbose "creating new vm as $_ with $guestOS"
         $VMXConfig += 'guestOS = "'+$guestOS+'"'        
         }
     "Default"
