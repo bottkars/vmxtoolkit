@@ -2390,6 +2390,7 @@ function New-VMXLinkedClone
 		$Targetpath = Join-Path $Clonepath $CloneName 
 		$CloneConfig = "$Targetpath\$CloneName.vmx"
 		$TemplateVM = Split-Path -Leaf $config
+		$Templatevm = $TemplateVM -replace ".vmx",""
 		Write-Verbose "Creating Linked Clone $Clonename from $TemplateVM $Basesnapshot in $Cloneconfig"
 		Write-Host -ForegroundColor Gray " ==>Creating Linked Clone from $TemplateVM $Basesnapshot for " -NoNewline
 		Write-Host -ForegroundColor Magenta $Clonename -NoNewline
