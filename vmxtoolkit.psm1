@@ -1634,7 +1634,10 @@ function Set-VMXGuestOS
 				   'vmkernel5','vmkernel6',
 				   'winhyperv','windows8srv-64',
 				   'other26xlinux','sles11-64')]
-				   [Alias('Value')]$GuestOS
+				   [Alias('Value')]$GuestOS,
+		[Parameter(Mandatory = $false,ValueFromPipelineByPropertyName = $True)]
+		[Alias('NAME','CloneName')]
+		[string]$VMXName
 	)
 	
 	Begin
@@ -1646,7 +1649,7 @@ function Set-VMXGuestOS
 	{
         if ((get-vmx -Path $config).state -eq "stopped")
         {
-		Write-Host -ForegroundColor Gray " ==>Setting GuestOS $GuestOS for " -NoNewlinen
+		Write-Host -ForegroundColor Gray " ==>Setting GuestOS $GuestOS for " -NoNewline
 		Write-Host -ForegroundColor Magenta $vmxname -NoNewline
 		Write-Host -ForegroundColor Green "[success]"
 		$Content = Get-Content $config | where { $_ -ne "" }
@@ -1698,7 +1701,10 @@ function Set-VMXVTBit
 				   HelpMessage = 'Please Specify Valid Config File')]$config,
 		[Parameter(Mandatory = $false,
 				   ValueFromPipelineByPropertyName = $False)]
-				   [switch]$VTBit
+				   [switch]$VTBit,
+		[Parameter(Mandatory = $false,ValueFromPipelineByPropertyName = $True)]
+		[Alias('NAME','CloneName')]
+		[string]$VMXName
 	)
 	
 	Begin
