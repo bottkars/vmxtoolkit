@@ -538,7 +538,7 @@ function Import-VMXOVATemplate
             $Name = $($ovaPath.Basename)
         }
         $ovfparam = "--skipManifestCheck"
-        Write-Host -ForegroundColor Magenta " ==>Importing from OVA $($ovaPath.Basename), may take a while"
+        Write-Host -ForegroundColor Gray " ==>Importing from OVA $($ovaPath.Basename), may take a while" -NoNewline
         if ($Quiet.IsPresent)
             {
             $ovfparam = "$ovfparam --quiet"
@@ -560,6 +560,7 @@ function Import-VMXOVATemplate
             {
             0
                 {
+				Write-Host -ForegroundColor Green "[success]"
 		        $object = New-Object -TypeName psobject
 		        $Object | Add-Member -MemberType NoteProperty -Name OVA -Value $OVAPath.BaseName
 		        $object | Add-Member -MemberType NoteProperty -Name VMname -Value $Name
@@ -567,6 +568,7 @@ function Import-VMXOVATemplate
                 }
             default
                 {
+				Write-Host -ForegroundColor Red "[failed]"
                 Write-Warning "Error $LASTEXITCODE when importing $OVAPath"
                 $object = New-Object -TypeName psobject
 		        $Object | Add-Member -MemberType NoteProperty -Name OVA -Value $OVAPath.BaseName
@@ -2189,11 +2191,6 @@ process
 end {}
 }
 # end get-vmx
-
-### new-*
-
-
-
 <#
 	.SYNOPSIS
 		A brief description of the New-VMXSnapshot function.
@@ -2244,6 +2241,8 @@ function New-VMXSnapshot
 			}
 		}
 	    Write-Verbose "Creating Snapshot $Snapshotname for $vmxname"
+		Write-Host -ForegroundColor Gray " ==>Creating new Snapshot $Snapshotname for " -NoNewline
+		Write-Host -ForegroundColor Magenta $VMXName -NoNewline
         do
             {
 	        ($cmdresult = &$vmrun snapshot $config $SnapshotName) # 2>&1 | Out-Null
@@ -2251,6 +2250,7 @@ function New-VMXSnapshot
 		until ($VMrunErrorCondition -notcontains $cmdresult)
         if ($LASTEXITCODE -eq 0)
             {
+			Write-Host -ForegroundColor Green "[success]"
 		    $object = New-Object psobject
 		    $object | Add-Member -MemberType 'NoteProperty' -Name VMXname -Value $VMXname
 		    $object | Add-Member -MemberType 'NoteProperty' -Name Snapshot -Value $SnapshotName
@@ -2260,11 +2260,11 @@ function New-VMXSnapshot
 			}
         else
             {
-            Write-Warning "exit with status $LASTEXITCODE $cmdresult"
+			Write-Host -ForegroundColor Red "[failed]"
+            Write-Error "exit with status $LASTEXITCODE $cmdresult"
+			Break
             }
     }
-		
-	
 	End
     {
 		
@@ -2406,7 +2406,6 @@ function New-VMXLinkedClone
 		Write-Verbose "Creating Linked Clone $Clonename from $TemplateVM $Basesnapshot in $Cloneconfig"
 		Write-Host -ForegroundColor Gray " ==>Creating Linked Clone from $TemplateVM $Basesnapshot for " -NoNewline
 		Write-Host -ForegroundColor Magenta $Clonename -NoNewline
-		Write-Host -ForegroundColor Green "[success]"
 		do
 			{
 		    $cmdresult = &$vmrun clone $config $Cloneconfig linked $BaseSnapshot $Clonename  2>&1 | Out-Null
@@ -2414,6 +2413,7 @@ function New-VMXLinkedClone
 		until ($VMrunErrorCondition -notcontains $cmdresult)
         if ($LASTEXITCODE -eq 0)
             {
+			Write-Host -ForegroundColor Green "[success]"
             $Addcontent = @()
             $Addcontent += 'guestinfo.buildDate = "'+$BuildDate+'"'
             Add-Content -Path $Cloneconfig -Value $Addcontent
@@ -2425,10 +2425,10 @@ function New-VMXLinkedClone
             }
         else
             {
+			Write-Host -ForegroundColor Red "[failed]"
             Write-Warning "could not create clone with $cmdresult"
             break
             }
-             
 		}	
 	End
 	{
@@ -2452,48 +2452,43 @@ function New-VMXClone
 		$CloneName,
 		[Parameter(Mandatory = $false)][ValidateScript({ Test-Path -Path $_ })]$Clonepath,
 		[Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]$Path
-		
-	
-		
 	)
-	<#
-	clone                    Path to vmx file     Create a copy of the VM
-                         Path to destination vmx file
-                         full|linked
-                         [-snapshot=Snapshot Name]
-                         [-cloneName=Name]
-	#>
 	Begin
 	{
-		
 	}
 	Process
 	{
 		#foreach ($config in $getconfig)
 		if (!$Clonepath) { $Clonepath = Split-Path -Path $Path -Parent }
 		Write-Verbose $ClonePath
-		
 		$CloneConfig = "$Clonepath\$Clonename\$CloneName.vmx"
+		$TemplateVM = Split-Path -Leaf $config
+		$Templatevm = $TemplateVM -replace ".vmx",""
 		Write-Verbose $CloneConfig
-			do
+		Write-Host -ForegroundColor Gray " ==>Creating Fullclone from $TemplateVM $Basesnapshot for " -NoNewline
+		Write-Host -ForegroundColor Magenta $Clonename -NoNewline
+		Write-Verbose "Creating Full Clone  $Clonename for $Basesnapshot in $Cloneconfig"
+		do
 			{
-			
-			# $VerbosePreference = [System.Management.Automation.ActionPreference]::Continue
-				Write-Verbose "Creating Full Clone  $Clonename for $Basesnapshot in $Cloneconfig"
 			($cmdresult = &$vmrun clone $config $Cloneconfig full $BaseSnapshot $Clonename) #  2>&1 | Out-Null
-			#  &$vmrun clone $MasterVMX $CloneVMX linked Base
-				#write-log "$origin snapshot  $cmdresult"
-				# $VerbosePreference = [System.Management.Automation.ActionPreference]::SilentlyContinue
 			}
 		until ($VMrunErrorCondition -notcontains $cmdresult)
-		# Set-VMXDisplayName -config $CloneConfig -Value $CloneName
+        if ($LASTEXITCODE -eq 0)
+            {
+			Write-Host -ForegroundColor Green "[success]"
 			$object = New-Object psobject
 			$object | Add-Member -MemberType 'NoteProperty' -Name CloneName -Value $Clonename
 			$object | Add-Member -MemberType 'NoteProperty' -Name Config -Value $Cloneconfig
 			$object | Add-Member -MemberType 'NoteProperty' -Name Path -Value "$Clonepath\$Clonename"
-		
 			Write-Output $Object
-             
+			}
+        else
+            {
+			Write-Host -ForegroundColor Red "[failed]"
+            Write-Warning "could not create clone with $cmdresult"
+            break
+            }
+
 		}	
 	End
 	{
@@ -2984,6 +2979,7 @@ function Set-VMXTemplate
 	[CmdletBinding(HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param (
 		[Parameter( Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('vmxconfig')]$config,
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')][string]$VMXName,
         [Parameter(Mandatory = $false)][switch]$unprotect
 		# [Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$config
 	)
@@ -3004,18 +3000,24 @@ function Set-VMXTemplate
 			$content = Get-Content -Path $config | where { $_ -ne "" }
 		    $content = $content | where { $_ -NotMatch "templateVM" }
 		    $object = New-Object psobject
+			$object | Add-Member -Type 'NoteProperty' -Name VMXName -Value $VMXName	
 			$object | Add-Member -Type 'NoteProperty' -Name VMXconfig -Value $config			
             if ($unprotect.IsPresent)
                 {
+				Write-Host -ForegroundColor Gray " ==>releasing Template mode for " -NoNewline
+				Write-Host -ForegroundColor Magenta $VMXName -NoNewline
                 $content += 'templateVM = "FALSE"'
                 $object | Add-Member -Type 'NoteProperty' -Name Template -Value $False
                 }
             else
                 {
+				Write-Host -ForegroundColor Gray " ==>setting Template mode for " -NoNewline
+				Write-Host -ForegroundColor Magenta $VMXName -NoNewline
                 $content += 'templateVM = "TRUE"'
 			    $object | Add-Member -Type 'NoteProperty' -Name Template -Value $True
                 }
             set-Content -Path $config -Value $content -Force
+			Write-Host -ForegroundColor Green "[success]"
 			Write-Output $object
 			}
             }
@@ -3800,11 +3802,11 @@ begin {
        }
 process 
     {
+    Write-Verbose "Adding Disk #$Disk with $Diskname to $VMXName as lun $lun controller $Controller"
 	Write-Host -ForegroundColor Gray " ==>Adding Disk $Diskname at Controller $Controller LUN $LUN to " -NoNewline
 	Write-Host -ForegroundColor Magenta $VMXName -NoNewline
     $vmxConfig = Get-VMXConfig -config $config
     $vmxconfig = $vmxconfig | where {$_ -notmatch "scsi$($Controller):$($LUN)"}
-    Write-Verbose "Adding Disk #$Disk with $Diskname to $VMXName as lun $lun controller $Controller"
     $AddDrives  = @('scsi'+$Controller+':'+$LUN+'.present = "TRUE"')
     $AddDrives += @('scsi'+$Controller+':'+$LUN+'.deviceType = "disk"')
     $AddDrives += @('scsi'+$Controller+':'+$LUN+'.fileName = "'+$diskname+'"')
