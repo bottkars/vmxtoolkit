@@ -3126,7 +3126,6 @@ function Set-VMXNetworkAdapter
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateSet('nat', 'bridged','custom','hostonly')]$ConnectionType,
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateSet('e1000e','vmxnet3','e1000')]$AdapterType,
 		[Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)][int]$PCISlot
-
 	)
 	
 	Begin
@@ -3144,7 +3143,9 @@ function Set-VMXNetworkAdapter
 		$Content = Get-Content -Path $config
 		Write-verbose "ethernet$Adapter.present"
 		if (!($Content -match "ethernet$Adapter.present")) { Write-Warning "Adapter not present, will be added" }
-		Write-Host -ForegroundColor Gray " ==>Configuring Ethernet$Adapter as $AdapterType with $ConnectionType for $VMXName"
+		Write-Host -ForegroundColor Gray " ==>Configuring Ethernet$Adapter as $AdapterType with $ConnectionType for " -NoNewline
+		write-host -ForegroundColor Magenta $VMXName -NoNewline
+		Write-Host -ForegroundColor Green "[success]"
 		$Content = $Content -notmatch "ethernet$Adapter"
         $Addnic = @('ethernet'+$Adapter+'.present = "TRUE"')
         $Addnic += @('ethernet'+$Adapter+'.connectionType = "'+$ConnectionType+'"')
