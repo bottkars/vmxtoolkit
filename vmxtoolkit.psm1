@@ -3675,6 +3675,7 @@ param (
 begin {
        }
 process {
+	Write-Host -ForegroundColor Gray " ==>Creating new $($NewDiskSize/1GB)GB SCSI Disk $NewDiskName at $Path" -NoNewline
     if (!$NewDiskname.EndsWith(".vmdk")) { $NewDiskname = $NewDiskname+".vmdk" }    
     if ($PSCmdlet.MyInvocation.BoundParameters["debug"].IsPresent)
         {
@@ -3694,8 +3695,8 @@ process {
 
     if ($LASTEXITCODE -eq 0)
         {
+	    Write-Host -ForegroundColor Green "[success]"
         $object = New-Object -TypeName psobject
-		Write-Host -ForegroundColor Gray " ==>Creating new $($NewDiskSize/1GB)GB SCSI Disk $NewDiskName at $Path"
         $object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
         $object | Add-Member -MemberType NoteProperty -Name Disktype -Value "lsilogic"
         $object | Add-Member -MemberType NoteProperty -Name Diskname -Value $NewDiskname
