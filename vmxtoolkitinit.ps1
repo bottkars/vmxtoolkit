@@ -7,7 +7,7 @@ write-Host "trying to get os type ... "
 if  (Test-Path C:\WINDOWS\system32\ntdll.dll)
 	{
 	$OS  = Get-Command C:\WINDOWS\system32\ntdll.dll
-	Write-Host "running on Windows $OS.Version"
+	Write-Host "running on Windows $($OS.Version)"
 	$vmxtoolkit_type ="win_x86_64"
 	}
 else
