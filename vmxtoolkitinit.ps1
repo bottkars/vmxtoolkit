@@ -1,4 +1,8 @@
-﻿################## Some Globals 
+﻿[CmdletBinding()]
+param
+()
+
+################## Some Globals 
 write-verbose "trying to get os type"
 
 if ($env:TERM_PROGRAM)
