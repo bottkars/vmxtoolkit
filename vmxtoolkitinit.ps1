@@ -3,27 +3,34 @@ param
 ()
 
 ################## Some Globals 
-write-verbose "trying to get os type"
-
-if ($env:TERM_PROGRAM)
+write-Host "trying to get os type ... "
+if  ($OS = get-command C:\WINDOWS\system32\ntdll.dll)
 	{
-	write-verbose "term variable detected,supposed to be on Linux or OSX"
-	if ($env:TERM_PROGRAM -match "Apple_Terminal")
-		{
-		write-Verbose "looks like vmxtoolkit is running on osx"
-		$vmxtoolkit_type = "osx"	
-		}
-	else	
-		{
-		write-warning "unsuppoted os"
-		break
-		}
+	Write-Host "running on Windows $OS.Version"
+	$vmxtoolkit_type ="win_x86_64"
 	}
 else
-    {
-    write-verbose "running windows"
-    $vmxtoolkit_type ="win_x86_64"
-    }
+	{
+	if ($OS = uname)
+		{
+		Write-Host "found OS $OS"
+		Switch ($OS)
+			{
+			"Darwin"
+				{
+				$vmxtoolkit_type = "OSX"
+				$OS_Version = (uname -r)
+				Write-Host "running $OS_Version"
+				}
+			default
+				{
+				Write-host "Sorry, rome was not build in one day"
+				Break
+				}
+			}
+		}
+
+	}
 
 switch ($vmxtoolkit_type)
     {
