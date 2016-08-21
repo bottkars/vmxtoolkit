@@ -4,8 +4,9 @@ param
 
 ################## Some Globals 
 write-Host "trying to get os type ... "
-if  ($OS = get-command C:\WINDOWS\system32\ntdll.dll)
+if  (Test-Path C:\WINDOWS\system32\ntdll.dll)
 	{
+	$OS  = Get-Command C:\WINDOWS\system32\ntdll.dll
 	Write-Host "running on Windows $OS.Version"
 	$vmxtoolkit_type ="win_x86_64"
 	}
@@ -84,4 +85,8 @@ switch ($vmxtoolkit_type)
     }
 
     }
+
+Write-Host -ForegroundColor Gray " ==>vmrun used from $Global:vmrun"
+Write-Host -ForegroundColor Gray " ==>vmwarepath is $Global:vmwarepath"
+Write-Host -ForegroundColor Gray " ==>default vmxdir is $Global:vmxdir"
 
