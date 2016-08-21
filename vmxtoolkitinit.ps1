@@ -30,10 +30,10 @@ switch ($vmxtoolkit_type)
     "osx"
         {
         $Global:vmxdir = split-path $PSScriptRoot
-        $VMWAREpath = "/Applications/VMware\ Fusion.app"
+        $VMWAREpath = "/Applications/VMware Fusion.app"
         $Global:vmwarepath = $VMWAREpath
         #$Global:vmware = "$VMWAREpath\vmware.exe"
-        $Global:vmrun = "/Applications/VMware\ Fusion.app/Contents/Library/vmrun"
+        $Global:vmrun = "/Applications/VMware Fusion.app/Contents/Library/vmrun"
         }
     "win_x86_64"
         {
