@@ -65,6 +65,14 @@ switch ($vmxtoolkit_type)
         $Global:vmxinventory = "$env:appdata\vmware\inventory.vmls"
         #}
         # End VMWare Path
+        $Global:vmwareversion = New-Object System.Version($vmwarefileinfo.VersionInfo.ProductMajorPart,$vmwarefileinfo.VersionInfo.ProductMinorPart,$vmwarefileinfo.VersionInfo.ProductBuildPart,$vmwarefileinfo.VersionInfo.ProductVersion.Split("-")[1])
+        # $Global:vmwareMajor = $vmwarefileinfo.VersionInfo.ProductMajorPart
+        # $Global:vmwareMinor = $vmwarefileinfo.VersionInfo.ProductMinorPart
+        # $Global:vmwareBuild = $vmwarefileinfo.VersionInfo.ProductBuildPart
+        # $Global:vmwareversion = $vmwarefileinfo.VersionInfo.ProductVersion
+    }
+
+    }
         $Global:VMrunErrorCondition = @(
           "Waiting for Command execution Available",
           "Error",
@@ -78,14 +86,6 @@ switch ($vmxtoolkit_type)
           "Error: A file was not found",
           "Error: VMware Tools are not running in the guest",
           "Error: The VMware Tools are not running in the virtual machine" )
-        $Global:vmwareversion = New-Object System.Version($vmwarefileinfo.VersionInfo.ProductMajorPart,$vmwarefileinfo.VersionInfo.ProductMinorPart,$vmwarefileinfo.VersionInfo.ProductBuildPart,$vmwarefileinfo.VersionInfo.ProductVersion.Split("-")[1])
-        # $Global:vmwareMajor = $vmwarefileinfo.VersionInfo.ProductMajorPart
-        # $Global:vmwareMinor = $vmwarefileinfo.VersionInfo.ProductMinorPart
-        # $Global:vmwareBuild = $vmwarefileinfo.VersionInfo.ProductBuildPart
-        # $Global:vmwareversion = $vmwarefileinfo.VersionInfo.ProductVersion
-    }
-
-    }
 
 Write-Host -ForegroundColor Gray " ==>vmrun used from $Global:vmrun"
 Write-Host -ForegroundColor Gray " ==>vmwarepath is $Global:vmwarepath"
