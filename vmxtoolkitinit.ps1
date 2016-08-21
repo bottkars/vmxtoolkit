@@ -7,10 +7,11 @@ write-verbose "trying to get os type"
 
 if ($env:TERM_PROGRAM)
 	{
-	write-verbose "supposed to be on Linux or vmware"
+	write-verbose "term variable detected,supposed to be on Linux or OSX"
 	if ($env:TERM_PROGRAM -match "Apple_Terminal")
 		{
 		write-Verbose "looks like vmxtoolkit is running on osx"
+		$vmxtoolkit_type = "osx"	
 		}
 	else	
 		{
@@ -21,7 +22,7 @@ if ($env:TERM_PROGRAM)
 else
 {
 write-verbose "running windows"
-
+$vmxtoolkit_type ="win_x86_64"
 
 write-verbose "getting VMware Path from Registry"
 if (!(Test-Path "HKCR:\")) { $NewPSDrive = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT }
