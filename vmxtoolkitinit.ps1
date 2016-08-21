@@ -10,7 +10,7 @@ if (env:TERM_PROGRAM)
 		}
 	else	
 		{
-		write-warning "unsuppoted os
+		write-warning "unsuppoted os"
 		exit
 		}
 	}
