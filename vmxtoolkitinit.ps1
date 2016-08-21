@@ -1,4 +1,24 @@
 ﻿################## Some Globals 
+write-verbose "trying to get os type"
+
+if (env:TERM_PROGRAM)
+	{
+	write-verbose "supposed to be on Linux or vmware"
+	if (env:TERM_PROGRAM -match Apple_Terminal)
+		{
+		write-Verbose "looks like vmxtoolkit is running on osx"
+		}
+	else	
+		{
+		write-warning "unsuppoted os
+		exit
+		}
+	}
+else
+{
+write-verbose "running windows"
+
+
 write-verbose "getting VMware Path from Registry"
 if (!(Test-Path "HKCR:\")) { $NewPSDrive = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT }
 if (!($VMWAREpath = Get-ItemProperty HKCR:\Applications\vmware.exe\shell\open\command -ErrorAction SilentlyContinue))
@@ -35,3 +55,5 @@ $Global:vmwareversion = New-Object System.Version($vmwarefileinfo.VersionInfo.Pr
 # $Global:vmwareMinor = $vmwarefileinfo.VersionInfo.ProductMinorPart
 # $Global:vmwareBuild = $vmwarefileinfo.VersionInfo.ProductBuildPart
 # $Global:vmwareversion = $vmwarefileinfo.VersionInfo.ProductVersion
+}
+
