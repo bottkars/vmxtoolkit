@@ -1,10 +1,10 @@
 ﻿################## Some Globals 
 write-verbose "trying to get os type"
 
-if (env:TERM_PROGRAM)
+if ($env:TERM_PROGRAM)
 	{
 	write-verbose "supposed to be on Linux or vmware"
-	if (env:TERM_PROGRAM -match Apple_Terminal)
+	if ($env:TERM_PROGRAM -match "Apple_Terminal")
 		{
 		write-Verbose "looks like vmxtoolkit is running on osx"
 		}
