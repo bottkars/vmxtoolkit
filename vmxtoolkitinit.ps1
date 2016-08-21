@@ -42,6 +42,7 @@ switch ($vmxtoolkit_type)
         $Global:vmwarepath = $VMWAREpath
         #$Global:vmware = "$VMWAREpath\vmware.exe"
         $Global:vmrun = "/Applications/VMware Fusion.app/Contents/Library/vmrun"
+		$Global:vmwareversion = "12.0.0.0"
         }
     "win_x86_64"
         {
@@ -89,4 +90,5 @@ switch ($vmxtoolkit_type)
 Write-Host -ForegroundColor Gray " ==>vmrun used from $Global:vmrun"
 Write-Host -ForegroundColor Gray " ==>vmwarepath is $Global:vmwarepath"
 Write-Host -ForegroundColor Gray " ==>default vmxdir is $Global:vmxdir"
+Write-Host -ForegroundColor Gray " ==>running VMware Version Mode $Global:vmwareversion"
 
