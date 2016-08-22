@@ -3701,7 +3701,7 @@ process {
     if (!$NewDiskname.EndsWith(".vmdk")) { $NewDiskname = $NewDiskname+".vmdk" }    
     if ($PSCmdlet.MyInvocation.BoundParameters["debug"].IsPresent)
         {
-        $returncommand = & $Global:VMware_vdiskmanager -c -s "$($NewDiskSize/1MB)MB" -t 0 $Path\$NewDiskname -a lsilogic # 2>&1 
+        $returncommand = & $Global:VMware_vdiskmanager -c -s "$($NewDiskSize/1MB)MB" -t 0 -a lsilogic $Path\$NewDiskname # 2>&1 
         write-host -ForegroundColor Cyan "Debug message start"
         Write-Host -ForegroundColor White "Command Returned: $returncommand"
         Write-Host -ForegroundColor White "Exitcode: $LASTEXITCODE"
@@ -3712,7 +3712,7 @@ process {
         }
     else
         {
-        $returncommand = & $Global:VMware_vdiskmanager -c -s "$($NewDiskSize/1MB)MB" -t 0 $Path\$NewDiskname -a lsilogic 2>&1 
+        $returncommand = &$Global:VMware_vdiskmanager -c -s "$($NewDiskSize/1MB)MB" -t 0 -a lsilogic $Path\$NewDiskname  #2>&1 
         }
 
     if ($LASTEXITCODE -eq 0)
