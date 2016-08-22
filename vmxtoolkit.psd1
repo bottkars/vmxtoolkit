@@ -76,7 +76,9 @@ FormatsToProcess = @(
 )
 
 # Die Module, die als geschachtelte Module des in "RootModule/ModuleToProcess" angegebenen Moduls importiert werden sollen.
-# NestedModules = @()
+NestedModules = @(
+".\Common\vmxtoolkit.psm1"
+)
 
 # Aus diesem Modul zu exportierende Funktionen
 FunctionsToExport = '*'
