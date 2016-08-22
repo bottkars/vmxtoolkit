@@ -2417,10 +2417,7 @@ function New-VMXLinkedClone
 		do
 			{
 			$snapcommand = "clone $config $Cloneconfig linked -snapshot=$($BaseSnapshot) -cloneName=$($Clonename)" # 2>&1 | Out-Null
-			Write-Host $snapcommand
 			$cmdresult = Start-Process $Global:vmrun -ArgumentList $snapcommand 
-			$cmdresult
-			pause
 			}
 		until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
         if ($LASTEXITCODE -eq 0)
