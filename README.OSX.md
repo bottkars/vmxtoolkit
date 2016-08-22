@@ -23,4 +23,8 @@ if you want to use another VM Directory as search base, load vmxtoolkit with -Ar
 ```Powershell
 ipmo /Users/bottk/vmxtoolkit -ArgumentList "/Users/bottk/labbuildr.osx" -Force
 ```
+this will set the $Global:vmxdir to /Users/bottk/labbuildr.osx  
+when running Get-VMX without parameter, i will use this Directory as Base Search path for VM´s.
+
+
 
