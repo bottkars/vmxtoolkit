@@ -23,6 +23,7 @@ if  (Test-Path C:\WINDOWS\system32\ntdll.dll)
     $Global:vmwarepath = $VMWAREpath
     $Global:vmware = "$VMWAREpath\vmware.exe"
     $Global:vmrun = "$VMWAREpath\vmrun.exe"
+	$Global:VMware_OVFTool = Join-Path $Global:vmwarepath 'OVFTool\ovftool.exe'
     $vmwarefileinfo = Get-ChildItem $Global:vmware
     $Global:vmxinventory = "$env:appdata\vmware\inventory.vmls"
     $Global:vmwareversion = New-Object System.Version($vmwarefileinfo.VersionInfo.ProductMajorPart,$vmwarefileinfo.VersionInfo.ProductMinorPart,$vmwarefileinfo.VersionInfo.ProductBuildPart,$vmwarefileinfo.VersionInfo.ProductVersion.Split("-")[1])
