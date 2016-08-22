@@ -1834,7 +1834,7 @@ function Set-VMXSharedFolderState
                     { 
                     $cmdresult = &$vmrun enableSharedFolders $config
                     }
-                until ($VMrunErrorCondition -notcontains $cmdresult)
+                until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
                 $object | Add-Member -MemberType 'NoteProperty' -Name State -Value "enabled"
                 }
 			"2"
@@ -1846,7 +1846,7 @@ function Set-VMXSharedFolderState
                 { 
                 $cmdresult = &$vmrun disableSharedFolders $config
                 }
-            until ($VMrunErrorCondition -notcontains $cmdresult)
+            until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
 		    $object | Add-Member -MemberType 'NoteProperty' -Name State -Value "disabled"
 			}
 		}
@@ -1933,7 +1933,7 @@ function Set-VMXSharedFolder
                     { 
                     $cmdresult = &$vmrun addSharedFolder $config $Sharename $Folder
                     }
-                until ($VMrunErrorCondition -notcontains $cmdresult)
+                until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
                 $object | Add-Member -MemberType 'NoteProperty' -Name Share -Value $Sharename
                 $object | Add-Member -MemberType 'NoteProperty' -Name Folder -Value $Folder
                 }
@@ -1946,7 +1946,7 @@ function Set-VMXSharedFolder
                     { 
                     $cmdresult = &$vmrun removeSharedFolder $config $Sharename
                     }
-                until ($VMrunErrorCondition -notcontains $cmdresult)
+                until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
 		        $object | Add-Member -MemberType 'NoteProperty' -Name Sharename -Value "removed"
 			}
 		}
@@ -2775,7 +2775,7 @@ function Start-VMX
 		    		        $cmdresult = &$vmrun start $vmx.config #  2>&1 | Out-Null
                             }
 		    	        }
-    			    until ($VMrunErrorCondition -notcontains $cmdresult)
+    			    until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
                     }
                 if ($LASTEXITCODE -eq 0) 
 	                {
@@ -3643,7 +3643,7 @@ function Remove-vmx {
         		    write-verbose "$Origin deleteVM $vmname $cmdresult"
                     write-verbose $LASTEXITCODE
 	                }
-	            until ($VMrunErrorCondition -notcontains $cmdresult)
+	            until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
                 if ($cmdresult -match "Error: This VM is in use.")
                     {
                     write-warning "$cmdresult Please close VMX $VMXName in Vmware UI and try again"
@@ -4118,7 +4118,7 @@ process
             Write-Verbose "c:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe '$myscript' '$Parameter'"
 	        $cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runPrograminGuest $config -activewindow "$nowait_parm" $interactive_parm c:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Executionpolicy bypass "$myscript" "$Parameter")
             }
-	    until ($VMrunErrorCondition -notcontains $cmdresult)
+	    until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
         Write-Verbose "Exitcode : $Lastexitcode"
         if ($Lastexitcode -ne 0)
             {
@@ -4214,7 +4214,7 @@ do
 	        {
 	        $cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm /bin/bash $Scriptblock)
 	        }
-	    until ($VMrunErrorCondition -notcontains $cmdresult)
+	    until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
         Write-Verbose "Exitcode : $Lastexitcode"
         if ($Lastexitcode -ne 0)
             {
