@@ -2407,7 +2407,7 @@ function New-VMXLinkedClone
 		if (!$Clonepath) { $Clonepath = $global:vmxdir } #Split-Path -Path $Path -Parent }
 		Write-Verbose $ClonePath
 		$Targetpath = Join-Path $Clonepath $CloneName 
-		$CloneConfig = Join-path "$Targetpath" "$CloneName"
+		$CloneConfig = Join-path "$Targetpath" "$CloneName.vmx"
 		$TemplateVM = Split-Path -Leaf $config
 		$Templatevm = $TemplateVM -replace ".vmx",""
 		Write-Verbose "creating Linked Clone $Clonename from $TemplateVM $Basesnapshot in $Cloneconfig"
@@ -2415,6 +2415,8 @@ function New-VMXLinkedClone
 		Write-Host -ForegroundColor Magenta $Clonename -NoNewline
 		do
 			{
+			Write-Host "Creatibg clone with command $vmrun clone $config $Cloneconfig linked $BaseSnapshot $Clonename"
+			pause
 		    $cmdresult = &$vmrun clone $config $Cloneconfig linked $BaseSnapshot $Clonename # 2>&1 | Out-Null
 			$cmdresult
 			}
