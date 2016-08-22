@@ -3,7 +3,7 @@ param
 (
 $VMX_Path)
 
-################## Some Globals 
+################## Some Globals
 write-Host "trying to get os type ... "
 if  (Test-Path C:\WINDOWS\system32\ntdll.dll)
 	{
@@ -22,7 +22,7 @@ if  (Test-Path C:\WINDOWS\system32\ntdll.dll)
     $VMware_Path = $VMware_Path -replace '"', ''
     $Global:vmwarepath = $VMware_Path
     $Global:vmware = "$VMware_Path\vmware.exe"
-    $Global:vmrun = "$VMware_Path\vmrun.exe"	
+    $Global:vmrun = "$VMware_Path\vmrun.exe"
 	$Global:vmware_vdiskmanager = Join-Path $VMware_Path 'vmware-vdiskmanager.exe'
 	$Global:VMware_OVFTool = Join-Path $Global:vmwarepath 'OVFTool\ovftool.exe'
     $VMwarefileinfo = Get-ChildItem $Global:vmware
@@ -49,13 +49,14 @@ else
 				$Global:vmrun = Join-Path $VMware_BIN_Path "vmrun"
 				$Global:VMware_OVFTool = Join-Path $VMware_Path 'ovftool'
 				[version]$Global:vmwareversion = "12.0.0.0"
+				}
 			default
 				{
 				Write-host "Sorry, rome was not build in one day"
 				Break
 				}
 			}
-	}
+		}
 	}
 if (!$VMX_Path)
 	{
@@ -73,13 +74,8 @@ else
 	{
 	$Global:vmxdir = $VMX_Path
 	}
-
-	# 				$Global:vmxdir = split-path $PSScriptRoot
-
 Write-Host -ForegroundColor Gray " ==>vmrun used from $Global:vmrun"
 Write-Host -ForegroundColor Gray " ==>vmwarepath is $Global:vmwarepath"
 Write-Host -ForegroundColor Gray " ==>default vmxdir is $Global:vmxdir"
 Write-Host -ForegroundColor Gray " ==>running VMware Version Mode $Global:vmwareversion"
 Write-Host -ForegroundColor Gray " ==>running OVFtool $Global:VMware_OVFTool"
-
-
