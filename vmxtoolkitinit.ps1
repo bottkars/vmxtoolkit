@@ -25,6 +25,7 @@ if  (Test-Path C:\WINDOWS\system32\ntdll.dll)
     $Global:vmrun = "$VMware_Path\vmrun.exe"
 	$Global:vmware_vdiskmanager = Join-Path $VMware_Path 'vmware-vdiskmanager.exe'
 	$Global:VMware_OVFTool = Join-Path $Global:vmwarepath 'OVFTool\ovftool.exe'
+	$GLobal:VMware_packer = Join-Path $Global:vmwarepath '7za.exe'
     $VMwarefileinfo = Get-ChildItem $Global:vmware
     $Global:vmxinventory = "$env:appdata\vmware\inventory.vmls"
     $Global:vmwareversion = New-Object System.Version($VMwarefileinfo.VersionInfo.ProductMajorPart,$VMwarefileinfo.VersionInfo.ProductMinorPart,$VMwarefileinfo.VersionInfo.ProductBuildPart,$VMwarefileinfo.VersionInfo.ProductVersion.Split("-")[1])
@@ -45,7 +46,8 @@ else
 				$VMware_Path = "/Applications/VMware Fusion.app"
 				$Global:vmwarepath = $VMware_Path
 				$VMware_BIN_Path = Join-Path $VMware_Path  '/Contents/Library'
-				$Global:VMware_vdiskmanager = Join-Path $VMware_BIN_Path "vmware-vdiskmanager"
+				$Global:VMware_vdiskmanager = Join-Path $VMware_BIN_Path 'vmware-vdiskmanager'
+				$GLobal:VMware_packer = Join-Path $VMware_BIN_Path 'unrar'
 				$Global:vmrun = Join-Path $VMware_BIN_Path "vmrun"
 				$Global:VMware_OVFTool = Join-Path $VMware_Path 'ovftool'
 				[version]$Global:vmwareversion = "12.0.0.0"
@@ -78,4 +80,5 @@ Write-Host -ForegroundColor Gray " ==>vmrun used from $Global:vmrun"
 Write-Host -ForegroundColor Gray " ==>vmwarepath is $Global:vmwarepath"
 Write-Host -ForegroundColor Gray " ==>default vmxdir is $Global:vmxdir"
 Write-Host -ForegroundColor Gray " ==>running VMware Version Mode $Global:vmwareversion"
-Write-Host -ForegroundColor Gray " ==>running OVFtool $Global:VMware_OVFTool"
+Write-Host -ForegroundColor Gray " ==>OVFtool $Global:VMware_OVFTool"
+Write-Host -ForegroundColor Gray " ==>unrar $GLobal:VMware_unrar"
