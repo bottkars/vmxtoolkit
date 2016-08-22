@@ -2407,7 +2407,7 @@ function New-VMXLinkedClone
 		if (!$Clonepath) { $Clonepath = $global:vmxdir } #Split-Path -Path $Path -Parent }
 		Write-Verbose $ClonePath
 		$Targetpath = Join-Path $Clonepath $CloneName 
-		$CloneConfig = Join-path "$Targetpath" "$CloneName.vmx"
+		$CloneConfig = Join-path "$Targetpath" "$CloneName"
 		$TemplateVM = Split-Path -Leaf $config
 		$Templatevm = $TemplateVM -replace ".vmx",""
 		Write-Verbose "creating Linked Clone $Clonename from $TemplateVM $Basesnapshot in $Cloneconfig"
