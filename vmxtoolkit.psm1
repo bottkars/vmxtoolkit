@@ -2415,7 +2415,8 @@ function New-VMXLinkedClone
 		Write-Host -ForegroundColor Magenta $Clonename -NoNewline
 		do
 			{
-		    $cmdresult = &$vmrun clone $config $Cloneconfig linked $BaseSnapshot $Clonename  2>&1 | Out-Null
+		    $cmdresult = &$vmrun clone $config $Cloneconfig linked $BaseSnapshot $Clonename # 2>&1 | Out-Null
+			$cmdresult
 			}
 		until ($VMrunErrorCondition -notcontains $cmdresult)
         if ($LASTEXITCODE -eq 0)
