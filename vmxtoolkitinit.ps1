@@ -57,7 +57,7 @@ if (!$VMX_Path)
 	{
 	try
 		{
-		$Global:vmxdir = Join-Path $HOME $VMX_Path
+		$Global:vmxdir = Join-Path $HOME $VMX_Basedir
 		}
 	catch
 		{
