@@ -2423,9 +2423,10 @@ function New-VMXLinkedClone
         if ($LASTEXITCODE -eq 0)
             {
 			Write-Host -ForegroundColor Green "[success]"
+			sleep 2
 			$Addcontent = @()
 			$Addcontent += 'guestinfo.buildDate = "'+$BuildDate+'"'
-			Add-Content -Path "$Cloneconfig" -Value $Addcontent -Verbose
+			Add-Content -Path "$Cloneconfig" -Value $Addcontent
 			$object = New-Object psobject
 			$object | Add-Member -MemberType 'NoteProperty' -Name CloneName -Value $Clonename
 			$object | Add-Member -MemberType 'NoteProperty' -Name Config -Value $Cloneconfig
