@@ -12,21 +12,22 @@ if  (Test-Path C:\WINDOWS\system32\ntdll.dll)
 	$vmxtoolkit_type ="win_x86_64"
     write-verbose "getting VMware Path from Registry"
     if (!(Test-Path "HKCR:\")) { $NewPSDrive = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT }
-    if (!($VMWAREpath = Get-ItemProperty HKCR:\Applications\vmware.exe\shell\open\command -ErrorAction SilentlyContinue))
+    if (!($VMware_Path = Get-ItemProperty HKCR:\Applications\vmware.exe\shell\open\command -ErrorAction SilentlyContinue))
         {
 	    Write-Error "VMware Binaries not found from registry"
         Break
         }
 	$VMX_Basedir ='\Documents\Virtual Machines\'
-    $VMWAREpath = Split-Path $VMWAREpath.'(default)' -Parent
-    $VMWAREpath = $VMWAREpath -replace '"', ''
-    $Global:vmwarepath = $VMWAREpath
-    $Global:vmware = "$VMWAREpath\vmware.exe"
-    $Global:vmrun = "$VMWAREpath\vmrun.exe"
+    $VMware_Path = Split-Path $VMware_Path.'(default)' -Parent
+    $VMware_Path = $VMware_Path -replace '"', ''
+    $Global:vmwarepath = $VMware_Path
+    $Global:vmware = "$VMware_Path\vmware.exe"
+    $Global:vmrun = "$VMware_Path\vmrun.exe"	
+	$Global:vmware_vdiskmanager = Join-Path $VMware_Path 'vmware-vdiskmanager.exe'
 	$Global:VMware_OVFTool = Join-Path $Global:vmwarepath 'OVFTool\ovftool.exe'
-    $vmwarefileinfo = Get-ChildItem $Global:vmware
+    $VMwarefileinfo = Get-ChildItem $Global:vmware
     $Global:vmxinventory = "$env:appdata\vmware\inventory.vmls"
-    $Global:vmwareversion = New-Object System.Version($vmwarefileinfo.VersionInfo.ProductMajorPart,$vmwarefileinfo.VersionInfo.ProductMinorPart,$vmwarefileinfo.VersionInfo.ProductBuildPart,$vmwarefileinfo.VersionInfo.ProductVersion.Split("-")[1])
+    $Global:vmwareversion = New-Object System.Version($VMwarefileinfo.VersionInfo.ProductMajorPart,$VMwarefileinfo.VersionInfo.ProductMinorPart,$VMwarefileinfo.VersionInfo.ProductBuildPart,$VMwarefileinfo.VersionInfo.ProductVersion.Split("-")[1])
 	}
 else
 	{
@@ -40,20 +41,14 @@ else
 				$vmxtoolkit_type = "OSX"
 				$OS_Version = (uname -r)
 				Write-Host "running $OS_Version"
-				$VMWAREpath = "/Applications/VMware Fusion.app"
-				$Global:vmwarepath = $VMWAREpath
-				$Global:vmrun = Join-Path $VMWAREpath "/Contents/Library/vmrun"
+				$VMX_BasePath = 'Documents/Virtual Machines.localized'
+				$VMware_Path = "/Applications/VMware Fusion.app"
+				$Global:vmwarepath = $VMware_Path
+				$VMware_BIN_Path = Join-Path $VMware_Path  '/Contents/Library'
+				$Global:VMware_vdiskmanager = Join-Path $VMware_BIN_Path "vmware-vdiskmanager"
+				$Global:vmrun = Join-Path $VMware_BIN_Path "vmrun"
+				$Global:VMware_OVFTool = Join-Path $VMware_Path 'ovftool'
 				[version]$Global:vmwareversion = "12.0.0.0"
-				$VMX_Basedir = 'Documents/Virtual Machines.localized'
-				try
-					{
-					$Global:VMware_OVFTool = Join-Path $VMWAREpath '/Contents/Library/VMware OVF Tool/ovftool'
-					}
-				catch
-					{
-					Write-Warning "could not evaluate OVFtool"
-					}
-				}
 			default
 				{
 				Write-host "Sorry, rome was not build in one day"
