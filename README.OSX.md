@@ -28,4 +28,4 @@ when running Get-VMX without parameter, i will use this Directory as Base Search
 
 
 
- - [ ] 
+ - [x] 
