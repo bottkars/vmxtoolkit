@@ -2406,6 +2406,7 @@ function New-VMXLinkedClone
 		#foreach ($config in $getconfig)
 		if (!$Clonepath) { $Clonepath = $global:vmxdir } #Split-Path -Path $Path -Parent }
 		Write-Verbose $ClonePath
+		$cmdresult = ""
 		$Targetpath = Join-Path $Clonepath $CloneName 
 		$CloneConfig = Join-path "$Targetpath" "$CloneName.vmx"
 		$TemplateVM = Split-Path -Leaf $config
@@ -2421,7 +2422,7 @@ function New-VMXLinkedClone
 			$cmdresult
 			pause
 			}
-		until ($VMrunErrorCondition -notcontains $cmdresult)
+		until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
         if ($LASTEXITCODE -eq 0)
             {
 			Write-Host -ForegroundColor Green "[success]"
