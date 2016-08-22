@@ -46,7 +46,7 @@ else
 				$VMX_Basedir = 'Documents/Virtual Machines.localized'
 				try
 					{
-					$Global:VMware_OVFTool = Join-Path $VMX_Path '/Contents/Library/VMware OVF Tool/ovftool'
+					$Global:VMware_OVFTool = Join-Path $VMWAREpath '/Contents/Library/VMware OVF Tool/ovftool'
 					}
 				catch
 					{
