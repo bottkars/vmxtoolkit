@@ -26,6 +26,6 @@ ipmo /Users/bottk/vmxtoolkit -ArgumentList "/Users/bottk/labbuildr.osx" -Force
 this will set the $Global:vmxdir to /Users/bottk/labbuildr.osx  
 when running Get-VMX without parameter, i will use this Directory as Base Search path for VM´s.
 
-
-a list of tested Command is checked in [Issue 8](https://github.com/bottkars/vmxtoolkit/issues/8)   
-a list of OS relevant changes can be found here [Issue 9](https://github.com/bottkars/vmxtoolkit/issues/9)   
+##progress
+* a list of tested Command is checked in [Issue 8](https://github.com/bottkars/vmxtoolkit/issues/8)   
+* a list of OS relevant changes can be found here [Issue 9](https://github.com/bottkars/vmxtoolkit/issues/9)   
