@@ -2473,7 +2473,7 @@ function New-VMXClone
 		#foreach ($config in $getconfig)
 		if (!$Clonepath) { $Clonepath = Split-Path -Path $Path -Parent }
 		Write-Verbose $ClonePath
-		$CloneConfig =  Join-Path "$Clonepath" $Clonename "$CloneName.vmx"
+		$CloneConfig =  Join-Path "$Clonepath" (Join-Path $Clonename "$CloneName.vmx")
 		$TemplateVM = Split-Path -Leaf $config
 		$Templatevm = $TemplateVM -replace ".vmx",""
 		Write-Verbose $CloneConfig
