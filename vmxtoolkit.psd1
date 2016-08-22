@@ -7,8 +7,8 @@
 #
 @{
 # Die diesem Manifest zugeordnete Skript- oder Binärmoduldatei.
-# RootModule = ''
-ModuletoProcess = "vmxtoolkit.psm1"
+RootModule = 'vmxtoolkit.psm1'
+ModuletoProcess = 'vmxtoolkit.psm1'
 # Die Versionsnummer dieses Moduls
 ModuleVersion = '4.0'
 # ID zur eindeutigen Kennzeichnung dieses Moduls
@@ -76,9 +76,7 @@ FormatsToProcess = @(
 )
 
 # Die Module, die als geschachtelte Module des in "RootModule/ModuleToProcess" angegebenen Moduls importiert werden sollen.
-NestedModules = @(
-".\Common\vmxtoolkit.psm1"
-)
+NestedModules = @()
 
 # Aus diesem Modul zu exportierende Funktionen
 FunctionsToExport = '*'
@@ -98,7 +96,7 @@ AliasesToExport = '*'
 # Liste aller Dateien in diesem Modulpaket
 FileList = @("vmxtoolkitinit.ps1",
 "vmxtoolkit.psd1",
-".\Common\vmxtoolkit.psm1")
+"vmxtoolkit.psm1")
 
 # Die privaten Daten, die an das in "RootModule/ModuleToProcess" angegebene Modul übergeben werden sollen.
 # PrivateData = ''
