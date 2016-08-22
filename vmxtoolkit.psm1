@@ -2415,9 +2415,8 @@ function New-VMXLinkedClone
 		Write-Host -ForegroundColor Magenta $Clonename -NoNewline
 		do
 			{
-			Write-Host "Creatibg clone with command $vmrun clone $config $Cloneconfig linked $BaseSnapshot $Clonename"
-			pause
-		    $cmdresult = &$vmrun clone $config $Cloneconfig linked $BaseSnapshot $Clonename # 2>&1 | Out-Null
+			$snapcommand = "$vmrun clone $config $Cloneconfig linked -snapShot=$($BaseSnapshot) -cloneNme=$($Clonename)" # 2>&1 | Out-Null
+			Write-Host $snapcommand
 			$cmdresult
 			}
 		until ($VMrunErrorCondition -notcontains $cmdresult)
