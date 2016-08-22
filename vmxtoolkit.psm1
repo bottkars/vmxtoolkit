@@ -554,7 +554,6 @@ function Import-VMXOVATemplate
             }
 
         Start-Process -FilePath  $Global:VMware_OVFTool -ArgumentList "--lax $ovfparam --name=$Name $($ovaPath.FullName) `"$destination" -NoNewWindow -Wait
-       # & $global:vmwarepath\OVFTool\ovftool.exe --lax $ovfparam --name=$Name $ovaPath.FullName $vmxdir #| Out-Null #
 
         switch ($LASTEXITCODE)
             {
