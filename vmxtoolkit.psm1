@@ -3712,7 +3712,7 @@ process {
         }
     else
         {
-        $returncommand = & $vmwarepath\vmware-vdiskmanager.exe -c -s "$($NewDiskSize/1MB)MB" -t 0 $Path\$NewDiskname -a lsilogic 2>&1 
+        $returncommand = & $Global:VMware_vdiskmanager -c -s "$($NewDiskSize/1MB)MB" -t 0 $Path\$NewDiskname -a lsilogic 2>&1 
         }
 
     if ($LASTEXITCODE -eq 0)
