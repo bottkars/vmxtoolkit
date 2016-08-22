@@ -41,9 +41,17 @@ else
 				Write-Host "running $OS_Version"
 				$VMWAREpath = "/Applications/VMware Fusion.app"
 				$Global:vmwarepath = $VMWAREpath
-				$Global:vmrun = "/Applications/VMware Fusion.app/Contents/Library/vmrun"
+				$Global:vmrun = Join-Path $VMWAREpath "/Contents/Library/vmrun"
 				[version]$Global:vmwareversion = "12.0.0.0"
 				$VMX_Basedir = 'Documents/Virtual Machines.localized'
+				try
+					{
+					$Global:VMware_OVFTool = Join-Path $VMX_Path '/Contents/Library/VMware OVF Tool/ovftool'
+					}
+				catch
+					{
+					Write-Warning "could not evaluate OVFtool"
+					}
 				}
 			default
 				{
@@ -76,4 +84,6 @@ Write-Host -ForegroundColor Gray " ==>vmrun used from $Global:vmrun"
 Write-Host -ForegroundColor Gray " ==>vmwarepath is $Global:vmwarepath"
 Write-Host -ForegroundColor Gray " ==>default vmxdir is $Global:vmxdir"
 Write-Host -ForegroundColor Gray " ==>running VMware Version Mode $Global:vmwareversion"
+Write-Host -ForegroundColor Gray " ==>running OVFtool $Global:VMware_OVFTool"
+
 
