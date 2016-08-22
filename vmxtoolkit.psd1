@@ -8,7 +8,7 @@
 @{
 # Die diesem Manifest zugeordnete Skript- oder Binärmoduldatei.
 RootModule = 'vmxtoolkit.psm1'
-ModuletoProcess = 'vmxtoolkit.psm1'
+# ModuletoProcess = 'vmxtoolkit.psm1'
 # Die Versionsnummer dieses Moduls
 ModuleVersion = '4.0'
 # ID zur eindeutigen Kennzeichnung dieses Moduls
