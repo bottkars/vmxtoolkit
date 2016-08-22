@@ -10,7 +10,7 @@
 # RootModule = ''
 ModuletoProcess = "vmxtoolkit.psm1"
 # Die Versionsnummer dieses Moduls
-ModuleVersion = '3.1'
+ModuleVersion = '4.0'
 # ID zur eindeutigen Kennzeichnung dieses Moduls
 GUID = 'abe3797c-5a42-4e80-a1fb-9e648872ee14'
 # Autor dieses Moduls
@@ -36,7 +36,7 @@ Copyright = '(c) 2014 Karsten Bott. Alle Rechte vorbehalten.
 '
 
 # Beschreibung der von diesem Modul bereitgestellten Funktionen
-Description = 'Lab Builder for VMware Workstation'
+Description = 'Lab Builder for VMware Workstation on Windows and VMware Fusion on OSX'
 
 # Die für dieses Modul mindestens erforderliche Version des Windows PowerShell-Moduls
 PowerShellVersion = '3.0'
@@ -94,7 +94,9 @@ AliasesToExport = '*'
 # ModuleList = @()
 
 # Liste aller Dateien in diesem Modulpaket
-FileList = @("vmxtoolkitinit.ps1","vmxtoolkit.psm1","vmxtoolkit.psd1")
+FileList = @("vmxtoolkitinit.ps1",
+"vmxtoolkit.psd1",
+".\Common\vmxtoolkit.psm1")
 
 # Die privaten Daten, die an das in "RootModule/ModuleToProcess" angegebene Modul übergeben werden sollen.
 # PrivateData = ''
