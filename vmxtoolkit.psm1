@@ -2415,9 +2415,9 @@ function New-VMXLinkedClone
 		Write-Host -ForegroundColor Magenta $Clonename -NoNewline
 		do
 			{
-			$snapcommand = "$vmrun clone $config $Cloneconfig linked -snapshot=$($BaseSnapshot) -cloneName=$($Clonename)" # 2>&1 | Out-Null
+			$snapcommand = "clone $config $Cloneconfig linked -snapshot=$($BaseSnapshot) -cloneName=$($Clonename)" # 2>&1 | Out-Null
 			Write-Host $snapcommand
-			$cmdresult = .$snapcommand
+			$cmdresult = Start-Process $Global:vmrun -ArgumentList $snapcommand 
 			$cmdresult
 			}
 		until ($VMrunErrorCondition -notcontains $cmdresult)
