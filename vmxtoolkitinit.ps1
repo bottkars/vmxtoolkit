@@ -44,7 +44,6 @@ else
 				$Global:vmrun = "/Applications/VMware Fusion.app/Contents/Library/vmrun"
 				[version]$Global:vmwareversion = "12.0.0.0"
 				$VMX_Basedir = 'Documents/Virtual Machines.localized'
-					}
 				}
 			default
 				{
@@ -53,7 +52,7 @@ else
 				}
 			}
 	}
-
+	}
 if (!$VMX_Path)
 	{
 	try
