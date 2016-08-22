@@ -2419,6 +2419,7 @@ function New-VMXLinkedClone
 			Write-Host $snapcommand
 			$cmdresult = Start-Process $Global:vmrun -ArgumentList $snapcommand 
 			$cmdresult
+			pause
 			}
 		until ($VMrunErrorCondition -notcontains $cmdresult)
         if ($LASTEXITCODE -eq 0)
