@@ -1907,7 +1907,9 @@ function Set-VMXSharedFolder
 		[Parameter(Mandatory = $True, ParameterSetName = 2, ValueFromPipelineByPropertyName = $True)][switch]$remove,
         [Parameter(Mandatory = $True, ParameterSetName = 1, ValueFromPipelineByPropertyName = $True)]
 		[Parameter(Mandatory = $True, ParameterSetName = 2, ValueFromPipelineByPropertyName = $True)][ValidateLength(3,10)][ValidatePattern("^[a-zA-Z\s]+$")]$Sharename,
-        [Parameter(Mandatory = $True, ParameterSetName = 1, ValueFromPipelineByPropertyName = $True)][ValidateScript({ Test-Path -Path $_ })]$Folder
+        [Parameter(Mandatory = $True, ParameterSetName = 1, ValueFromPipelineByPropertyName = $True)]
+		#[ValidateScript({ Test-Path -Path $_ })]
+		$Folder
 
 
 	)
