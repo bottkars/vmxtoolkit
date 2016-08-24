@@ -2095,6 +2095,8 @@ process
                     {
                     $VMXName = $VMXName.TrimStart(".\")
                     $VMXName = $VMXName.TrimEnd("\")
+					$VMXName = $VMXName.TrimStart("./")
+                    $VMXName = $VMXName.TrimEnd("/")
                     Write-Verbose $VMXName
                     }
                 else
