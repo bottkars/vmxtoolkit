@@ -4103,7 +4103,7 @@ function Invoke-VMXPowerShell
 process
     {
     $myscript = ".'$ScriptPath\$Script'"
-    Write-Host -ForegroundColor Gray " ==>starting '$Script $Parameter' on " -NoNewline
+    Write-Host -ForegroundColor Gray " ==>starting Powershell '$ScriptPath\$Script $Parameter' form on " -NoNewline
     Write-Host -ForegroundColor Magenta $VMXName -NoNewline
     do
         {
