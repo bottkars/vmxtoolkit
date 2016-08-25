@@ -7,8 +7,8 @@ $VMX_Path)
 write-Host "trying to get os type ... "
 if  (Test-Path C:\WINDOWS\system32\ntdll.dll)
 	{
-	$OS  = Get-Command C:\WINDOWS\system32\ntdll.dll
-	Write-Host " ==>Product Name: Windows $($OS.Version)"
+	$OS_Version  = Get-Command C:\WINDOWS\system32\ntdll.dll
+	$OS_Version = "Product Name: Windows $($OS.Version)"
 	$vmxtoolkit_type ="win_x86_64"
     write-verbose "getting VMware Path from Registry"
     if (!(Test-Path "HKCR:\")) { $NewPSDrive = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT }
@@ -42,7 +42,6 @@ else
 				$vmxtoolkit_type = "OSX"
 				$OS_Version = (sw_vers)
 				$OS_Version = $OS_Version -join " "
-				Write-Host " ==>$OS_Version"
 				$VMX_BasePath = 'Documents/Virtual Machines.localized'
 				$VMware_Path = "/Applications/VMware Fusion.app"
 				$Global:vmwarepath = $VMware_Path
@@ -92,7 +91,7 @@ $Global:VMrunErrorCondition = @(
   "Error: A file was not found",
   "Error: VMware Tools are not running in the guest",
   "Error: The VMware Tools are not running in the virtual machine" )
-
+write-Host -ForegroundColor Gray " ==>$OS_Version"
 Write-Host -ForegroundColor Gray " ==>vmrun used from $Global:vmrun"
 Write-Host -ForegroundColor Gray " ==>vmwarepath is $Global:vmwarepath"
 Write-Host -ForegroundColor Gray " ==>default vmxdir is $Global:vmxdir"
