@@ -76,6 +76,22 @@ else
 	{
 	$Global:vmxdir = $VMX_Path
 	}
+
+#### some vmx api error handlers :-) false positives from experience
+$Global:VMrunErrorCondition = @(
+  "Waiting for Command execution Available",
+  "Error",
+  "Unable to connect to host.",
+  "Error: Unable to connect to host.",
+  "Error: The operation is not supported for the specified parameters",
+  "Unable to connect to host. Error: The operation is not supported for the specified parameters",
+  "Error: The operation is not supported for the specified parameters",
+  "Error: vmrun was unable to start. Please make sure that vmrun is installed correctly and that you have enough resources available on your system.",
+  "Error: The specified guest user must be logged in interactively to perform this operation",
+  "Error: A file was not found",
+  "Error: VMware Tools are not running in the guest",
+  "Error: The VMware Tools are not running in the virtual machine" )
+
 Write-Host -ForegroundColor Gray " ==>vmrun used from $Global:vmrun"
 Write-Host -ForegroundColor Gray " ==>vmwarepath is $Global:vmwarepath"
 Write-Host -ForegroundColor Gray " ==>default vmxdir is $Global:vmxdir"
