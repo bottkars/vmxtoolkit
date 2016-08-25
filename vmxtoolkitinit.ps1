@@ -40,7 +40,8 @@ else
 			"Darwin"
 				{
 				$vmxtoolkit_type = "OSX"
-				$OS_Version = (uname -r)
+				$OS_Version = (sw_vers)
+				$OS_Version = $OS_Version -join ""
 				Write-Host "running $OS_Version"
 				$VMX_BasePath = 'Documents/Virtual Machines.localized'
 				$VMware_Path = "/Applications/VMware Fusion.app"
