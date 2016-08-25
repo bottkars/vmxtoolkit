@@ -8,7 +8,7 @@ write-Host "trying to get os type ... "
 if  (Test-Path C:\WINDOWS\system32\ntdll.dll)
 	{
 	$OS  = Get-Command C:\WINDOWS\system32\ntdll.dll
-	Write-Host "running on Windows $($OS.Version)"
+	Write-Host " ==>Product Name: Windows $($OS.Version)"
 	$vmxtoolkit_type ="win_x86_64"
     write-verbose "getting VMware Path from Registry"
     if (!(Test-Path "HKCR:\")) { $NewPSDrive = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT }
@@ -41,8 +41,8 @@ else
 				{
 				$vmxtoolkit_type = "OSX"
 				$OS_Version = (sw_vers)
-				$OS_Version = $OS_Version -join ""
-				Write-Host "running $OS_Version"
+				$OS_Version = $OS_Version -join " "
+				Write-Host " ==>$OS_Version"
 				$VMX_BasePath = 'Documents/Virtual Machines.localized'
 				$VMware_Path = "/Applications/VMware Fusion.app"
 				$Global:vmwarepath = $VMware_Path
