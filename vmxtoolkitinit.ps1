@@ -52,10 +52,27 @@ else
 				$Global:VMware_OVFTool = Join-Path $VMware_Path 'ovftool'
 				[version]$Global:vmwareversion = "12.0.0.0"
 				}
-			default
+			'Linux'
+				{
+				$vmxtoolkit_type = "LINUX"
+				#$OS_Version = (sw_vers)
+				#$OS_Version = $OS_Version -join " "
+				$VMX_BasePath = '/var/lib/vmware/Shared VMs'
+				$VMware_Path = "/usr/bin"
+				$Global:vmwarepath = $VMware_Path
+				$VMware_BIN_Path = Join-Path $VMware_Path  '/Contents/Library'
+				$Global:VMware_vdiskmanager = Join-Path $VMware_BIN_Path 'vmware-vdiskmanager'
+				$GLobal:VMware_packer = Join-Path $VMware_BIN_Path 'unrar'
+				$Global:vmrun = Join-Path $VMware_BIN_Path "vmrun"
+				$Global:VMware_OVFTool = Join-Path $VMware_Path 'ovftool'
+				$Vmware_Base_Version = (vmware -v)
+				$Vmware_Base_Version = $Vmware_Base_Version -replace "VMware Workstation "
+				[version]$Global:vmwareversion = ($Vmware_Base_Version.Split(' '))[0]
+				}
+				default
 				{
 				Write-host "Sorry, rome was not build in one day"
-				Break
+				exit
 				}
 			}
 		}
