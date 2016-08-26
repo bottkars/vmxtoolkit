@@ -60,7 +60,7 @@ else
 				$VMX_BasePath = '/var/lib/vmware/Shared VMs'
 				$VMware_Path = "/usr/bin"
 				$Global:vmwarepath = $VMware_Path
-				$VMware_BIN_Path = Join-Path $VMware_Path  '/Contents/Library'
+				$VMware_BIN_Path = $VMware_Path  
 				$Global:VMware_vdiskmanager = Join-Path $VMware_BIN_Path 'vmware-vdiskmanager'
 				$GLobal:VMware_packer = Join-Path $VMware_BIN_Path 'unrar'
 				$Global:vmrun = Join-Path $VMware_BIN_Path "vmrun"
