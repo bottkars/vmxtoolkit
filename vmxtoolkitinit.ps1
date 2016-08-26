@@ -62,7 +62,7 @@ else
 				$Global:vmwarepath = $VMware_Path
 				$VMware_BIN_Path = $VMware_Path  
 				$Global:VMware_vdiskmanager = Join-Path $VMware_BIN_Path 'vmware-vdiskmanager'
-				$GLobal:VMware_packer = Join-Path $VMware_BIN_Path 'unrar'
+				$GLobal:VMware_packer = Join-Path $VMware_BIN_Path '7za'
 				$Global:vmrun = Join-Path $VMware_BIN_Path "vmrun"
 				$Global:VMware_OVFTool = Join-Path $VMware_Path 'ovftool'
 				$Vmware_Base_Version = (vmware -v)
