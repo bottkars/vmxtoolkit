@@ -47,7 +47,7 @@ else
 				$Global:vmwarepath = $VMware_Path
 				$VMware_BIN_Path = Join-Path $VMware_Path  '/Contents/Library'
 				$Global:VMware_vdiskmanager = Join-Path $VMware_BIN_Path 'vmware-vdiskmanager'
-				$GLobal:VMware_packer = Join-Path $VMware_BIN_Path 'unrar'
+				$GLobal:VMware_packer = Join-Path '/opt/local/bin/' '7za'
 				$Global:vmrun = Join-Path $VMware_BIN_Path "vmrun"
 				$Global:VMware_OVFTool = Join-Path $VMware_Path 'ovftool'
 				[version]$Global:vmwareversion = "12.0.0.0"
@@ -63,14 +63,6 @@ else
 				$VMware_BIN_Path = $VMware_Path  
 				$Global:VMware_vdiskmanager = Join-Path $VMware_BIN_Path 'vmware-vdiskmanager'
 				$GLobal:VMware_packer = Join-Path $VMware_BIN_Path '7za'
-				if (Test-Path $GLobal:VMware_packer)
-					{
-					Write-Host " ==>found $Packer"
-					}
-				else
-					{
-					Write-Warning "Please install 7za, otherwise labbtools can not expand OS Masters"
-					}
 				$Global:vmrun = Join-Path $VMware_BIN_Path "vmrun"
 				$Global:VMware_OVFTool = Join-Path $VMware_Path 'ovftool'
 				$Vmware_Base_Version = (vmware -v)
@@ -116,6 +108,14 @@ $Global:VMrunErrorCondition = @(
   "Error: A file was not found",
   "Error: VMware Tools are not running in the guest",
   "Error: The VMware Tools are not running in the virtual machine" )
+if (Test-Path $GLobal:VMware_packer)
+	{
+	Write-Host " ==>found $Packer"
+	}
+else
+	{
+	Write-Warning "Please install 7za/p7zip, otherwise labbtools can not expand OS Masters"
+	}
 write-Host -ForegroundColor Gray " ==>$OS_Version"
 Write-Host -ForegroundColor Gray " ==>vmrun used from $Global:vmrun"
 Write-Host -ForegroundColor Gray " ==>vmwarepath is $Global:vmwarepath"
