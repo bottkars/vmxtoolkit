@@ -47,7 +47,7 @@ else
 				$Global:vmwarepath = $VMware_Path
 				$VMware_BIN_Path = Join-Path $VMware_Path  '/Contents/Library'
 				$Global:VMware_vdiskmanager = Join-Path $VMware_BIN_Path 'vmware-vdiskmanager'
-				$GLobal:VMware_packer = Join-Path '/opt/local/bin/' '7za'
+				$GLobal:VMware_packer = Join-Path '/usr/local/bin/' '7za'
 				$Global:vmrun = Join-Path $VMware_BIN_Path "vmrun"
 				$Global:VMware_OVFTool = Join-Path $VMware_Path 'ovftool'
 				[version]$Global:vmwareversion = "12.0.0.0"
