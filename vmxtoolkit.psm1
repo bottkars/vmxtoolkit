@@ -2077,7 +2077,7 @@ function Get-VMX
 		[Parameter(ParameterSetName = "1", HelpMessage = "Please enter an optional root Path to you VMs (default is vmxdir)",Mandatory = $false)]
 		$Path = $vmxdir,
 		[Parameter(ParameterSetName = "1",Mandatory = $false)]$UUID,
-        [Parameter(ParameterSetName = "2", Position = 2,HelpMessage = "Please specify a config to vmx",Mandatory = $true)]$config
+        [Parameter(ParameterSetName = "2", Position = 2,HelpMessage = "Please specify a config to vmx",Mandatory = $true)][System.IO.FileInfo]$config
 
 )
 
@@ -2090,7 +2090,7 @@ process
 			{
 			"1"
 				{ 
-                Write-Verbose "Getting vmxname"
+                Write-Verbose "Getting vmxname from parameterset 1"
                 if ($VMXName)
                     {
                     $VMXName = $VMXName.TrimStart(".\")
@@ -2119,7 +2119,6 @@ process
 				
 				"2"
 				{
-				[System.IO.FileInfo]$config = $config
                 $VMXname = $config.Basename
 				#$VMXName = (Split-Path -Leaf $config) -replace ".vmx",""
                 if (!($Configfiles = Get-Item -Path $config -ErrorAction SilentlyContinue ))
@@ -2133,7 +2132,7 @@ process
         $VMX = @()
 	    foreach ($Config in $Configfiles)
 	        {
-		    Write-Verbose "Configfile: $($config.FullName)"
+		    Write-Verbose "getting Configfile: $($config.FullName) from parameterset 2"
 		    if ($Config.Extension -eq ".vmx")
                 {
 			if ($UUID)
