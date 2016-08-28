@@ -2123,8 +2123,10 @@ process
 				
 				"2"
 				{
-                $VMXName = (Split-Path -Leaf $config) -replace ".vmx",""
-                if (!($Configfiles = Get-Item -Path $config -Filter "vmx" -ErrorAction SilentlyContinue ))
+				[System.IO.FileInfo]$config = $config
+                $VMXname = $config.Basename
+				#$VMXName = (Split-Path -Leaf $config) -replace ".vmx",""
+                if (!($Configfiles = Get-Item -Path $config -ErrorAction SilentlyContinue ))
                     {
                     Write-Warning "$($MyInvocation.MyCommand) : VM Config for $config does currently not exist"
                     # break
