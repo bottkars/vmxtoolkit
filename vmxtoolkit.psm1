@@ -2086,6 +2086,7 @@ begin
 process
 		{
         $vmxrun = (Get-VMXRun).config
+		$Configfiles = @()
 		switch ($PsCmdlet.ParameterSetName)
 			{
 			"1"
