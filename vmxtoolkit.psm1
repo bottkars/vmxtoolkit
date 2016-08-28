@@ -2038,8 +2038,8 @@ function Get-VMXRun{
 	foreach ($runvm in $cmdresult)
 	{
 		if ($runvm -notmatch "Total running VMs")
-		{
-			# $runvm = split-path $runvm -leaf -resolve
+			{
+			[System.IO.FileInfo]$runvm = $runvm
 			# $runvm = $runvm.TrimEnd(".vmx")
 			$object = New-Object -TypeName psobject
 			#$object.pstypenames.insert(0,'virtualmachine')
