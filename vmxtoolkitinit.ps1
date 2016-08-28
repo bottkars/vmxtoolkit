@@ -9,7 +9,7 @@ if  (Test-Path C:\WINDOWS\system32\ntdll.dll)
 	{
 	$OS_Version  = Get-Command C:\WINDOWS\system32\ntdll.dll
 	$OS_Version = "Product Name: Windows $($OS.Version)"
-	$vmxtoolkit_type ="win_x86_64"
+	$Global:vmxtoolkit_type ="win_x86_64"
     write-verbose "getting VMware Path from Registry"
     if (!(Test-Path "HKCR:\")) { $NewPSDrive = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT }
     if (!($VMware_Path = Get-ItemProperty HKCR:\Applications\vmware.exe\shell\open\command -ErrorAction SilentlyContinue))
@@ -39,7 +39,7 @@ else
 			{
 			"Darwin"
 				{
-				$vmxtoolkit_type = "OSX"
+				$Global:vmxtoolkit_type = "OSX"
 				$OS_Version = (sw_vers)
 				$OS_Version = $OS_Version -join " "
 				$VMX_BasePath = 'Documents/Virtual Machines.localized'
@@ -54,7 +54,7 @@ else
 				}
 			'Linux'
 				{
-				$vmxtoolkit_type = "LINUX"
+				$Global:vmxtoolkit_type = "LINUX"
 				#$OS_Version = (sw_vers)
 				#$OS_Version = $OS_Version -join " "
 				$VMX_BasePath = '/var/lib/vmware/Shared VMs'
