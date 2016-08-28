@@ -2072,7 +2072,7 @@ function Get-VMX
 {
 	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/get-vmx/")]
 	param (
-		[Parameter(ParameterSetName = "1", Position = 1,HelpMessage = "Please specify an optional VM Name",Mandatory = $false)]
+		[Parameter(ParameterSetName = "1", Position = 1,HelpMessage = "Please specify an optional VM Name",Mandatory = $true)]
         [Parameter(ParameterSetName = "2",Mandatory = $false)]$VMXName,
 		[Parameter(ParameterSetName = "1", HelpMessage = "Please enter an optional root Path to you VMs (default is vmxdir)",Mandatory = $false)]
 		$Path = $vmxdir,
