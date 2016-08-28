@@ -2833,7 +2833,7 @@ function Stop-VMX{
 	[CmdletBinding(DefaultParameterSetName = '2',HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param (
 		[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $True)]
-        [Parameter(ParameterSetName = "2", Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $True)]
+        [Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $True)]
         [Alias('NAME','CloneName')][string]$VMXName,
 		[Parameter(ParameterSetName = "1", Mandatory = $false,ValueFromPipelineByPropertyName = $True)]
         [Alias('VMXUUID')][string]$UUID,
