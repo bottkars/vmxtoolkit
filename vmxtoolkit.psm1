@@ -2006,10 +2006,6 @@ function Get-VMXUUID
 	}
 	end { }
 }#end Get-UUID
-
-
-
-
 <#	
 	.SYNOPSIS
 		A brief description of the Get-VMXRun function.

@@ -110,13 +110,16 @@ $Global:VMrunErrorCondition = @(
   "Error: The VMware Tools are not running in the virtual machine" )
 if (Test-Path $GLobal:VMware_packer)
 	{
-	Write-Host " ==>found $Packer"
+	Write-Host -ForegroundColor Gray " ==>found $GLobal:VMware_packer"
 	}
 else
 	{
 	Write-Warning "Please install 7za/p7zip, otherwise labbtools can not expand OS Masters"
 	}
-write-Host -ForegroundColor Gray " ==>$OS_Version"
+if ($OS_Version)
+	{
+	write-Host -ForegroundColor Gray " ==>$OS_Version"
+	}
 Write-Host -ForegroundColor Gray " ==>vmrun used from $Global:vmrun"
 Write-Host -ForegroundColor Gray " ==>vmwarepath is $Global:vmwarepath"
 Write-Host -ForegroundColor Gray " ==>default vmxdir is $Global:vmxdir"
