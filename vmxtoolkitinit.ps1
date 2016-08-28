@@ -120,8 +120,10 @@ if ($OS_Version)
 	{
 	write-Host -ForegroundColor Gray " ==>$OS_Version"
 	}
+Write-Host -ForegroundColor Gray " ==>running vmxtoolkit for $Global:vmxtoolkit_type"
 Write-Host -ForegroundColor Gray " ==>vmrun used from $Global:vmrun"
 Write-Host -ForegroundColor Gray " ==>vmwarepath is $Global:vmwarepath"
+Write-Host -ForegroundColor Gray " ==>virtual machine directory from module load is $Global:vmxdir"
 Write-Host -ForegroundColor Gray " ==>default vmxdir is $Global:vmxdir"
 Write-Host -ForegroundColor Gray " ==>running VMware Version Mode $Global:vmwareversion"
 Write-Host -ForegroundColor Gray " ==>OVFtool $Global:VMware_OVFTool"
