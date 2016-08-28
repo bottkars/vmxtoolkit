@@ -2041,11 +2041,15 @@ function Get-VMXRun{
 		{
 			# $runvm = split-path $runvm -leaf -resolve
 			# $runvm = $runvm.TrimEnd(".vmx")
-			$runvms += $runvm
+			$object = New-Object -TypeName psobject
+			$object.pstypenames.insert(0,'virtualmachine')
+			$object | Add-Member -MemberType NoteProperty -Name VMXName -Value ([string]($runvm.BaseName))
+			$object | Add-Member -MemberType NoteProperty -Name config -Value $runvm
+			$object | Add-Member -MemberType NoteProperty -Name Status -Value $running
+			Write-Output $object
 			# Shell opject will be cretaed in next version containing name, vmpath , status
 		}# end if
 	}#end foreach
-	return, $runvms
 } #end get-vmxrun
 
 
