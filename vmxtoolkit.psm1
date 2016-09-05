@@ -399,41 +399,6 @@ function Get-VMXConfigVersion
 	.NOTES
 		requires VMXtoolkit loaded
 #>
-
-function Repair-VMXDiskfile
-{
-	[CmdletBinding(DefaultParametersetName = "1",HelpUri = "http://labbuildr.bottnet.de/modules")]
-	param (
-
-	[Parameter(ParameterSetName = "1", Mandatory = $True, ValueFromPipelineByPropertyName = $True)]$DiskPath,
-    [Parameter(ParameterSetName = "1", Mandatory = $True, ValueFromPipelineByPropertyName = $True)]$Disk,
-    [Parameter(ParameterSetName = "2", Mandatory = $True, ValueFromPipelineByPropertyName = $false)]$Diskfile
-
-	)
-	begin
-	{
-	}
-	process
-	{
-		switch ($PsCmdlet.ParameterSetName)
-		{
-			"1"
-			{
-            $Diskfile = Join-Path $DiskPath $Disk
-            }
-            default
-            {}
-
-		}
-        Write-Warning "Shrinking $Diskfile"
-	    & "$VMWAREpath\vmware-vdiskmanager.exe" -R $Diskfile
-        Write-Verbose "Exitcode: $LASTEXITCODE"
-		
-	}
-	end { }
-}
-
-
 function Resize-VMXDiskfile
 {
 	[CmdletBinding(DefaultParametersetName = "1",HelpUri = "http://labbuildr.bottnet.de/modules")]
@@ -1944,11 +1909,7 @@ function Set-VMXSharedFolder
         [Parameter(Mandatory = $True, ParameterSetName = 1, ValueFromPipelineByPropertyName = $True)]
 		[Parameter(Mandatory = $True, ParameterSetName = 2, ValueFromPipelineByPropertyName = $True)][ValidateLength(3,10)][ValidatePattern("^[a-zA-Z\s]+$")]$Sharename,
         [Parameter(Mandatory = $True, ParameterSetName = 1, ValueFromPipelineByPropertyName = $True)]
-<<<<<<< HEAD
-		[ValidateScript({ Test-Path -Path $_ })]
-=======
 		#[ValidateScript({ Test-Path -Path $_ })]
->>>>>>> develop
 		$Folder
 
 
@@ -4126,7 +4087,7 @@ function Invoke-VMXPowerShell
 	[OutputType([psobject])]
 	param
 	(
-        [Parameter(ParameterSetName = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $true)][Alias('NAME','CloneName')][string]$VMXName,
+        [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $true)][Alias('NAME','CloneName')][string]$VMXName,
         [Parameter(ParameterSetName = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $true)]$config,
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)]$ScriptPath,
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)]$Script, 
@@ -4135,7 +4096,7 @@ function Invoke-VMXPowerShell
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)][switch]$interactive,
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)][switch]$activewindow, 
         [Parameter(ParameterSetName = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $false)][Alias('gu')]$Guestuser, 
-        [Parameter(ParameterSetName = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $false)][Alias('gp')]$Guestpassword
+        [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)][Alias('gp')]$Guestpassword
 	)
 	begin
     {	
@@ -4150,8 +4111,10 @@ function Invoke-VMXPowerShell
 process
     {
     $myscript = ".'$ScriptPath\$Script'"
-    Write-Host -ForegroundColor Gray " ==>starting Powershell '$ScriptPath\$Script $Parameter' form on " -NoNewline
+    Write-Host -ForegroundColor Gray " ==>starting '$Script $Parameter' on " -NoNewline
     Write-Host -ForegroundColor Magenta $VMXName -NoNewline
+  #  Write-Host  -ForegroundColor Magenta (Split-Path -Leaf $config ).Replace(".vmx","") -NoNewline
+
     do
         {
         $Myresult = 1
@@ -4226,7 +4189,7 @@ function Invoke-VMXBash
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)][switch]$activewindow,
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)][Validaterange(0,300)][int]$SleepSec,
         [Parameter(ParameterSetName = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $true)][Alias('gu')]$Guestuser, 
-        [Parameter(ParameterSetName = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $true)][Alias('gp')]$Guestpassword,
+        [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $true)][Alias('gp')]$Guestpassword,
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $true)][Alias('log')]$logfile
 
 	)

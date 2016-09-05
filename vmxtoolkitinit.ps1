@@ -1,24 +1,3 @@
-<<<<<<< HEAD
-﻿################## Some Globals 
-write-verbose "getting VMware Path from Registry"
-if (!(Test-Path "HKCR:\")) { $NewPSDrive = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT }
-if (!($VMWAREpath = Get-ItemProperty HKCR:\Applications\vmware.exe\shell\open\command -ErrorAction SilentlyContinue))
-{
-	Write-Error "VMware Binaries not found from registry"; Break
-}
-$Global:vmxdir = split-path $PSScriptRoot
-$VMWAREpath = Split-Path $VMWAREpath.'(default)' -Parent
-$VMWAREpath = $VMWAREpath -replace '"', ''
-$Global:vmwarepath = $VMWAREpath
-$Global:vmware = "$VMWAREpath\vmware.exe"
-$Global:vmrun = "$VMWAREpath\vmrun.exe"
-$vmwarefileinfo = Get-ChildItem $Global:vmware
-# if (Test-Path "$env:appdata\vmware\inventory.vmls")
-#{
-$Global:vmxinventory = "$env:appdata\vmware\inventory.vmls"
-#}
-# End VMWare Path
-=======
 ﻿[CmdletBinding()]
 param
 (
@@ -116,7 +95,6 @@ else
 	}
 
 #### some vmx api error handlers :-) false positives from experience
->>>>>>> develop
 $Global:VMrunErrorCondition = @(
   "Waiting for Command execution Available",
   "Error",
@@ -130,13 +108,6 @@ $Global:VMrunErrorCondition = @(
   "Error: A file was not found",
   "Error: VMware Tools are not running in the guest",
   "Error: The VMware Tools are not running in the virtual machine" )
-<<<<<<< HEAD
-$Global:vmwareversion = New-Object System.Version($vmwarefileinfo.VersionInfo.ProductMajorPart,$vmwarefileinfo.VersionInfo.ProductMinorPart,$vmwarefileinfo.VersionInfo.ProductBuildPart,$vmwarefileinfo.VersionInfo.ProductVersion.Split("-")[1])
-# $Global:vmwareMajor = $vmwarefileinfo.VersionInfo.ProductMajorPart
-# $Global:vmwareMinor = $vmwarefileinfo.VersionInfo.ProductMinorPart
-# $Global:vmwareBuild = $vmwarefileinfo.VersionInfo.ProductBuildPart
-# $Global:vmwareversion = $vmwarefileinfo.VersionInfo.ProductVersion
-=======
 if (Test-Path $GLobal:VMware_packer)
 	{
 	Write-Host -ForegroundColor Gray " ==>found $GLobal:VMware_packer"
@@ -158,4 +129,3 @@ Write-Host -ForegroundColor Gray " ==>running VMware Version Mode $Global:vmware
 Write-Host -ForegroundColor Gray " ==>OVFtool $Global:VMware_OVFTool"
 Write-Host -ForegroundColor Gray " ==>Packertool $GLobal:VMware_packer"
 Write-Host -ForegroundColor Gray " ==>vdisk manager is $Global:vmware_vdiskmanager"
->>>>>>> develop
