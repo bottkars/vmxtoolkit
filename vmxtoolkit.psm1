@@ -460,12 +460,13 @@ function Resize-VMXDiskfile
 
 		}
         Write-Warning "Shrinking $Diskfile"
-	    & "$VMWAREpath\vmware-vdiskmanager.exe" -k $Diskfile
+	    & $Global:vmware_vdiskmanager -k $Diskfile
         Write-Verbose "Exitcode: $LASTEXITCODE"
 		
 	}
 	end { }
 }
+
 <#	
 	.SYNOPSIS
 	Optimize-VMXDisk
@@ -505,7 +506,7 @@ function Optimize-VMXDisk
 
 		}
         Write-Warning "Defragmenting $Diskfile"
-	    & "$VMWAREpath\vmware-vdiskmanager.exe" -d $Diskfile
+	    & $Global:vmware_vdiskmanager -d $Diskfile
         Write-Verbose "Exitcode: $LASTEXITCODE"
 		
 	}
@@ -537,8 +538,8 @@ function Repair-VMXDisk
             {}
 
 		}
-        Write-Warning "Checking $Diskfile"
-	    $repair =  & "$VMWAREpath\vmware-vdiskmanager.exe" -R $Diskfile
+        Write-Warning "Repairing $Diskfile"
+	    $repair =  & $Global:vmware_vdiskmanager -R $Diskfile
         Write-Verbose "Exitcode: $LASTEXITCODE"
 		
 	}
@@ -588,8 +589,7 @@ function Import-VMXOVATemplate
             $ovfparam = "$ovfparam --allowExtraConfig"
             }
 
-        Start-Process -FilePath  $global:vmwarepath\OVFTool\ovftool.exe -ArgumentList "--lax $ovfparam --name=$Name $($ovaPath.FullName) $destination" -NoNewWindow -Wait
-       # & $global:vmwarepath\OVFTool\ovftool.exe --lax $ovfparam --name=$Name $ovaPath.FullName $vmxdir #| Out-Null #
+        Start-Process -FilePath  $Global:VMware_OVFTool -ArgumentList "--lax $ovfparam --name=$Name $($ovaPath.FullName) `"$destination" -NoNewWindow -Wait
 
         switch ($LASTEXITCODE)
             {
@@ -1870,7 +1870,7 @@ function Set-VMXSharedFolderState
                     { 
                     $cmdresult = &$vmrun enableSharedFolders $config
                     }
-                until ($VMrunErrorCondition -notcontains $cmdresult)
+                until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
                 $object | Add-Member -MemberType 'NoteProperty' -Name State -Value "enabled"
                 }
 			"2"
@@ -1882,7 +1882,7 @@ function Set-VMXSharedFolderState
                 { 
                 $cmdresult = &$vmrun disableSharedFolders $config
                 }
-            until ($VMrunErrorCondition -notcontains $cmdresult)
+            until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
 		    $object | Add-Member -MemberType 'NoteProperty' -Name State -Value "disabled"
 			}
 		}
@@ -1944,7 +1944,11 @@ function Set-VMXSharedFolder
         [Parameter(Mandatory = $True, ParameterSetName = 1, ValueFromPipelineByPropertyName = $True)]
 		[Parameter(Mandatory = $True, ParameterSetName = 2, ValueFromPipelineByPropertyName = $True)][ValidateLength(3,10)][ValidatePattern("^[a-zA-Z\s]+$")]$Sharename,
         [Parameter(Mandatory = $True, ParameterSetName = 1, ValueFromPipelineByPropertyName = $True)]
+<<<<<<< HEAD
 		[ValidateScript({ Test-Path -Path $_ })]
+=======
+		#[ValidateScript({ Test-Path -Path $_ })]
+>>>>>>> develop
 		$Folder
 
 
@@ -1971,7 +1975,7 @@ function Set-VMXSharedFolder
                     { 
                     $cmdresult = &$vmrun addSharedFolder $config $Sharename $Folder
                     }
-                until ($VMrunErrorCondition -notcontains $cmdresult)
+                until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
                 $object | Add-Member -MemberType 'NoteProperty' -Name Share -Value $Sharename
                 $object | Add-Member -MemberType 'NoteProperty' -Name Folder -Value $Folder
                 }
@@ -1984,7 +1988,7 @@ function Set-VMXSharedFolder
                     { 
                     $cmdresult = &$vmrun removeSharedFolder $config $Sharename
                     }
-                until ($VMrunErrorCondition -notcontains $cmdresult)
+                until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
 		        $object | Add-Member -MemberType 'NoteProperty' -Name Sharename -Value "removed"
 			}
 		}
@@ -2041,10 +2045,6 @@ function Get-VMXUUID
 	}
 	end { }
 }#end Get-UUID
-
-
-
-
 <#	
 	.SYNOPSIS
 		A brief description of the Get-VMXRun function.
@@ -2073,14 +2073,18 @@ function Get-VMXRun{
 	foreach ($runvm in $cmdresult)
 	{
 		if ($runvm -notmatch "Total running VMs")
-		{
-			# $runvm = split-path $runvm -leaf -resolve
+			{
+			[System.IO.FileInfo]$runvm = $runvm
 			# $runvm = $runvm.TrimEnd(".vmx")
-			$runvms += $runvm
+			$object = New-Object -TypeName psobject
+			#$object.pstypenames.insert(0,'virtualmachine')
+			$object | Add-Member -MemberType NoteProperty -Name VMXName -Value ([string]($runvm.BaseName))
+			$object | Add-Member -MemberType NoteProperty -Name config -Value $runvm.FullName
+			$object | Add-Member -MemberType NoteProperty -Name Status -Value running
+			Write-Output $object
 			# Shell opject will be cretaed in next version containing name, vmpath , status
 		}# end if
 	}#end foreach
-	return, $runvms
 } #end get-vmxrun
 
 
@@ -2112,7 +2116,7 @@ function Get-VMX
 		[Parameter(ParameterSetName = "1", HelpMessage = "Please enter an optional root Path to you VMs (default is vmxdir)",Mandatory = $false)]
 		$Path = $vmxdir,
 		[Parameter(ParameterSetName = "1",Mandatory = $false)]$UUID,
-        [Parameter(ParameterSetName = "2", Position = 2,HelpMessage = "Please specify a config to vmx",Mandatory = $true)]$config
+        [Parameter(ParameterSetName = "2", Position = 2,HelpMessage = "Please specify a config to vmx",Mandatory = $true)][System.IO.FileInfo]$config
 
 )
 
@@ -2120,16 +2124,19 @@ begin
     {}
 process
 		{
-        $vmxrun = Get-VMXRun
+        $vmxrun = (Get-VMXRun).config
+		$Configfiles = @()
 		switch ($PsCmdlet.ParameterSetName)
 			{
 			"1"
 				{ 
-                Write-Verbose "Getting vmxname"
+                Write-Verbose "Getting vmxname from parameterset 1"
                 if ($VMXName)
                     {
                     $VMXName = $VMXName.TrimStart(".\")
                     $VMXName = $VMXName.TrimEnd("\")
+					$VMXName = $VMXName.TrimStart("./")
+                    $VMXName = $VMXName.TrimEnd("/")
                     Write-Verbose $VMXName
                     }
                 else
@@ -2152,8 +2159,9 @@ process
 				
 				"2"
 				{
-                $VMXName = (Split-Path -Leaf $config) -replace ".vmx",""
-                if (!($Configfiles = Get-Item -Path $config -Filter "vmx" -ErrorAction SilentlyContinue ))
+                $VMXname = $config.Basename
+				#$VMXName = (Split-Path -Leaf $config) -replace ".vmx",""
+                if (!($Configfiles = Get-Item -Path $config -ErrorAction SilentlyContinue ))
                     {
                     Write-Warning "$($MyInvocation.MyCommand) : VM Config for $config does currently not exist"
                     # break
@@ -2164,7 +2172,7 @@ process
         $VMX = @()
 	    foreach ($Config in $Configfiles)
 	        {
-		    Write-Verbose "Configfile: $($config.FullName)"
+		    Write-Verbose "getting Configfile: $($config.FullName) from parameterset 2"
 		    if ($Config.Extension -eq ".vmx")
                 {
 			if ($UUID)
@@ -2444,8 +2452,9 @@ function New-VMXLinkedClone
 		#foreach ($config in $getconfig)
 		if (!$Clonepath) { $Clonepath = $global:vmxdir } #Split-Path -Path $Path -Parent }
 		Write-Verbose $ClonePath
+		$cmdresult = ""
 		$Targetpath = Join-Path $Clonepath $CloneName 
-		$CloneConfig = "$Targetpath\$CloneName.vmx"
+		$CloneConfig = Join-path "$Targetpath" "$CloneName.vmx"
 		$TemplateVM = Split-Path -Leaf $config
 		$Templatevm = $TemplateVM -replace ".vmx",""
 		Write-Verbose "creating Linked Clone $Clonename from $TemplateVM $Basesnapshot in $Cloneconfig"
@@ -2453,15 +2462,17 @@ function New-VMXLinkedClone
 		Write-Host -ForegroundColor Magenta $Clonename -NoNewline
 		do
 			{
-		    $cmdresult = &$vmrun clone $config $Cloneconfig linked $BaseSnapshot $Clonename  2>&1 | Out-Null
+			$snapcommand = "clone $config $Cloneconfig linked -snapshot=$($BaseSnapshot) -cloneName=$($Clonename)" # 2>&1 | Out-Null
+			$cmdresult = Start-Process $Global:vmrun -ArgumentList $snapcommand 
 			}
-		until ($VMrunErrorCondition -notcontains $cmdresult)
+		until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
         if ($LASTEXITCODE -eq 0)
             {
 			Write-Host -ForegroundColor Green "[success]"
-            $Addcontent = @()
-            $Addcontent += 'guestinfo.buildDate = "'+$BuildDate+'"'
-            Add-Content -Path $Cloneconfig -Value $Addcontent
+			sleep 2
+			$Addcontent = @()
+			$Addcontent += 'guestinfo.buildDate = "'+$BuildDate+'"'
+			Add-Content -Path "$Cloneconfig" -Value $Addcontent
 			$object = New-Object psobject
 			$object | Add-Member -MemberType 'NoteProperty' -Name CloneName -Value $Clonename
 			$object | Add-Member -MemberType 'NoteProperty' -Name Config -Value $Cloneconfig
@@ -2506,7 +2517,7 @@ function New-VMXClone
 		#foreach ($config in $getconfig)
 		if (!$Clonepath) { $Clonepath = Split-Path -Path $Path -Parent }
 		Write-Verbose $ClonePath
-		$CloneConfig = "$Clonepath\$Clonename\$CloneName.vmx"
+		$CloneConfig =  Join-Path "$Clonepath" (Join-Path $Clonename "$CloneName.vmx")
 		$TemplateVM = Split-Path -Leaf $config
 		$Templatevm = $TemplateVM -replace ".vmx",""
 		Write-Verbose $CloneConfig
@@ -2808,7 +2819,7 @@ function Start-VMX
 		    		        $cmdresult = &$vmrun start $vmx.config #  2>&1 | Out-Null
                             }
 		    	        }
-    			    until ($VMrunErrorCondition -notcontains $cmdresult)
+    			    until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
                     }
                 if ($LASTEXITCODE -eq 0) 
 	                {
@@ -2857,7 +2868,7 @@ function Stop-VMX{
 	[CmdletBinding(DefaultParameterSetName = '2',HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 	param (
 		[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $True)]
-        [Parameter(ParameterSetName = "2", Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $True)]
+        [Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $True)]
         [Alias('NAME','CloneName')][string]$VMXName,
 		[Parameter(ParameterSetName = "1", Mandatory = $false,ValueFromPipelineByPropertyName = $True)]
         [Alias('VMXUUID')][string]$UUID,
@@ -3676,7 +3687,7 @@ function Remove-vmx {
         		    write-verbose "$Origin deleteVM $vmname $cmdresult"
                     write-verbose $LASTEXITCODE
 	                }
-	            until ($VMrunErrorCondition -notcontains $cmdresult)
+	            until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
                 if ($cmdresult -match "Error: This VM is in use.")
                     {
                     write-warning "$cmdresult Please close VMX $VMXName in Vmware UI and try again"
@@ -3736,10 +3747,11 @@ begin {
        }
 process {
 	Write-Host -ForegroundColor Gray " ==>creating new $($NewDiskSize/1GB)GB SCSI Disk $NewDiskName at $Path" -NoNewline
-    if (!$NewDiskname.EndsWith(".vmdk")) { $NewDiskname = $NewDiskname+".vmdk" }    
+    if (!$NewDiskname.EndsWith(".vmdk")) { $NewDiskname = $NewDiskname+".vmdk" }
+	$Diskpath = Join-Path $Path $NewDiskname    
     if ($PSCmdlet.MyInvocation.BoundParameters["debug"].IsPresent)
         {
-        $returncommand = & $vmwarepath\vmware-vdiskmanager.exe -c -s "$($NewDiskSize/1MB)MB" -t 0 $Path\$NewDiskname -a lsilogic # 2>&1 
+        $returncommand = & $Global:VMware_vdiskmanager -c -s "$($NewDiskSize/1MB)MB" -t 0 -a lsilogic $Diskpath # 2>&1 
         write-host -ForegroundColor Cyan "Debug message start"
         Write-Host -ForegroundColor White "Command Returned: $returncommand"
         Write-Host -ForegroundColor White "Exitcode: $LASTEXITCODE"
@@ -3750,7 +3762,7 @@ process {
         }
     else
         {
-        $returncommand = & $vmwarepath\vmware-vdiskmanager.exe -c -s "$($NewDiskSize/1MB)MB" -t 0 $Path\$NewDiskname -a lsilogic 2>&1 
+        $returncommand = &$Global:VMware_vdiskmanager -c -s "$($NewDiskSize/1MB)MB" -t 0 -a lsilogic $Diskpath  #2>&1 
         }
 
     if ($LASTEXITCODE -eq 0)
@@ -4148,7 +4160,7 @@ process
             Write-Verbose "c:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe '$myscript' '$Parameter'"
 	        $cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runPrograminGuest $config -activewindow "$nowait_parm" $interactive_parm c:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Executionpolicy bypass "$myscript" "$Parameter")
             }
-	    until ($VMrunErrorCondition -notcontains $cmdresult)
+	    until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
         Write-Verbose "Exitcode : $Lastexitcode"
         if ($Lastexitcode -ne 0)
             {
@@ -4244,7 +4256,7 @@ do
 	        {
 	        $cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm /bin/bash $Scriptblock)
 	        }
-	    until ($VMrunErrorCondition -notcontains $cmdresult)
+	    until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
         Write-Verbose "Exitcode : $Lastexitcode"
         if ($Lastexitcode -ne 0)
             {
@@ -5434,4 +5446,32 @@ tools.remindInstall = "FALSE"')
     $object | Add-Member -MemberType NoteProperty -Name Config -Value $Config
     $object | Add-Member -MemberType NoteProperty -Name Path -Value $VMXpath
     Write-Output $object
+}
+
+
+
+function Test-VMXFileInGuest
+{
+	[CmdletBinding(HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
+	param (
+	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$Filename,
+	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
+	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$config,
+    [Parameter(ParameterSetName = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $true)][Alias('gu')]$Guestuser, 
+    [Parameter(ParameterSetName = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $true)][Alias('gp')]$Guestpassword
+    )
+begin {
+    }
+process 
+	{
+    $fileok = .$vmrun -gu $Guestuser -gp $Guestpassword fileExistsInGuest  $config $Filename
+	if ($fileok -match "exists")
+	 {Write-Output $True}
+	 else
+	 {Write-Output $false}
+    }
+end 
+	{
+    
+    }
 }

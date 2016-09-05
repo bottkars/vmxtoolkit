@@ -1,7 +1,7 @@
-vmxtoolkit
+##vmxtoolkit
 ==========
 
-vmxtoolkit is the Powershell extension to VMware Workstation
+vmxtoolkit is the Powershell extension to VMware Workstation and Fusion
 vmxtoolkit is community-driven
 vmxtoolkit is the Base for labbuildr, the automated lab building environment for vmware workstation on windows
 you get support for labbuildr on github
@@ -10,13 +10,22 @@ https://github.com/bottkars/labbuildr/wiki
 ![logo](https://cloud.githubusercontent.com/assets/8255007/17695850/ce034d40-63aa-11e6-8cb7-69a9b914334d.gif)
 
 simply follow @sddc_guy on twitter for updates
-Installation  
+##Installation  
 ===========
  
 Simply extract the toolkit into a folder where your VM´s reside.
 Per Default, vmxtoolkit searches from that path
 Otherwise, specifythe path to your vm when doing a get-vmx
 
+##Installation on OSX
+to run vmxtoolkit on OSX, you need to have PowerShell for OSX installed  
+see [PowerShell for OSX](https://github.com/PowerShell/PowerShell/blob/master/docs/installation/linux.md#os-x-1011) for instructions
+it is also recommended to install .NET Core for OSX from for details on installation of .NET Core LIBS see [.NET Core on MACOS](https://www.microsoft.com/net/core#macos)   
+OSX port is currently only available via Git clone, no auto installer  
+use
+```Bash```
+git clone https://github.com/bottkars/vmxtoolkit --branch osx
+``````
 current exposed commands
 ===========  
 ```Powershell
