@@ -539,12 +539,11 @@ function Import-VMXOVATemplate
             $Name = $($ovaPath.Basename)
         }
         $ovfparam = "--skipManifestCheck"
-        Write-Host -ForegroundColor Gray " ==>Importing from OVA $($ovaPath.Basename), may take a while" -NoNewline
+        Write-Host -ForegroundColor Gray " ==>Importing from OVA $($ovaPath.Basename), may take a while" # -NoNewline
         if ($Quiet.IsPresent)
             {
             $ovfparam = "$ovfparam --quiet"
             }
-
         if ($acceptAllEulas.IsPresent)
             {
             $ovfparam = "$ovfparam --acceptAllEulas"
@@ -553,9 +552,7 @@ function Import-VMXOVATemplate
             {
             $ovfparam = "$ovfparam --allowExtraConfig"
             }
-
         Start-Process -FilePath  $Global:VMware_OVFTool -ArgumentList "--lax $ovfparam --name=$Name $($ovaPath.FullName) `"$destination" -NoNewWindow -Wait
-
         switch ($LASTEXITCODE)
             {
             0
@@ -1014,8 +1011,10 @@ param (
 
 	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
 	[Parameter(ParameterSetName = "1", Mandatory = $True, ValueFromPipelineByPropertyName = $True)]$config,
-    [Parameter(Mandatory=$false)][ValidateRange(0,3)]$SCSIController=0,
-    [Parameter(Mandatory=$false)][ValidateSet('pvscsi','lsisas1068')]$Type="pvscsi"
+    [Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
+	[ValidateRange(0,3)]$SCSIController=0,
+    [Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
+	[ValidateSet('pvscsi','lsisas1068')]$Type="pvscsi"
 	)
 	begin
 	{
@@ -1025,9 +1024,9 @@ param (
         if ((get-vmx -Path $config).state -eq "stopped")
 
             { 
-            $vmxconfig = Get-VMXConfig -config $config
-            $Content = $vmxconfig -notmatch "scsi$SCSIController.present"
-            $Content = $vmxconfig -notmatch "scsi$SCSIController.virtualDev"
+            $content = Get-VMXConfig -config $config
+            $Content = $content -notmatch "scsi$SCSIController.present"
+            $Content = $Content -notmatch "scsi$SCSIController.virtualDev"
 		    $Content = $Content += 'scsi'+$SCSIController+'.virtualDev = "'+$Type+'"'
 		    $Content = $Content += 'scsi'+$SCSIController+'.present = "TRUE"'
             $Content | Set-Content -Path $config
@@ -3853,8 +3852,7 @@ end {
     
     }
 } 
-
-
+###
 function Set-VMXscenario
 {
 	[CmdletBinding()]
