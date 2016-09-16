@@ -2411,7 +2411,7 @@ function New-VMXLinkedClone
 	{
 		#foreach ($config in $getconfig)
 		if (!$Clonepath) { $Clonepath = $global:vmxdir } #Split-Path -Path $Path -Parent }
-		Write-Verbose $ClonePath
+		Write-Verbose "clonepath is $ClonePath"
 		$cmdresult = ""
 		$Targetpath = Join-Path $Clonepath $CloneName 
 		$CloneConfig = Join-path "$Targetpath" "$CloneName.vmx"
@@ -2423,6 +2423,7 @@ function New-VMXLinkedClone
 		do
 			{
 			$snapcommand = "clone $config $Cloneconfig linked -snapshot=$($BaseSnapshot) -cloneName=$($Clonename)" # 2>&1 | Out-Null
+			Write-Verbose "Trying $snapcommand"
 			$cmdresult = Start-Process $Global:vmrun -ArgumentList $snapcommand 
 			}
 		until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
