@@ -2424,7 +2424,7 @@ function New-VMXLinkedClone
 			{
 			$snapcommand = "clone `"$config`" `"$Cloneconfig`" linked -snapshot=$($BaseSnapshot) -cloneName=$($Clonename)" # 2>&1 | Out-Null
 			Write-Verbose "Trying $snapcommand"
-			$cmdresult = Start-Process $Global:vmrun -ArgumentList "$snapcommand" -NoNewWindow
+			$cmdresult = Start-Process $Global:vmrun -ArgumentList "$snapcommand" -NoNewWindow -Wait 
 			}
 		until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
         if ($LASTEXITCODE -eq 0)
@@ -2476,7 +2476,7 @@ function New-VMXClone
 	Process
 	{
 		#foreach ($config in $getconfig)
-		if (!$Clonepath) { $Clonepath = Split-Path -Path $Path -Parent }
+		if (!$Clonepath) { $Clonepath = $global:vmxdir }
 		Write-Verbose $ClonePath
 		$CloneConfig =  Join-Path "$Clonepath" (Join-Path $Clonename "$CloneName.vmx")
 		$TemplateVM = Split-Path -Leaf $config
@@ -2484,13 +2484,16 @@ function New-VMXClone
 		Write-Verbose $CloneConfig
 		Write-Host -ForegroundColor Gray " ==>creating Fullclone from $TemplateVM $Basesnapshot for " -NoNewline
 		Write-Host -ForegroundColor Magenta $Clonename -NoNewline
-		Write-Verbose "creating Full Clone  $Clonename for $Basesnapshot in $Cloneconfig"
+		Write-Verbose "creating Full Clone $Clonename for $Basesnapshot in $Cloneconfig"
+		$clonecommand = "clone `"$config`" `"$Cloneconfig`" full -snapshot=$($BaseSnapshot) -cloneName=$($Clonename)" # 2>&1 | Out-Null
+		Write-Verbose "Trying $clonecommand"
 		do
 			{
-			($cmdresult = &$vmrun clone $config $Cloneconfig full $BaseSnapshot $Clonename) #  2>&1 | Out-Null
+			Write-Verbose "Trying $clonecommand"
+			$cmdresult = Start-Process $vmrun -ArgumentList $clonecommand -NoNewWindow -Wait
 			}
-		until ($VMrunErrorCondition -notcontains $cmdresult)
-        if ($LASTEXITCODE -eq 0)
+		until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)	
+        if ($LASTEXITCODE -eq 0 -and $cmdresult -ne "Error: The snapshot already exists")
             {
 			Write-Host -ForegroundColor Green "[success]"
 			$object = New-Object psobject
