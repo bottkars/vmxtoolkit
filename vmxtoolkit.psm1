@@ -94,23 +94,41 @@ begin {
     }
 process {
     
-    $Processlist = .$vmrun -gu $Guestuser -gp $Guestpassword listprocessesinguest  $config
-    $Processlist = $Processlist -notmatch "Process list:"
-    foreach ($Process in $Processlist)
-        {
-        $Process = $Process.replace("pid=","")
-        $Process = $Process.replace("owner=","")
-        $Process = $Process.replace("cmd=","")
-        $Process = $Process.split(', ')
-        $Object = New-Object -TypeName psobject
-        $Object | Add-Member -MemberType NoteProperty -Name PID -Value $Process[0]
-        $Object | Add-Member -MemberType NoteProperty -Name USER -Value $Process[2]
-        $Object | Add-Member -MemberType NoteProperty -Name Process -Value $Process[4]
-        Write-Output $Object
+    [System.Collections.ArrayList]$Processlist = .$vmrun -gu $Guestuser -gp $Guestpassword listprocessesinguest  $config
+    $Processlist.RemoveRange(0,2)
+		if ($global:vmwareversion -lt 12.5)
+			{
+			foreach ($Process in $Processlist)
+				{
+				$Process = $Process.replace("pid=","")
+				$Process = $Process.replace("owner=","")
+				$Process = $Process.replace("cmd=","")
+				$Process = $Process.split(', ')
+				$Object = New-Object -TypeName psobject
+				$Object | Add-Member -MemberType NoteProperty -Name PID -Value $Process[0]
+				$Object | Add-Member -MemberType NoteProperty -Name USER -Value $Process[2]
+				$Object | Add-Member -MemberType NoteProperty -Name Process -Value $Process[4]
+				Write-Output $Object
+				}
+			}
+		else
+			{
+			foreach ($Process in $Processlist)
+				{
+				$Process = $Process.replace("pid=","")
+				$Process = $Process.replace("owner=","")
+				$Process = $Process.replace("cmd=","")
+				$Process = $Process -split ", "
+				$Object = New-Object -TypeName psobject
+				$Object | Add-Member -MemberType NoteProperty -Name PID -Value $Process[0]
+				$Object | Add-Member -MemberType NoteProperty -Name USER -Value $Process[1]
+				$Object | Add-Member -MemberType NoteProperty -Name Process -Value ($Process[2,-1] -join " ")
+				Write-Output $Object
+				}
+			}
+        
         }
 
-
-    }
 end {
     
     }
@@ -5529,4 +5547,41 @@ end
 	{
     
     }
+}
+
+function Wait-VMXuserloggedIn
+{
+	param (
+	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
+	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$config,
+    [Parameter(ParameterSetName = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $true)][Alias('gu')]$Guestuser, 
+    [Parameter(ParameterSetName = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $true)][Alias('gp')]$Guestpassword,
+	$testuser
+	)
+	Write-Host -ForegroundColor Gray -NoNewline " ==>waiting for user $whois logged in machine $machine"
+	$vmx = get-vmx $machine
+	do
+		{
+		$sleep = 1
+		$ProcInGuest = Get-VMXProcessesInGuest -config $config -Guestuser $Guestuser -Guestpassword $Guestpassword
+		foreach ($i in  (1..$sleep))
+			{
+			Write-Host -ForegroundColor Yellow "-`b" -NoNewline
+			sleep 1
+			Write-Host -ForegroundColor Yellow "\`b" -NoNewline
+			sleep 1
+			Write-Host -ForegroundColor Yellow "|`b" -NoNewline
+			sleep 1
+			Write-Host -ForegroundColor Yellow "/`b" -NoNewline
+			sleep 1
+			}
+	}
+until ($ProcInGuest -match $testuser) 
+Write-Host	-ForegroundColor Green "[success]"
+    $object = New-Object -TypeName psobject
+    $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
+    $object | Add-Member -MemberType NoteProperty -Name Config -Value $Config
+    $object | Add-Member -MemberType NoteProperty -Name User -Value $testuser
+    $object | Add-Member -MemberType NoteProperty -Name LoggedIn -Value $true
+	Write-Output $object
 }
