@@ -57,12 +57,12 @@ else
 					}
 				try
 					{
-					$GLobal:VMware_packer = (get-command 7za -ErrorAction Stop).Path 
+					$GLobal:VMware_packer = (get-command 7za -ErrorAction SilentlyContinue).Path 
 					}
 				catch
 					{
 					Write-Warning "7za not found, pleas install p7zip full"
-					Break
+					return
 					}
 				$Global:VMware_vdiskmanager = Join-Path $VMware_BIN_Path 'vmware-vdiskmanager'
 				$GLobal:VMware_packer = Join-Path '/usr/local/bin/' '7za'
