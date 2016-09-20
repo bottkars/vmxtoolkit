@@ -176,12 +176,7 @@ $Global:VMrunErrorCondition = @(
   "Error: A file was not found",
   "Error: VMware Tools are not running in the guest",
   "Error: The VMware Tools are not running in the virtual machine" )
-if (Test-Path $GLobal:VMware_packer)
-	{
-	Write-Host -ForegroundColor Gray " ==>found $GLobal:VMware_packer"
-	}
-else
-	{
+if (!$GLobal:VMware_packer)
 	Write-Warning "Please install 7za/p7zip, otherwise labbtools can not expand OS Masters"
 	}
 if ($OS_Version)
