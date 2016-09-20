@@ -29,6 +29,7 @@ if  (Test-Path C:\WINDOWS\system32\ntdll.dll)
     $VMwarefileinfo = Get-ChildItem $Global:vmware
     $Global:vmxinventory = "$env:appdata\vmware\inventory.vmls"
     $Global:vmwareversion = New-Object System.Version($VMwarefileinfo.VersionInfo.ProductMajorPart,$VMwarefileinfo.VersionInfo.ProductMinorPart,$VMwarefileinfo.VersionInfo.ProductBuildPart,$VMwarefileinfo.VersionInfo.ProductVersion.Split("-")[1])
+	$webrequestor = ".Net"
 	}
 else
 	{
@@ -57,12 +58,12 @@ else
 					}
 				try
 					{
-					$GLobal:VMware_packer = (get-command 7za -ErrorAction SilentlyContinue).Path 
+					$GLobal:VMware_packer = (get-command 7za -ErrorAction Stop).Path 
 					}
 				catch
 					{
 					Write-Warning "7za not found, pleas install p7zip full"
-					exit
+					Break
 					}
 				$Global:VMware_vdiskmanager = Join-Path $VMware_BIN_Path 'vmware-vdiskmanager'
 				$Global:vmrun = Join-Path $VMware_BIN_Path "vmrun"
