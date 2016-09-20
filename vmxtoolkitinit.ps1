@@ -177,6 +177,7 @@ $Global:VMrunErrorCondition = @(
   "Error: VMware Tools are not running in the guest",
   "Error: The VMware Tools are not running in the virtual machine" )
 if (!$GLobal:VMware_packer)
+	{
 	Write-Warning "Please install 7za/p7zip, otherwise labbtools can not expand OS Masters"
 	}
 if ($OS_Version)
