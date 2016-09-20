@@ -96,7 +96,7 @@ process {
     
     [System.Collections.ArrayList]$Processlist = .$vmrun -gu $Guestuser -gp $Guestpassword listprocessesinguest  $config
     $Processlist.RemoveRange(0,2)
-		if ($global:vmwareversion -lt 12.5)
+		if ($global:vmwareversion -lt 10.5)
 			{
 			foreach ($Process in $Processlist)
 				{
