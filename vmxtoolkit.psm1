@@ -122,7 +122,7 @@ process {
 				$Object = New-Object -TypeName psobject
 				$Object | Add-Member -MemberType NoteProperty -Name PID -Value $Process[0]
 				$Object | Add-Member -MemberType NoteProperty -Name USER -Value $Process[1]
-				$Object | Add-Member -MemberType NoteProperty -Name Process -Value ($Process[2,-1] -join " ")
+				$Object | Add-Member -MemberType NoteProperty -Name Process -Value ($Process[2,3,4,5,6,7,8,9] -join " ")
 				Write-Output $Object
 				}
 			}
