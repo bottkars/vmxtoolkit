@@ -45,6 +45,7 @@ else
 				$VMX_BasePath = 'Documents/Virtual Machines.localized'
 				$VMware_Path = "/Applications/VMware Fusion.app"
 				$Global:vmwarepath = $VMware_Path
+				$VMware_BIN_Path = Join-Path $VMware_Path  '/Contents/Library'
 				try 
 					{
 					$webrequestor  = (get-command curl).Path
@@ -54,56 +55,14 @@ else
 					Write-Warning "curl not found"
 					exit
 					}
-				try 
-					{
-					$VMware_Path = Split-Path -Parent (get-command vmware).Path
-					}
-				catch
-					{
-					Write-Warning "VMware Path not found"
-					exit
-					}
-				$Global:vmwarepath = $VMware_Path
-				$VMware_BIN_Path = $VMware_Path  
 				try
 					{
-					$Global:VMware_vdiskmanager = (get-command vmware-vdiskmanager).Path
-					}
-				catch
-					{
-					Write-Warning "vmware-vdiskmanager not found"
-					break
-					}
-				try
-					{
-					$GLobal:VMware_packer = (get-command 7za).Path
+					$GLobal:VMware_packer = (get-command 7za).Path 
 					}
 				catch
 					{
 					Write-Warning "7za not found, pleas install p7zip full"
 					}
-				
-				try
-					{
-					$Global:vmrun = (Get-Command vmrun).Path
-					}	
-				catch
-					{
-					Write-Warning "vmrun not found"
-					break
-					}
-				try
-					{
-					$Global:VMware_OVFTool = (Get-Command ovftool).Path
-					}
-				catch
-					{
-					Write-Warning "ovftool not found"
-					break
-					}
-
-
-
 				$Global:VMware_vdiskmanager = Join-Path $VMware_BIN_Path 'vmware-vdiskmanager'
 				$GLobal:VMware_packer = Join-Path '/usr/local/bin/' '7za'
 				$Global:vmrun = Join-Path $VMware_BIN_Path "vmrun"
