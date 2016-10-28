@@ -1996,7 +1996,8 @@ function Get-VMXUUID
 		[Parameter(ParameterSetName = "1", Mandatory = $true, Position = 1, ValueFromPipelineByPropertyName = $True)]
 		[Parameter(ParameterSetName = "2", Mandatory = $false, Position = 1, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
 		[Parameter(ParameterSetName = "2", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$config,
-		[Parameter(ParameterSetName = "3", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$vmxconfig
+		[Parameter(ParameterSetName = "3", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$vmxconfig,
+		[switch]$unityformat
 	)
 	begin
 	{
@@ -2016,9 +2017,19 @@ function Get-VMXUUID
 		$patterntype = ".bios"
 		$Value = Search-VMXPattern  -Pattern "uuid.bios" -vmxconfig $vmxconfig -Name "Type" -value $ObjectType -patterntype $patterntype -nospace
 		# $Value = Search-VMXPattern -Pattern "ethernet\d{1,2}.virtualdev" -vmxconfig $vmxconfig -name "Adapter" -value "Type" -patterntype $patterntype
+		if ($unityformat.ispresent)
+			{
+			$out_uuid = $Value.uuid.Insert(8,"-")
+			$out_uuid = $out_uuid.Insert(13,"-")
+			$out_uuid = $out_uuid.Insert(23,"-")
+			}
+		else
+			{
+			$out_uuid = $Value.uuid
+			}	
 		$object = New-Object -TypeName psobject
 		$Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
-		$object | Add-Member -MemberType NoteProperty -Name $ObjectType -Value $Value.uuid
+		$object | Add-Member -MemberType NoteProperty -Name $ObjectType -Value $out_uuid
 		Write-Output $Object
 	}
 	end { }
@@ -3875,7 +3886,7 @@ end {
     }
 } 
 ###
-function Set-VMXscenario
+function Set-VMXScenario
 {
 	[CmdletBinding()]
 	param
