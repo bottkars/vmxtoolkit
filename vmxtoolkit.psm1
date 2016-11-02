@@ -4226,6 +4226,7 @@ function Invoke-VMXBash
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)][Validaterange(0,300)][int]$SleepSec,
         [Parameter(ParameterSetName = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $true)][Alias('gu')]$Guestuser, 
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $true)][Alias('gp')]$Guestpassword,
+        [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)][Alias('pe')]$Possible_Error_Fix,
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $true)][Alias('log')]$logfile
 
 	)
@@ -4260,6 +4261,11 @@ do
         if ($Lastexitcode -ne 0)
             {
             Write-Warning "Script Failure for $Scriptblock with $cmdresult"
+			If ($Possible_Error_Fix)
+				{
+				Write-Host -ForegroundColor White " ==>Possible Resolution from Calling Command:"
+				Write-Host -ForegroundColor Yellow $Possible_Error_Fix
+				}
             Write-Verbose "Confirmpreference: $ConfirmPreference"
             if ($ConfirmPreference -notmatch "none")
                 {
