@@ -4127,7 +4127,9 @@ function Invoke-VMXPowerShell
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)][switch]$interactive,
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)][switch]$activewindow, 
         [Parameter(ParameterSetName = 1, Mandatory = $true, ValueFromPipelineByPropertyName = $false)][Alias('gu')]$Guestuser, 
-        [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)][Alias('gp')]$Guestpassword
+        [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)][Alias('gp')]$Guestpassword,
+        [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $false)][Alias('pe')]$Possible_Error_Fix
+
 	)
 	begin
     {	
@@ -4137,8 +4139,6 @@ function Invoke-VMXPowerShell
 	if ($nowait) { $nowait_parm = "-nowait" }
 	if ($interactive) { $interactive_parm = "-interactive" }
 	}
-
-
 process
     {
     $myscript = ".'$ScriptPath\$Script'"
@@ -4160,6 +4160,11 @@ process
             {
 			Write-Host -ForegroundColor Red "[failed]"
             Write-Warning "Script Failure for $Script with $cmdresult"
+			If ($Possible_Error_Fix)
+				{
+				Write-Host -ForegroundColor White " ==>Possible Resolution from Calling Command:"
+				Write-Host -ForegroundColor Yellow $Possible_Error_Fix
+				}
             Write-Verbose "Confirmpreference: $ConfirmPreference"
             if ($ConfirmPreference -notmatch "none")
                 {
