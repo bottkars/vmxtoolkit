@@ -865,8 +865,6 @@ function Get-VMXScsiDisk{
 			"2"
 			{ $vmxconfig = Get-VMXConfig -config $config }
 		}
-		
-
 		$Patterntype = ".fileName"
 		$ObjectType = "SCSIDisk"
 		$ErrorActionPreference = "silentlyContinue"
@@ -874,13 +872,21 @@ function Get-VMXScsiDisk{
 		$Value = Search-VMXPattern -Pattern "scsi\d{1,2}:\d{1,2}.fileName" -vmxconfig $vmxconfig -name "SCSIAddress" -value "Disk" -patterntype $Patterntype
 		foreach ($Disk in $value)
 		{
+			#$DiskProperties = Search-VMXPattern -Pattern "$($Disk.ScsiAddress)" -vmxconfig $vmxconfig -name "DiskPropreties" -value "Disk" -patterntype ".virtualSSD"
+			$VirtualSSD = Search-VMXPattern -pattern "$($Disk.ScsiAddress).virtualssd" -vmxconfig $VMXconfig -patterntype ".virtualSSD" -name "virtualssd" -value "value"
+			$Mode = Search-VMXPattern -pattern "$($Disk.ScsiAddress).mode" -vmxconfig $VMXconfig -patterntype ".mode" -name "mode" -value "value"
+			$writeThrough = Search-VMXPattern -pattern "$($Disk.ScsiAddress).writeThrough" -vmxconfig $VMXconfig -patterntype ".writeThrough" -name "writeThrough" -value "value"
+
 			$object = New-Object -TypeName psobject
 			$object.pstypenames.insert(0,'vmxscsidisk')
-		$object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
+			$object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
 			$object | Add-Member -MemberType NoteProperty -Name SCSIAddress -Value $Disk.ScsiAddress
             $object | Add-Member -MemberType NoteProperty -Name Controller -Value ($Disk.ScsiAddress.Split(":")[0]).replace("scsi","")
             $object | Add-Member -MemberType NoteProperty -Name LUN -Value $Disk.ScsiAddress.Split(":")[1]
 			$object | Add-Member -MemberType NoteProperty -Name Disk -Value $Disk.disk
+			$object | Add-Member -MemberType NoteProperty -Name VirtualSSD -Value $VirtualSSD.value
+			$object | Add-Member -MemberType NoteProperty -Name Mode -Value $mode.value
+			$object | Add-Member -MemberType NoteProperty -Name writeThrough -Value $writeThrough.value
             If ($PsCmdlet.ParameterSetName -eq 2)
                 {
                 $Diskpath = split-path -Parent $config
@@ -1032,7 +1038,7 @@ param (
     [Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
 	[ValidateRange(0,3)]$SCSIController=0,
     [Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
-	[ValidateSet('pvscsi','lsisas1068')]$Type="pvscsi"
+	[ValidateSet('pvscsi','lsisas1068','lsilogic')]$Type="pvscsi"
 	)
 	begin
 	{
@@ -1759,6 +1765,55 @@ function Set-VMXVTBit
 		
 	}
 }
+function Set-VMXnestedHVEnabled
+{
+	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/Set-VMXVTBit")]
+	param
+	(
+		[Parameter(Mandatory = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   HelpMessage = 'Please Specify Valid Config File')]$config,
+		[Parameter(Mandatory = $false,
+				   ValueFromPipelineByPropertyName = $False)]
+				   [switch]$nestedHVEnabled,
+		[Parameter(Mandatory = $false,ValueFromPipelineByPropertyName = $True)]
+		[Alias('NAME','CloneName')]
+		[string]$VMXName
+	)
+	
+	Begin
+	{
+		
+		
+	}
+	Process
+	{
+        if ((get-vmx -Path $config).state -eq "stopped")
+        {
+		Write-Host -ForegroundColor Gray " ==>setting Virtual VTbit to $($VTBit.IsPresent.ToString()) for " -NoNewline
+		Write-Host -ForegroundColor Magenta $vmxname -NoNewline
+		Write-Host -ForegroundColor Green "[success]"
+		$Content = Get-Content $config | where { $_ -ne "" }
+		$Content = $content | where { $_ -NotMatch "vhv.enable" }
+		$content += 'nestedHVEnabled = "' + $nestedHVEnabled.IsPresent.ToString() + '"'
+		Set-Content -Path $config -Value $content -Force
+		$object = New-Object -TypeName psobject
+		$object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXName
+		$Object | Add-Member -MemberType NoteProperty -Name Config -Value $config
+		$object | Add-Member -MemberType NoteProperty -Name "nestedHVEnabled" -Value $VTBit.IsPresent.ToString()
+		Write-Output $Object
+        }
+		else
+        {
+        Write-Warning "VM must be in stopped state"
+        }
+	}
+	End
+	{
+		
+	}
+}
+
 
 function Set-VMXUUID
 {
@@ -3844,7 +3899,8 @@ param (
 	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)][Alias('VMXconfig')]$config,
 	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$LUN,
 	[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$Controller,
-	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][switch]$Shared
+	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][switch]$Shared,
+	[Parameter(ParameterSetName = "1", Mandatory = $false, ValueFromPipelineByPropertyName = $True)][switch]$VirtualSSD
 )
 begin {
 
@@ -3868,17 +3924,25 @@ process
         $AddDrives += @('disk.locking = "false"')
         $AddDrives += @('scsi'+$Controller+':'+$LUN+'.shared = "true"')
         }
+    if ($VirtualSSD.IsPresent )
+        {
+        $AddDrives += @('scsi'+$Controller+':'+$LUN+'.virtualSSD = "1"')
+        }
+	else
+        {
+        $AddDrives += @('scsi'+$Controller+':'+$LUN+'.virtualSSD = "0"')
+        }
     $vmxConfig += $AddDrives
     $vmxConfig | set-Content -Path $config
     Write-Host -ForegroundColor Green "[success]"
     $object = New-Object -TypeName psobject
     $object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
-    $object | Add-Member -MemberType NoteProperty -Name Disktype -Value "lsilogic"
     $object | Add-Member -MemberType NoteProperty -Name Filename -Value $Diskname
     $object | Add-Member -MemberType NoteProperty -Name Cotroller -Value $Controller
     $object | Add-Member -MemberType NoteProperty -Name LUN -Value $LUN
     $object | Add-Member -MemberType NoteProperty -Name Config -Value $Config
     $object | Add-Member -MemberType NoteProperty -Name Shared -Value $Shared.IsPresent
+    $object | Add-Member -MemberType NoteProperty -Name VirtualSSD -Value $VirtualSSD.IsPresent
     Write-Output $object
     }
 end {
