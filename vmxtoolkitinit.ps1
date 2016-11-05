@@ -30,6 +30,7 @@ if  (Test-Path C:\WINDOWS\system32\ntdll.dll)
     $Global:vmxinventory = "$env:appdata\vmware\inventory.vmls"
     $Global:vmwareversion = New-Object System.Version($VMwarefileinfo.VersionInfo.ProductMajorPart,$VMwarefileinfo.VersionInfo.ProductMinorPart,$VMwarefileinfo.VersionInfo.ProductBuildPart,$VMwarefileinfo.VersionInfo.ProductVersion.Split("-")[1])
 	$webrequestor = ".Net"
+	$Global:mkisofs = "$Global:vmwarepath/mkisofs.exe"
 	}
 else
 	{
@@ -132,6 +133,15 @@ else
 				catch
 					{
 					Write-Warning "ovftool not found"
+					break
+					}
+				try
+					{
+					$Global:mkisofs = (Get-Command mkisofs).Path
+					}
+				catch
+					{
+					Write-Warning "mkisofs not found"
 					break
 					}
 				$Vmware_Base_Version = (vmware -v)
