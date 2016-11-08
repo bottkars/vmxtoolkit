@@ -4665,6 +4665,8 @@ function Set-VMXMainMemory {
 		}
         if ((get-vmx -Path $config).state -eq "stopped" )
         {
+		Write-Host -ForegroundColor Gray " ==>setting MainMemoryUseFile to $($usefile.IsPresent) for " -NoNewline
+		Write-Host -ForegroundColor Magenta $vmxname -NoNewline
         Write-Verbose "We got to set mainMem.useNamedFile to $($usefile.IsPresent) "
         $vmxconfig = $vmxconfig | where {$_ -NotMatch "mainMem.useNamedFile"}
         If ($usefile.IsPresent)
@@ -4677,6 +4679,7 @@ function Set-VMXMainMemory {
             }
 
         $vmxconfig | Set-Content -Path $config
+		Write-Host -ForegroundColor Green "[success]"
 		$object = New-Object -TypeName psobject
 		$Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
 		$object | Add-Member -MemberType NoteProperty -Name UseMemFile -Value $($usefile.IsPresent)
