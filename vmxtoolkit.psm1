@@ -3380,6 +3380,8 @@ function Connect-VMXcdromImage
              }
         else
             {
+			Write-Host -ForegroundColor Gray -NoNewline " ==> Configuring IDE $($Contoller)$($Port) on "
+			Write-Host -ForegroundColor Magenta -NoNewline $VMXName
             $object = New-Object -TypeName psobject		    
             $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
 	        $object | Add-Member -MemberType 'NoteProperty' -Name Config -Value $config
@@ -3401,6 +3403,7 @@ function Connect-VMXcdromImage
                 $Content += "$($Contoller)$($Port)"+'.startConnected = "FALSE"'
                 }
             $Content | Set-Content -Path $config
+			Write-Host -ForegroundColor Green "[success]"
 	        $object | Add-Member -MemberType 'NoteProperty' -Name Connected -Value $connect
             Write-Output $object
 
