@@ -5522,16 +5522,18 @@ function New-VMX
     )
     $VMXpath = Join-Path $Path $VMXName
     Write-Verbose $VMXpath
-    if (get-vmx -Path $VMXpath | Out-Null)
+    if (get-vmx -Path $VMXpath -WarningAction SilentlyContinue | Out-Null)
         {
         Write-Warning "Vm Already Exists" 
         break
         }
     if (!(Test-Path $VMXpath))
         {
-        New-Item -ItemType Directory -Path $VMXpath | Out-Null
+        New-Item -ItemType Directory -Path $VMXpath -WarningAction SilentlyContinue| Out-Null
         }
     $Firmware = $Firmware.ToLower()
+	Write-Host -ForegroundColor Gray " ==Creating new VM " -NoNewline
+	Write-Host -ForegroundColor Magenta $VMXName -NoNewline
     $VMXConfig =@('.encoding = "windows-1252"
 config.version = "8"
 virtualHW.version = "11"
@@ -5610,6 +5612,7 @@ tools.remindInstall = "FALSE"')
     $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
     $object | Add-Member -MemberType NoteProperty -Name Config -Value $Config
     $object | Add-Member -MemberType NoteProperty -Name Path -Value $VMXpath
+	Write-Host -ForegroundColor Green [success]
     Write-Output $object
 }
 
