@@ -1560,7 +1560,47 @@ function Get-VMXIPAddress
 	end { }
 	}#end Get-VMXIPAddress
 
-
+function Get-VMXVariable
+{
+	[CmdletBinding(DefaultParametersetName = "1",HelpUri = "http://labbuildr.bottnet.de/modules/Get-VMXIPAddress/")]
+	param (
+		[Parameter(ParameterSetName = "1", Mandatory = $true, Position = 1, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
+		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$GuestVariable,
+		[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]
+		[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$config
+	)
+	begin
+	{
+	}
+	process
+	{
+		switch ($PsCmdlet.ParameterSetName)
+		{
+			"1"
+			{ }
+			"2"
+			{ 
+            $vmx = Get-VMX -Path $config
+            $Config = $vmx.config
+            }
+		}	
+         #$ErrorActionPreference = "silentlyContinue"
+        $Value = .$vmrun readVariable $config guestVar $GuestVariable
+        If ($LASTEXITCODE -ne 0)
+            {
+            Write-Warning "$LASTEXITCODE , $Guestvariable"
+            }
+        Else
+            {
+            Write-Verbose -Message "getting $GuestVariable vor $VMXName"
+		    $object = New-Object -TypeName psobject
+		    $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
+		    $object | Add-Member -MemberType NoteProperty -Name $GuestVariable -Value $Value
+		    Write-Output $Object
+            }
+	}
+	end { }
+	}
 
 <#
 	.SYNOPSIS
@@ -4304,7 +4344,7 @@ function Invoke-VMXBash
 	$interactive_parm = ""
 	if ($nowait) { $nowait_parm = "-nowait" }
 	if ($interactive) { $interactive_parm = "-interactive" }
-	}
+}
 
 
 process
@@ -4313,7 +4353,7 @@ if ($Logfile)
     {
     $Scriptblock = "$Scriptblock >> $logfile 2>&1"
     }
-	
+$Scriptblock = $Scriptblock -replace '"','\"'	
 Write-host -ForegroundColor Gray " ==>running $Scriptblock on: " -NoNewline
 Write-Host -ForegroundColor Magenta $VMXName -NoNewline
 do
@@ -5312,9 +5352,9 @@ process {
         $vmx | Invoke-VMXBash -Scriptblock "hostname $Hostname" -Guestuser $rootuser -Guestpassword $rootpassword
         $Scriptblock = "echo 'default "+$gateway+" - -' > /etc/sysconfig/network/routes"
         $vmx | Invoke-VMXBash -Scriptblock $Scriptblock  -Guestuser $rootuser -Guestpassword $rootpassword
-        $sed = "sed -i -- 's/NETCONFIG_DNS_STATIC_SEARCHLIST=\`"\`"/NETCONFIG_DNS_STATIC_SEARCHLIST=\`"$DNSDomain\`"/g' /etc/sysconfig/network/config" 
+        $sed = "sed -i -- 's/NETCONFIG_DNS_STATIC_SEARCHLIST=`"`"/NETCONFIG_DNS_STATIC_SEARCHLIST=`"$DNSDomain`"/g' /etc/sysconfig/network/config" 
         $vmx | Invoke-VMXBash -Scriptblock $sed -Guestuser $rootuser -Guestpassword $rootpassword
-        $sed = "sed -i -- 's/NETCONFIG_DNS_STATIC_SERVERS=\`"\`"/NETCONFIG_DNS_STATIC_SERVERS=\`"$DNS1\`"/g' /etc/sysconfig/network/config"
+        $sed = "sed -i -- 's/NETCONFIG_DNS_STATIC_SERVERS=`"`"/NETCONFIG_DNS_STATIC_SERVERS=`"$DNS1`"/g' /etc/sysconfig/network/config"
         $vmx | Invoke-VMXBash -Scriptblock $sed -Guestuser $rootuser -Guestpassword $rootpassword
         $vmx | Invoke-VMXBash -Scriptblock "/sbin/netconfig -f update" -Guestuser $rootuser -Guestpassword $rootpassword
         $Scriptblock = "echo '"+$Hostname+"."+$DNSDOMAIN+"'  > /etc/HOSTNAME"
