@@ -16,7 +16,7 @@ for powershell 5 of higher, you can use
 ```Powershell
 install-module vmxtoolkit
 ```
-to install the modulke using the nuget provider.
+to install the module using the nuget provider.
 
 to install on earlier versions, simply extract the vmxttoolkit into a folder where your VM´s reside.
 Per Default, vmxtoolkit searches from that path
