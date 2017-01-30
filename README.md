@@ -12,8 +12,13 @@ https://github.com/bottkars/labbuildr/wiki
 simply follow @sddc_guy on twitter for updates
 ##Installation  
 ===========
- 
-Simply extract the toolkit into a folder where your VM´s reside.
+for powershell 5 of higher, you can use
+```Powershell
+install-module vmxtoolkit
+```
+to install the modulke using the nuget provider.
+
+to install on earlier versions, simply extract the vmxttoolkit into a folder where your VM´s reside.
 Per Default, vmxtoolkit searches from that path
 Otherwise, specifythe path to your vm when doing a get-vmx
 
