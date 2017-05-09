@@ -443,10 +443,9 @@ function Expand-VMXDiskfile
             {}
 
 		}
-        Write-Warning "Expanding $Diskfile"
+        Write-Host " ==>Expanding $Diskfile"
 	    & $Global:vmware_vdiskmanager -x "$($NewSize/1MB)MB" $Diskfile
         Write-Verbose "Exitcode: $LASTEXITCODE"
-		
 	}
 	end { }
 }
