@@ -4399,10 +4399,6 @@ function Invoke-VMXBash
 
 process
 {
-if ($Logfile) 
-    {
-    $Scriptblock = "$Scriptblock >> $logfile 2>&1"
-    }
 if (!$noescape.IsPresent)
     { 
     $Scriptblock = $Scriptblock -replace '"','\"'
@@ -4414,7 +4410,14 @@ do
     $Myresult = 1
         do
 	        {
-	        $cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm /bin/bash $Scriptblock)
+			if ($logfile)
+				{
+	        	$cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm /bin/bash $Scriptblock | tee $logfile)
+				}
+			else
+				{
+	        	$cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm /bin/bash $Scriptblock)
+				}		
 	        }
 	    until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
         Write-Verbose "Exitcode : $Lastexitcode"
