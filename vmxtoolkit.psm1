@@ -4412,7 +4412,7 @@ do
 	        {
 			if ($logfile)
 				{
-	        	$cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm /bin/bash $Scriptblock | tee $logfile)
+	        	$cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm "/bin/bash $Scriptblock | tee $logfile")
 				}
 			else
 				{
