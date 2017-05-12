@@ -4405,19 +4405,16 @@ if (!$noescape.IsPresent)
     }	
 Write-host -ForegroundColor Gray " ==>running $Scriptblock on: " -NoNewline
 Write-Host -ForegroundColor Magenta $VMXName -NoNewline
+if ($Logfile)
+	{
+		$Scriptblock = "$Scriptblock | tee >> $logfile"
+	}
 do
 	{
     $Myresult = 1
         do
 	        {
-			if ($logfile)
-				{
-	        	$cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm "/bin/bash $Scriptblock | tee $logfile")
-				}
-			else
-				{
-	        	$cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm /bin/bash $Scriptblock)
-				}		
+			$cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm /bin/bash $Scriptblock)
 	        }
 	    until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
         Write-Verbose "Exitcode : $Lastexitcode"
