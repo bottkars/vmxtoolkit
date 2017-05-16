@@ -1,4 +1,4 @@
-﻿<#	
+<#	
 	.SYNOPSIS
 	Get-VMwareversion
 	.DESCRIPTION
@@ -4399,22 +4399,23 @@ function Invoke-VMXBash
 
 process
 {
+if ($logfile)
+    {
+    $Scriptblock = "$scriptblock >> $logfile 2>&1"
+    }
 if (!$noescape.IsPresent)
     { 
     $Scriptblock = $Scriptblock -replace '"','\"'
     }	
 Write-host -ForegroundColor Gray " ==>running $Scriptblock on: " -NoNewline
 Write-Host -ForegroundColor Magenta $VMXName -NoNewline
-if ($Logfile)
-	{
-		$Scriptblock = "$Scriptblock | tee >> $logfile"
-	}
+
 do
 	{
     $Myresult = 1
         do
 	        {
-			$cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm /bin/bash $Scriptblock)
+		$cmdresult = (&$vmrun  -gu $Guestuser -gp $Guestpassword  runScriptinGuest $config -activewindow "$nowait_parm" $interactive_parm /bin/bash $Scriptblock)
 	        }
 	    until ($VMrunErrorCondition -notcontains $cmdresult -or !$cmdresult)
         Write-Verbose "Exitcode : $Lastexitcode"
