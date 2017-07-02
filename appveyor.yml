@@ -3,6 +3,6 @@ nuget:
   account_feed: true
   project_feed: true
 build:
-#  project: vmxtoolkit.psm1
+  project: vmxtoolkit.sln
   parallel: true
   verbosity: minimal
