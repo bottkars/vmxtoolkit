@@ -15,7 +15,7 @@ $RECYCLE.BIN/
 *.msp
 *.pssproj 
 *.pssproj.*
-*.sln
+#*.sln
 .vs
 ./.vs
 # Windows shortcuts
