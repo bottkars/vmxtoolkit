@@ -13,8 +13,8 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
-*.pssproj 
-*.pssproj.*
+#*.pssproj 
+#*.pssproj.*
 #*.sln
 .vs
 ./.vs
