@@ -1,0 +1,8 @@
+version: 4.2.{build}
+nuget:
+  account_feed: true
+  project_feed: true
+build:
+  project: vmxtoolkit.psm1
+  parallel: true
+  verbosity: minimal
