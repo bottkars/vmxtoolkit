@@ -8,6 +8,9 @@
     <RootNamespace>MyApplication</RootNamespace>
     <AssemblyName>MyApplication</AssemblyName>
     <Name>vmxtoolkit</Name>
+    <ManifestPath>$(ProjectName).psd1</ManifestPath>
+    <Guid>ac255503-3fb2-4ef4-8c8c-ff9fbe064a8d</Guid>
+    <ProcessorArchitecture />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
