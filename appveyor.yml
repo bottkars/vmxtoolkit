@@ -6,3 +6,6 @@ build:
   project: vmxtoolkit.sln
   parallel: true
   verbosity: minimal
+only_commits:
+  files:
+  - vmxtoolkit/

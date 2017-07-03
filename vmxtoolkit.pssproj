@@ -31,8 +31,6 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <Compile Include="vmxtoolkit.psd1" />
-    <Compile Include="vmxtoolkit.psm1" />
     <Compile Include="vmxtoolkit.tests.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
