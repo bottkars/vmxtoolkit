@@ -36,7 +36,7 @@ Copyright = '(c) 2014 Karsten Bott. Alle Rechte vorbehalten.
 '
 
 # Beschreibung der von diesem Modul bereitgestellten Funktionen
-Description = 'Lab Builder for VMware Workstation on Windows and VMware Fusion on OSX'
+Description = 'Powershell Modules for VMware Workstation on Windows/Linux and VMware Fusion on OSX'
 
 # Die für dieses Modul mindestens erforderliche Version des Windows PowerShell-Moduls
 PowerShellVersion = '3.0'
