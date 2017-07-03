@@ -1,4 +1,7 @@
-##vmxtoolkit
+[![Build status](https://ci.appveyor.com/api/projects/status/qj88qo6772ujim54/branch/develop?svg=true)](https://ci.appveyor.com/project/bottkars/vmxtoolkit/branch/develop)
+
+
+## vmxtoolkit
 ==========
 
 vmxtoolkit is the Powershell extension to VMware Workstation and Fusion
@@ -10,7 +13,7 @@ https://github.com/bottkars/labbuildr/wiki
 ![logo](https://cloud.githubusercontent.com/assets/8255007/17695850/ce034d40-63aa-11e6-8cb7-69a9b914334d.gif)
 
 simply follow @sddc_guy on twitter for updates
-##Installation  
+## Installation  
 ===========
 for powershell 5 of higher, you can use
 ```Powershell
@@ -22,7 +25,7 @@ to install on earlier versions, simply extract the vmxttoolkit into a folder whe
 Per Default, vmxtoolkit searches from that path
 Otherwise, specifythe path to your vm when doing a get-vmx
 
-##Installation on OSX
+## Installation on OSX
 to run vmxtoolkit on OSX, you need to have PowerShell for OSX installed  
 see [PowerShell for OSX](https://github.com/PowerShell/PowerShell/blob/master/docs/installation/linux.md#os-x-1011) for instructions
 it is also recommended to install .NET Core for OSX from for details on installation of .NET Core LIBS see [.NET Core on MACOS](https://www.microsoft.com/net/core#macos)   
