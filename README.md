@@ -25,14 +25,14 @@ to install on earlier versions, simply extract the vmxttoolkit into a folder whe
 Per Default, vmxtoolkit searches from that path
 Otherwise, specifythe path to your vm when doing a get-vmx
 
-## Installation on OSX
+## Installation on OSX 
 to run vmxtoolkit on OSX, you need to have PowerShell for OSX installed  
 see [PowerShell for OSX](https://github.com/PowerShell/PowerShell/blob/master/docs/installation/linux.md#os-x-1011) for instructions
 it is also recommended to install .NET Core for OSX from for details on installation of .NET Core LIBS see [.NET Core on MACOS](https://www.microsoft.com/net/core#macos)   
 OSX port is currently only available via Git clone, no auto installer  
 use
 ```Bash```
-git clone https://github.com/bottkars/vmxtoolkit --branch osx
+git clone https://github.com/bottkars/vmxtoolkit
 ``````
 current exposed commands
 ===========  
