@@ -93,8 +93,15 @@ function Get-VMXProcessesInGuest
 begin {
     }
 process {
-    
-    [System.Collections.ArrayList]$Processlist = .$vmrun -gu $Guestuser -gp $Guestpassword listprocessesinguest  $config
+	Write-Verbose "running .$vmrun -gu $Guestuser -gp $Guestpassword listprocessesinguest  $config"
+	try {
+	    [System.Collections.ArrayList]$Processlist = .$vmrun -gu $Guestuser -gp $Guestpassword listprocessesinguest  $config
+	}
+	catch {
+		Write-Verbose $_.Exception
+		Write-Host "did not get processes"
+		return
+	}
     $Processlist.RemoveRange(0,2)
 		if ($global:vmwareversion -lt 10.5)
 			{
