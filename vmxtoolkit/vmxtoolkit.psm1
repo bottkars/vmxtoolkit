@@ -102,7 +102,11 @@ process {
 		Write-Host "did not get processes"
 		return
 	}
+<<<<<<< HEAD
 	$Processlist.RemoveRange(0,2)
+=======
+    $Processlist.RemoveRange(0,2)
+>>>>>>> master
 		if ($global:vmwareversion -lt 10.5)
 			{
 			foreach ($Process in $Processlist)
