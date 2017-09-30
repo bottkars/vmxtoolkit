@@ -1350,7 +1350,8 @@ function Get-VMXNetworkAdapter{
 		switch ($PsCmdlet.ParameterSetName)
 		{
 			"1"
-			{ $vmxconfig = Get-VMXConfig -VMXName $VMXName }
+			{ 
+			$vmxconfig = Get-VMXConfig -VMXName $VMXName }
 			"2"
 			{ $vmxconfig = Get-VMXConfig -config $config }
 		}	
@@ -1365,6 +1366,8 @@ function Get-VMXNetworkAdapter{
 			$object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXname
 			$object | Add-Member -MemberType NoteProperty -Name Adapter -Value $Adapter.Adapter
 			$object | Add-Member -MemberType NoteProperty -Name Type -Value $Adapter.type
+			$object | Add-Member -MemberType NoteProperty -Name Config -Value $config
+			
 			Write-Output $Object
 		}
 	}
@@ -1721,15 +1724,24 @@ function Set-VMXNetAdapterDisplayName
 	}
 }
 #>
-function Get-VMXNetAdapterDisplayName
+function Get-VMXNetworkAdapterDisplayName
 {
 	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/Get-VMXDisplayName/")]
 	param (
 		[Parameter(ParameterSetName = "1", Mandatory = $true, Position = 1, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
 		[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]
-		[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$config,
-		[Parameter(ParameterSetName = "3", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$vmxconfig,
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateRange(0,9)][int]$Adapter	
+		[Parameter(ParameterSetName = "2", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]$config,
+	#	[Parameter(ParameterSetName = "3", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$vmxconfig,
+		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateSet('ethernet0',
+		'ethernet1',
+		'ethernet2',
+		'ethernet3',
+		'ethernet4',
+		'ethernet5',
+		'ethernet6',
+		'ethernet7',
+		'ethernet8',
+		'ethernet9')]$Adapter	
 	)
 	begin
 	{
@@ -1739,24 +1751,27 @@ function Get-VMXNetAdapterDisplayName
 		switch ($PsCmdlet.ParameterSetName)
 		{
 			"1"
-			{ $vmxconfig = Get-VMXConfig -VMXName $VMXname $config }
+			{ $vmxconfig = Get-VMXConfig -VMXName $VMXname }
 			"2"
 			{ $vmxconfig = Get-VMXConfig -config $config }
-		}	$ObjectType = "ethernet$($Adapter)Displayname"
+		}	
+		$ObjectType = "$($Adapter)Displayname"
 		$ErrorActionPreference = "silentlyContinue"
 		Write-Verbose -Message "getting $ObjectType"
 		$patterntype = "displayname"
-		$vmxconfig = $vmxconfig | where {$_  -match "ethernet$Adapter"}
+		$vmxconfig = $vmxconfig | where {$_  -match "$Adapter"}
 		$Value = Search-VMXPattern -Pattern "$patterntype" -vmxconfig $vmxconfig -value $patterntype -patterntype $patterntype
 		$object = New-Object -TypeName psobject
 		# $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
-		$object | Add-Member -MemberType NoteProperty -Name $ObjectType -Value $Value.displayname
+		$object | Add-Member -MemberType NoteProperty -Name Displayname -Value $Value.displayname
 		$object | Add-Member -MemberType NoteProperty -Name Config -Value (Get-ChildItem -Path $Config)
+		$object | Add-Member -MemberType NoteProperty -Name Adapter -Value $Adapter
+		
 		
 		Write-Output $Object
 	}
 	end { }
-	}#end Get-VMXDisplayName
+	} # end Get-VMXNetworkAdapterDisplayName
 
 
 function Get-VMXIPAddress
