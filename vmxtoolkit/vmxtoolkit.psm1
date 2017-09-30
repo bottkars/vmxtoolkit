@@ -1639,6 +1639,126 @@ function Get-VMXVTBit
 	end { }
 	}#end Get-VMXVTBit
 
+function Get-VMXDisplayName
+{
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/Get-VMXDisplayName/")]
+	param (
+		[Parameter(ParameterSetName = "1", Mandatory = $true, Position = 1, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
+		[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]
+		[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$config,
+		[Parameter(ParameterSetName = "3", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$vmxconfig
+	)
+	begin
+	{
+	}
+	process
+	{
+		switch ($PsCmdlet.ParameterSetName)
+		{
+			"1"
+			{ $vmxconfig = Get-VMXConfig -VMXName $VMXname $config }
+			"2"
+			{ $vmxconfig = Get-VMXConfig -config $config }
+		}	$ObjectType = "Displayname"
+		$ErrorActionPreference = "silentlyContinue"
+		Write-Verbose -Message "getting $ObjectType"
+		$patterntype = "displayname"
+		$vmxconfig = $vmxconfig | where {$_ -match '^DisplayName'}
+		$Value = Search-VMXPattern -Pattern "$patterntype" -vmxconfig $vmxconfig -value $patterntype -patterntype $patterntype
+		$object = New-Object -TypeName psobject
+		# $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
+		$object | Add-Member -MemberType NoteProperty -Name $ObjectType -Value $Value.displayname
+		$object | Add-Member -MemberType NoteProperty -Name Config -Value (Get-ChildItem -Path $Config)
+		
+		Write-Output $Object
+	}
+	end { }
+	}#end Get-VMXDisplayName
+
+<#
+function Set-VMXNetAdapterDisplayName
+{
+	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/Set-VMXNetAdapterDisplayName")]
+	param
+	(
+		[Parameter(Mandatory = $true,
+				   ValueFromPipelineByPropertyName = $true,
+				   HelpMessage = 'Please Specify Valid Config File')]$config,
+		[Parameter(Mandatory = $false,
+				   ValueFromPipelineByPropertyName = $False,
+				   HelpMessage = 'Please Specify New Value for DisplayName')][Alias('Value')]$DisplayName,
+		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateRange(0,9)][int]$Adapter	
+		   
+	)
+	
+	Begin
+	{
+		
+		
+	}
+	Process
+	{
+        if ((get-vmx -Path $config).state -eq "stopped")
+        {
+        $Displayname = $DisplayName.replace(" ","_")
+		$Content = Get-Content $config | where { $_ -ne "" }
+		$Content = $content | where { $_ -NotMatch "^ethernet$($adapter).DisplayName" }
+		$content += 'ethernet'+$adapter+'.DisplayName = "' + $DisplayName + '"'
+		Set-Content -Path $config -Value $content -Force
+		$object = New-Object -TypeName psobject
+		$Object | Add-Member -MemberType NoteProperty -Name Config -Value $config
+		$object | Add-Member -MemberType NoteProperty -Name "ethernet$($adapter).DisplayName" -Value $DisplayName
+		Write-Output $Object
+        }
+		else
+        {
+        Write-Warning "VM must be in stopped state"
+        }
+	}
+	End
+	{
+		
+	}
+}
+#>
+function Get-VMXNetAdapterDisplayName
+{
+	[CmdletBinding(DefaultParametersetName = "2",HelpUri = "http://labbuildr.bottnet.de/modules/Get-VMXDisplayName/")]
+	param (
+		[Parameter(ParameterSetName = "1", Mandatory = $true, Position = 1, ValueFromPipelineByPropertyName = $True)][Alias('NAME','CloneName')]$VMXName,
+		[Parameter(ParameterSetName = "1", Mandatory = $true, ValueFromPipelineByPropertyName = $True)]
+		[Parameter(ParameterSetName = "2", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$config,
+		[Parameter(ParameterSetName = "3", Mandatory = $false, ValueFromPipelineByPropertyName = $True)]$vmxconfig,
+		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)][ValidateRange(0,9)][int]$Adapter	
+	)
+	begin
+	{
+	}
+	process
+	{
+		switch ($PsCmdlet.ParameterSetName)
+		{
+			"1"
+			{ $vmxconfig = Get-VMXConfig -VMXName $VMXname $config }
+			"2"
+			{ $vmxconfig = Get-VMXConfig -config $config }
+		}	$ObjectType = "ethernet$($Adapter)Displayname"
+		$ErrorActionPreference = "silentlyContinue"
+		Write-Verbose -Message "getting $ObjectType"
+		$patterntype = "displayname"
+		$vmxconfig = $vmxconfig | where {$_  -match "ethernet$Adapter"}
+		$Value = Search-VMXPattern -Pattern "$patterntype" -vmxconfig $vmxconfig -value $patterntype -patterntype $patterntype
+		$object = New-Object -TypeName psobject
+		# $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
+		$object | Add-Member -MemberType NoteProperty -Name $ObjectType -Value $Value.displayname
+		$object | Add-Member -MemberType NoteProperty -Name Config -Value (Get-ChildItem -Path $Config)
+		
+		Write-Output $Object
+	}
+	end { }
+	}#end Get-VMXDisplayName
+
+
 function Get-VMXIPAddress
 {
 	[CmdletBinding(DefaultParametersetName = "1",HelpUri = "http://labbuildr.bottnet.de/modules/Get-VMXIPAddress/")]
@@ -1766,7 +1886,7 @@ function Set-VMXDisplayName
         {
         $Displayname = $DisplayName.replace(" ","_")
 		$Content = Get-Content $config | where { $_ -ne "" }
-		$Content = $content | where { $_ -NotMatch "DisplayName" }
+		$Content = $content | where { $_ -NotMatch "^DisplayName" }
 		$content += 'DisplayName = "' + $DisplayName + '"'
 		Set-Content -Path $config -Value $content -Force
 		$object = New-Object -TypeName psobject
