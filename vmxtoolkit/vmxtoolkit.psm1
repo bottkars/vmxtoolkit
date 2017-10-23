@@ -13,7 +13,6 @@
 function Get-yesno
 {
     [CmdletBinding(DefaultParameterSetName='Parameter Set 1', 
-                  SupportsShouldProcess=$true, 
                   PositionalBinding=$false,
                   HelpUri = 'http://labbuildr.com/',
                   ConfirmImpact='Medium')]
@@ -48,7 +47,6 @@ end {
 function Get-yesnoabort
 {
     [CmdletBinding(DefaultParameterSetName='Parameter Set 1', 
-                  SupportsShouldProcess=$true, 
                   PositionalBinding=$false,
                   HelpUri = 'http://labbuildr.com/',
                   ConfirmImpact='Medium')]
@@ -198,7 +196,7 @@ function Set-VMXDisconnectIDE
 			{}
 		}
 		$VMXConfig = Get-VMXConfig -config $config
-        $VMXConfig = $VMXConfig | where {$_ -NotMatch "ide0:0.startConnected"}
+        $VMXConfig = $VMXConfig | Where-Object {$_ -NotMatch "ide0:0.startConnected"}
         Write-Verbose -Message "Disabling IDE0"
 		$VMXConfig += 'ide0:0.startConnected = "FALSE"'
         $VMXConfig | Set-Content -Path $config
@@ -236,7 +234,7 @@ function Set-VMXIDECDrom
 		{
 		$VMXConfig = Get-VMXConfig -config $config
 		$IDEdevice = "ide$($IDEcontroller):$($IDElun)"
-        $VMXConfig = $VMXConfig | where {$_ -NotMatch $IDEdevice}
+        $VMXConfig = $VMXConfig | Where-Object {$_ -NotMatch $IDEdevice}
         Write-Host -ForegroundColor Gray " ==>configuring $IDEdevice"		
 		$object = New-Object -TypeName psobject
 		$Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
@@ -297,7 +295,7 @@ function Set-VMXAnnotation
         if ((get-vmx -Path $config).state -eq "stopped" )
             {
 		    $VMXConfig = Get-VMXConfig -config $config
-            $VMXConfig = $VMXConfig | where {$_ -NotMatch "annotation"}
+            $VMXConfig = $VMXConfig | Where-Object {$_ -NotMatch "annotation"}
             Write-Verbose -Message "setting Annotation"
             $date = get-date
             if ($builddate.IsPresent)
@@ -578,7 +576,7 @@ function Repair-VMXDisk
 
 		}
         Write-Warning "Repairing $Diskfile"
-	    $repair =  & $Global:vmware_vdiskmanager -R $Diskfile
+	    & $Global:vmware_vdiskmanager -R $Diskfile | Out-Null
         Write-Verbose "Exitcode: $LASTEXITCODE"
 		
 	}
@@ -602,8 +600,6 @@ function Import-VMXOVATemplate
         [Switch]$Quiet
 
         )
-	$Origin = $MyInvocation.MyCommand
-    
 	if (test-path($OVA))
 	    {
         $OVAPath = Get-ChildItem -Path $OVA -Recurse -include "*.ova","*.ovf" |Sort-Object -Descending
@@ -708,7 +704,7 @@ function Get-VMXInfo {
         $Processes = ""
 		[bool]$ismyvmx = $false
 		[uint64]$SizeOnDiskinMB = ""
-		$Processes = get-process -id (Get-WmiObject -Class win32_process | where commandline -match $config.replace('\','\\')).handle
+		$Processes = get-process -id (Get-WmiObject -Class win32_process | Where-Object commandline -match $config.replace('\','\\')).handle
 			foreach ($Process in $Processes)
 			{
 				if ($Process.ProcessName -ne "vmware")
@@ -735,13 +731,13 @@ function Get-VMXInfo {
                         $object | Add-Member NonPagedMemory ([uint64]($Process.NonpagedSystemMemorySize64 / 1MB))
                         $object | Add-Member CPUtime ($Process.CPU)
 					}
-					$object | Add-Member NetWork (Get-VMXNetwork -vmxconfig $vmxconfig | select Adapter, Network)
-					$object | Add-Member Adapter (Get-VMXNetworkAdapter -vmxconfig $vmxconfig | select Adapter,Type )
-					$object | Add-Member Connection (Get-VMXNetworkConnection -vmxconfig $vmxconfig | select Adapter,ConnectionType)
+					$object | Add-Member NetWork (Get-VMXNetwork -vmxconfig $vmxconfig | Select-Object Adapter, Network)
+					$object | Add-Member Adapter (Get-VMXNetworkAdapter -vmxconfig $vmxconfig | Select-Object Adapter,Type )
+					$object | Add-Member Connection (Get-VMXNetworkConnection -vmxconfig $vmxconfig | Select-Object Adapter,ConnectionType)
 					
 					$object | Add-Member Configfile $config
-					$object | Add-Member -MemberType NoteProperty -Name SCSIController -Value (Get-VMXScsiController -vmxconfig $vmxconfig | select SCSIController, Type)
-					$object | Add-Member -MemberType NoteProperty -Name ScsiDisk -Value (Get-VMXScsiDisk -vmxconfig $vmxconfig | select SCSIAddress, Disk)
+					$object | Add-Member -MemberType NoteProperty -Name SCSIController -Value (Get-VMXScsiController -vmxconfig $vmxconfig | Select-Object SCSIController, Type)
+					$object | Add-Member -MemberType NoteProperty -Name ScsiDisk -Value (Get-VMXScsiDisk -vmxconfig $vmxconfig | Select-Object SCSIAddress, Disk)
 					Write-Output $object
 					
 				} #end if $Process.ProcessName -ne "vmware"
@@ -1224,7 +1220,7 @@ param (
 function Search-VMXPattern  {
 param($pattern,$vmxconfig,$name,$value,$patterntype,[switch]$nospace)
 #[array]$mypattern
-$getpattern = $vmxconfig| where {$_ -match $pattern}
+$getpattern = $vmxconfig| Where-Object {$_ -match $pattern}
 Write-Verbose "Patterncount : $getpattern.count"
 Write-Verbose "Patterntype : $patterntype"
 	foreach ($returnpattern in $getpattern)
@@ -1458,7 +1454,7 @@ process
 	$ObjectType = "Network"
 	$ErrorActionPreference = "silentlyContinue"
 	Write-Verbose -Message "getting Network Controller"
-	$Networklist = Search-VMXPattern -Pattern "ethernet\d{1,2}$patterntype" -vmxconfig $vmxconfig -name "Adapter" -value "Network" -patterntype $patterntype
+	$Networklist = Search-VMXPattern -Pattern "ethernet\d{1,2}$patterntype" -vmxconfig $vmxconfig -name "Adapter" -value $ObjectType -patterntype $patterntype
 		foreach ($Value in $Networklist)
 		{
 			$object = New-Object -TypeName psobject
@@ -1666,7 +1662,7 @@ function Get-VMXDisplayName
 		$ErrorActionPreference = "silentlyContinue"
 		Write-Verbose -Message "getting $ObjectType"
 		$patterntype = "displayname"
-		$vmxconfig = $vmxconfig | where {$_ -match '^DisplayName'}
+		$vmxconfig = $vmxconfig | Where-Object {$_ -match '^DisplayName'}
 		$Value = Search-VMXPattern -Pattern "$patterntype" -vmxconfig $vmxconfig -value $patterntype -patterntype $patterntype
 		$object = New-Object -TypeName psobject
 		# $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
@@ -1759,7 +1755,7 @@ function Get-VMXNetworkAdapterDisplayName
 		$ErrorActionPreference = "silentlyContinue"
 		Write-Verbose -Message "getting $ObjectType"
 		$patterntype = "displayname"
-		$vmxconfig = $vmxconfig | where {$_  -match "$Adapter"}
+		$vmxconfig = $vmxconfig | Where-Object {$_  -match "$Adapter"}
 		$Value = Search-VMXPattern -Pattern "$patterntype" -vmxconfig $vmxconfig -value $patterntype -patterntype $patterntype
 		$object = New-Object -TypeName psobject
 		# $Object | Add-Member -MemberType NoteProperty -Name VMXName -Value $VMXName
@@ -1877,47 +1873,41 @@ function Get-VMXVariable
 		Additional information about the function or script.
 
 #>
-function Set-VMXDisplayName
-{
-	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/Set-VMXDisplayName")]
-	param
-	(
-		[Parameter(Mandatory = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   HelpMessage = 'Please Specify Valid Config File')]$config,
-		[Parameter(Mandatory = $false,
-				   ValueFromPipelineByPropertyName = $False,
-				   HelpMessage = 'Please Specify New Value for DisplayName')][Alias('Value')]$DisplayName
-	)
+function Set-VMXDisplayName {
+    [CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/Set-VMXDisplayName")]
+    param
+    (
+        [Parameter(Mandatory = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Please Specify Valid Config File')]$config,
+        [Parameter(Mandatory = $false,
+            ValueFromPipelineByPropertyName = $False,
+            HelpMessage = 'Please Specify New Value for DisplayName')][Alias('Value')]$DisplayName
+    )
 	
-	Begin
-	{
+    Begin {
 		
 		
-	}
-	Process
-	{
-        if ((get-vmx -Path $config).state -eq "stopped")
-        {
-        $Displayname = $DisplayName.replace(" ","_")
-		$Content = Get-Content $config | where { $_ -ne "" }
-		$Content = $content | where { $_ -NotMatch "^DisplayName" }
-		$content += 'DisplayName = "' + $DisplayName + '"'
-		Set-Content -Path $config -Value $content -Force
-		$object = New-Object -TypeName psobject
-		$Object | Add-Member -MemberType NoteProperty -Name Config -Value $config
-		$object | Add-Member -MemberType NoteProperty -Name DisplayName -Value $DisplayName
-		Write-Output $Object
+    }
+    Process {
+        if ((get-vmx -Path $config).state -eq "stopped") {
+            $Displayname = $DisplayName.replace(" ", "_")
+            $Content = Get-Content $config | Where-Object { $_ -ne "" }
+            $Content = $content | Where-Object { $_ -NotMatch "^DisplayName" }
+            $content += 'DisplayName = "' + $DisplayName + '"'
+            Set-Content -Path $config -Value $content -Force
+            $object = New-Object -TypeName psobject
+            $Object | Add-Member -MemberType NoteProperty -Name Config -Value $config
+            $object | Add-Member -MemberType NoteProperty -Name DisplayName -Value $DisplayName
+            Write-Output $Object
         }
-		else
-        {
-        Write-Warning "VM must be in stopped state"
+        else {
+            Write-Warning "VM must be in stopped state"
         }
-	}
-	End
-	{
+    }
+    End {
 		
-	}
+    }
 }
 
 <#
@@ -1939,59 +1929,247 @@ function Set-VMXDisplayName
 		Additional information about the function or script.
 
 #>
-function Set-VMXGuestOS
-{
-	[CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/Set-VMXguestos")]
-	param
-	(
-		[Parameter(Mandatory = $true,
-				   ValueFromPipelineByPropertyName = $true,
-				   HelpMessage = 'Please Specify Valid Config File')]$config,
-		[Parameter(Mandatory = $false,
-				   ValueFromPipelineByPropertyName = $False,
-				   HelpMessage = 'Please Specify New Value for guestos')]
-				   [ValidateSet(
-				   'other-64','winhyperv','centos-64',
-				   'vmkernel5','vmkernel6',
-				   'winhyperv','windows8srv-64',
-				   'other26xlinux','sles11-64')]
-				   [Alias('Value')]$GuestOS,
-		[Parameter(Mandatory = $false,ValueFromPipelineByPropertyName = $True)]
-		[Alias('NAME','CloneName')]
-		[string]$VMXName
-	)
+function Set-VMXGuestOS {
+    [CmdletBinding(HelpUri = "http://labbuildr.bottnet.de/modules/Set-VMXguestos")]
+    param
+    (
+        [Parameter(Mandatory = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Please Specify Valid Config File')]$config,
+        [Parameter(Mandatory = $false,
+            ValueFromPipelineByPropertyName = $False,
+            HelpMessage = 'Please Specify New Value for guestos')]
+        [ValidateSet(
+            'win31',
+            'win95',
+            'win98',
+            'winMe',
+            'nt4',
+            'win2000',
+            'win2000Pro',
+            'win2000Serv',
+            'win2000ServGues',
+            'win2000AdvServ',
+            'winXPHome',
+            'whistler',
+            'winXPPro-64',
+            'winNetWeb',
+            'winNetStandard',
+            'winNetEnterprise',
+            'winNetDatacenter',
+            'winNetBusiness',
+            'winNetStandard-64',
+            'winNetEnterprise-64',
+            'winNetDatacenter-64',
+            'longhorn',
+            'longhorn-64',
+            'winvista',
+            'winvista-64',
+            'windows7',
+            'windows7-64',
+            'windows7srv-64',
+            'windows8',
+            'windows8-64',
+            'windows8srv-64',
+            'windows9',
+            'windows9-64',
+            'windows9srv-64',
+            'winHyperV',
+            'winServer2008Cluster-32',
+            'winServer2008Datacenter-32',
+            'winServer2008DatacenterCore-32',
+            'winServer2008Enterprise-32',
+            'winServer2008EnterpriseCore-32',
+            'winServer2008EnterpriseItanium-32',
+            'winServer2008SmallBusiness-32',
+            'winServer2008SmallBusinessPremium-32',
+            'winServer2008Standard-32',
+            'winServer2008StandardCore-32',
+            'winServer2008MediumManagement-32',
+            'winServer2008MediumMessaging-32',
+            'winServer2008MediumSecurity-32',
+            'winServer2008ForSmallBusiness-32',
+            'winServer2008StorageEnterprise-32',
+            'winServer2008StorageExpress-32',
+            'winServer2008StorageStandard-32',
+            'winServer2008StorageWorkgroup-32',
+            'winServer2008Web-32',
+            'winServer2008Cluster-64',
+            'winServer2008Datacenter-64',
+            'winServer2008DatacenterCore-64',
+            'winServer2008Enterprise-64',
+            'winServer2008EnterpriseCore-64',
+            'winServer2008EnterpriseItanium-64',
+            'winServer2008SmallBusiness-64',
+            'winServer2008SmallBusinessPremium-64',
+            'winServer2008Standard-64',
+            'winServer2008StandardCore-64',
+            'winServer2008MediumManagement-64',
+            'winServer2008MediumMessaging-64',
+            'winServer2008MediumSecurity-64',
+            'winServer2008ForSmallBusiness-64',
+            'winServer2008StorageEnterprise-64',
+            'winServer2008StorageExpress-64',
+            'winServer2008StorageStandard-64',
+            'winServer2008StorageWorkgroup-64',
+            'winServer2008Web-64',
+            'winVistaUltimate-32',
+            'winVistaHomePremium-32',
+            'winVistaHomeBasic-32',
+            'winVistaEnterprise-32',
+            'winVistaBusiness-32',
+            'winVistaStarter-32',
+            'winVistaUltimate-64',
+            'winVistaHomePremium-64',
+            'winVistaHomeBasic-64',
+            'winVistaEnterprise-64',
+            'winVistaBusiness-64',
+            'winVistaStarter-64',
+            'redhat',
+            'rhel2',
+            'rhel3',
+            'rhel3-64',
+            'rhel4',
+            'rhel4-64',
+            'rhel5',
+            'rhel5-64',
+            'rhel6',
+            'rhel6-64',
+            'rhel7',
+            'rhel7-64',
+            'centos',
+            'centos-64',
+            'centos6',
+            'centos6-64',
+            'centos7',
+            'centos7-64',
+            'oraclelinux',
+            'oraclelinux-64',
+            'oraclelinux6',
+            'oraclelinux6-64',
+            'oraclelinux7',
+            'oraclelinux7-64',
+            'suse',
+            'suse-64',
+            'sles',
+            'sles-64',
+            'sles10',
+            'sles10-64',
+            'sles11',
+            'sles11-64',
+            'sles12',
+            'sles12-64',
+            'mandrake',
+            'mandrake-64',
+            'mandriva',
+            'mandriva-64',
+            'turbolinux',
+            'turbolinux-64',
+            'ubuntu-64',
+            'debian4',
+            'debian4-64',
+            'debian5',
+            'debian5-64',
+            'debian6',
+            'debian6-64',
+            'debian7',
+            'debian7-64',
+            'debian8',
+            'debian8-64',
+            'debian9',
+            'debian9-64',
+            'debian10',
+            'debian10-64',
+            'asianux3',
+            'asianux3-64',
+            'asianux4',
+            'asianux4-64',
+            'asianux5-6',
+            'asianux7-64',
+            'nld9',
+            'oes',
+            'sjds',
+            'opensuse',
+            'opensuse-64',
+            'fedora',
+            'fedora-64',
+            'coreos-64',
+            'vmware-photon-64',
+            'other24xlinux-64',
+            'other26xlinux',
+            'other26xlinux-64',
+            'other3xlinux',
+            'other3xlinux-64',
+            'otherlinux',
+            'otherlinux-64',
+            'genericlinux',
+            'netware4',
+            'netware5',
+            'solaris6',
+            'solaris7',
+            'solaris8',
+            'solaris9',
+            'solaris10-64',
+            'solaris11-64',
+            'darwin-64',
+            'darwin10',
+            'darwin10-64',
+            'darwin11',
+            'darwin11-64',
+            'darwin12-64',
+            'darwin13-64',
+            'darwin14-64',
+            'darwin15-64',
+            'darwin16-64',
+            'darwin17-64',
+            'vmkernel',
+            'vmkernel5',
+            'vmkernel6',
+            'vmkernel65',
+            'dos',
+            'os2',
+            'os2experimenta',
+            'eComStation',
+            'eComStation2',
+            'freeBSD-64',
+            'freeBSD11',
+            'freeBSD11-64',
+            'openserver5',
+            'openserver6',
+            'unixware7',
+            'other-64')]
+        [Alias('Value')]$GuestOS,
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
+        [Alias('NAME', 'CloneName')]
+        [string]$VMXName
+    )
 	
-	Begin
-	{
+    Begin {
 		
 		
-	}
-	Process
-	{
-        if ((get-vmx -Path $config).state -eq "stopped")
-        {
-		Write-Host -ForegroundColor Gray " ==>setting GuestOS $GuestOS for " -NoNewline
-		Write-Host -ForegroundColor Magenta $vmxname -NoNewline
-		Write-Host -ForegroundColor Green "[success]"
-		$Content = Get-Content $config | where { $_ -ne "" }
-		$Content = $content | where { $_ -NotMatch "guestos" }
-		$content += 'guestos = "' + $GuestOS + '"'
-		Set-Content -Path $config -Value $content -Force
-		$object = New-Object -TypeName psobject
-		$object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXName
-		$Object | Add-Member -MemberType NoteProperty -Name Config -Value $config
-		$object | Add-Member -MemberType NoteProperty -Name GuestOS -Value $GuestOS
-		Write-Output $Object
+    }
+    Process {
+        if ((get-vmx -Path $config).state -eq "stopped") {
+            Write-Host -ForegroundColor Gray " ==>setting GuestOS $GuestOS for " -NoNewline
+            Write-Host -ForegroundColor Magenta $vmxname -NoNewline
+            Write-Host -ForegroundColor Green "[success]"
+            $Content = Get-Content $config | Where-Object { $_ -ne "" }
+            $Content = $content | Where-Object { $_ -NotMatch "guestos" }
+            $content += 'guestos = "' + $GuestOS + '"'
+            Set-Content -Path $config -Value $content -Force
+            $object = New-Object -TypeName psobject
+            $object | Add-Member -MemberType NoteProperty -Name VMXname -Value $VMXName
+            $Object | Add-Member -MemberType NoteProperty -Name Config -Value $config
+            $object | Add-Member -MemberType NoteProperty -Name GuestOS -Value $GuestOS
+            Write-Output $Object
         }
-		else
-        {
-        Write-Warning "VM must be in stopped state"
+        else {
+            Write-Warning "VM must be in stopped state"
         }
-	}
-	End
-	{
+    }
+    End {
 		
-	}
+    }
 }
 
 <#
@@ -2041,8 +2219,8 @@ function Set-VMXVTBit
 		Write-Host -ForegroundColor Gray " ==>setting Virtual VTbit to $($VTBit.IsPresent.ToString()) for " -NoNewline
 		Write-Host -ForegroundColor Magenta $vmxname -NoNewline
 		Write-Host -ForegroundColor Green "[success]"
-		$Content = Get-Content $config | where { $_ -ne "" }
-		$Content = $content | where { $_ -NotMatch "vhv.enable" }
+		$Content = Get-Content $config | Where-Object { $_ -ne "" }
+		$Content = $content | Where-Object { $_ -NotMatch "vhv.enable" }
 		$content += 'vhv.enable = "' + $VTBit.IsPresent.ToString() + '"'
 		Set-Content -Path $config -Value $content -Force
 		$object = New-Object -TypeName psobject
@@ -2089,8 +2267,8 @@ function Set-VMXnestedHVEnabled
 		Write-Host -ForegroundColor Gray " ==>setting Virtual VTbit to $($VTBit.IsPresent.ToString()) for " -NoNewline
 		Write-Host -ForegroundColor Magenta $vmxname -NoNewline
 		Write-Host -ForegroundColor Green "[success]"
-		$Content = Get-Content $config | where { $_ -ne "" }
-		$Content = $content | where { $_ -NotMatch "vhv.enable" }
+		$Content = Get-Content $config | Where-Object { $_ -ne "" }
+		$Content = $content | Where-Object { $_ -NotMatch "vhv.enable" }
 		$content += 'nestedHVEnabled = "' + $nestedHVEnabled.IsPresent.ToString() + '"'
 		Set-Content -Path $config -Value $content -Force
 		$object = New-Object -TypeName psobject
@@ -2133,8 +2311,8 @@ function Set-VMXUUID
 	{
         if ((get-vmx -Path $config).state -eq "stopped")
         {
-		$Content = Get-Content $config | where { $_ -ne "" }
-		$Content = $content | where { $_ -NotMatch "uuid.bios" }
+		$Content = Get-Content $config | Where-Object { $_ -ne "" }
+		$Content = $content | Where-Object { $_ -NotMatch "uuid.bios" }
 		$content += 'uuid.bios = "' + $UUID + '"'
 		Set-Content -Path $config -Value $content -Force
 		$object = New-Object -TypeName psobject
@@ -2509,7 +2687,7 @@ process
                 }
 				
 			}
-        $VMX = @()
+        #$VMX = @()
 	    foreach ($Config in $Configfiles)
 	        {
 		    Write-Verbose "getting Configfile: $($config.FullName) from parameterset 2"
@@ -2810,7 +2988,7 @@ function New-VMXLinkedClone
         if ($LASTEXITCODE -eq 0)
             {
 			Write-Host -ForegroundColor Green "[success]"
-			sleep 2
+			Start-Sleep 2
 			$Addcontent = @()
 			$Addcontent += 'guestinfo.buildDate = "'+$BuildDate+'"'
 			Add-Content -Path "$Cloneconfig" -Value $Addcontent
@@ -3128,7 +3306,7 @@ function Start-VMX
                 Copy-Item -Path $vmx.config -Destination "$($vmx.config).bak" 
 	    		Write-Verbose -Message "setting Startparameters for $vmxname"
 	    		$VMXStarttime = Get-Date -Format "MM.dd.yyyy hh:mm:ss"
-	    		$content = Get-Content $vmx.config | where { $_ -ne "" }
+	    		$content = Get-Content $vmx.config | Where-Object { $_ -ne "" }
 	    		$content = $content | where { $_ -NotMatch "guestinfo.hypervisor" }
 	    		$content += 'guestinfo.hypervisor = "' + $env:COMPUTERNAME + '"'
 	    		$content = $content | where { $_ -NotMatch "guestinfo.powerontime" }
