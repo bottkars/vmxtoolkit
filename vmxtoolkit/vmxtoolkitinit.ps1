@@ -45,8 +45,10 @@ else
 				$OS_Version = (sw_vers)
 				$OS_Version = $OS_Version -join " "
 				$VMX_BasePath = 'Documents/Virtual Machines.localized'
-				$VMware_Path = "/Applications/VMware Fusion.app"
+				# $VMware_Path = "/Applications/VMware Fusion.app"
+				$VMware_Path = mdfind -onlyin /Applications "VMware Fusion"                
 				$Global:vmwarepath = $VMware_Path
+				[version]$Fusion_Version = defaults read $VMware_Path/Contents/Info.plist CFBundleShortVersionString
 				$VMware_BIN_Path = Join-Path $VMware_Path  '/Contents/Library'
 				try 
 					{
@@ -66,10 +68,24 @@ else
 					Write-Warning "7za not found, pleas install p7zip full"
 					Break
 					}
+
 				$Global:VMware_vdiskmanager = Join-Path $VMware_BIN_Path 'vmware-vdiskmanager'
 				$Global:vmrun = Join-Path $VMware_BIN_Path "vmrun"
-				$Global:VMware_OVFTool = Join-Path $VMware_Path 'ovftool'
-				[version]$Global:vmwareversion = "12.0.0.0"
+				switch ($Fusion_Version.Major)
+					{
+						"10"
+						{
+						$Global:VMware_OVFTool = "/Applications/VMware Fusion.app/Contents/Library/VMware OVF Tool/ovftool"
+						[version]$Global:vmwareversion = "14.0.0.0"
+						}
+					
+						default
+						{
+						$Global:VMware_OVFTool = Join-Path $VMware_Path 'ovftool'
+						[version]$Global:vmwareversion = "12.0.0.0"
+						}
+					}
+
 				}
 			'Linux'
 				{
@@ -86,7 +102,6 @@ else
 					Write-Warning "curl not found"
 					exit
 					}
-
 				try 
 					{
 					$VMware_Path = Split-Path -Parent (get-command vmware).Path
