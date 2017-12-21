@@ -4794,10 +4794,7 @@ end {}
 #>	
 function Invoke-VMXBash
 {
-	[CmdletBinding(DefaultParameterSetName = 1,
-    ConfirmImpact="Medium")]
-
-	[OutputType([psobject])]
+	[CmdletBinding(DefaultParameterSetName = 1)]
 	param
 	(
         [Parameter(ParameterSetName = 1, Mandatory = $false, ValueFromPipelineByPropertyName = $true)][Alias('NAME','CloneName')][string]$VMXName,
