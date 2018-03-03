@@ -5,9 +5,9 @@ $VMX_Path)
 
 ################## Some Globals
 write-Host "trying to get os type ... "
-if  (Test-Path C:\WINDOWS\system32\ntdll.dll)
+if  ($env:windir)
 	{
-	$OS_Version  = Get-Command C:\WINDOWS\system32\ntdll.dll
+	$OS_Version  = Get-Command "$env:windir\system32\ntdll.dll"
 	$OS_Version = "Product Name: Windows $($OS.Version)"
 	$Global:vmxtoolkit_type ="win_x86_64"
     write-verbose "getting VMware Path from Registry"
@@ -32,7 +32,7 @@ if  (Test-Path C:\WINDOWS\system32\ntdll.dll)
 	$webrequestor = ".Net"
 	$Global:mkisofs = "$Global:vmwarepath/mkisofs.exe"
 	}
-else
+elseif
 	{
 	if ($OS = uname)
 		{
@@ -168,9 +168,24 @@ else
 				Write-host "Sorry, rome was not build in one day"
 				exit
 				}
+			
+			
+			
+			'default'
+			{
+				write-host "unknown linux OS"
+				break
 			}
 		}
 	}
+
+
+
+else
+{
+	write-host "error detecting OS"
+}
+
 if (!$VMX_Path)
 	{
 	try
@@ -210,6 +225,10 @@ if ($OS_Version)
 	{
 	write-Host -ForegroundColor Gray " ==>$OS_Version"
 	}
+else	{
+	write-host "error Detecting OS"
+	Break
+}
 Write-Host -ForegroundColor Gray " ==>running vmxtoolkit for $Global:vmxtoolkit_type"
 Write-Host -ForegroundColor Gray " ==>vmrun is $Global:vmrun"
 Write-Host -ForegroundColor Gray " ==>vmwarepath is $Global:vmwarepath"
