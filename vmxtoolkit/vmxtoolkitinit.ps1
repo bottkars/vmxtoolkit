@@ -176,7 +176,6 @@ elseif ($OS = uname)
 			}
 		}
 	}
-}
 else
 {
 	write-host "error detecting OS"
