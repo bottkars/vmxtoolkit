@@ -32,9 +32,7 @@ if  ($env:windir)
 	$webrequestor = ".Net"
 	$Global:mkisofs = "$Global:vmwarepath/mkisofs.exe"
 	}
-elseif
-	{
-	if ($OS = uname)
+elseif ($OS = uname)
 		{
 		Write-Host "found OS $OS"
 		Switch ($OS)
@@ -178,9 +176,7 @@ elseif
 			}
 		}
 	}
-
-
-
+}
 else
 {
 	write-host "error detecting OS"
