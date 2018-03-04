@@ -168,7 +168,7 @@ if (Test-Path $preferences_file) {
             $defaultVMPath = $defaultVMPath.TrimStart(" ")
             Write-Verbose "default vmpath from preferences is $defaultVMPath"
             $VMX_default_Path = $defaultVMPath
-            $defaultselection = "preferences.ini"
+            $defaultselection = "preferences"
         }
         else {
             Write-Verbose "no defaultVMPath in prefernces.ini"
