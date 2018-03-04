@@ -19,22 +19,8 @@ if ($env:windir) {
         Write-Error "VMware Binaries not found from registry"
         Break
     }
-    if (Test-Path "$env:AppData\VMware\preferences.ini") {
-        Write-Verbose "Found VMware Preferences file"
-        Write-Verbose "trying to get vmx path from preferences"
-        $defaultVMPath = get-content "$env:AppData\VMware\preferences.ini" | Select-String prefvmx.defaultVMPath
-        if ($defaultVMPath) {
-            $defaultVMPath = $defaultVMPath -replace "`""
-            $defaultVMPath = ($defaultVMPath -split "=")[-1]
-            $defaultVMPath = $defaultVMPath.TrimStart(" ")
-            Write-Verbose "default vmpath from preferences is $defaultVMPath"
-            $VMX_default_Path = $defaultVMPath
-            $defaultselection = "preferences.ini"
-        }
-        else {
-            Write-Verbose "no defaultVMPath in prefernces.ini"
-        }
-    }
+
+    $preferences_file = "$env:AppData\VMware\preferences.ini"
     $VMX_BasePath = '\Documents\Virtual Machines\'	
     $VMware_Path = Split-Path $VMware_Path.'(default)' -Parent
     $VMware_Path = $VMware_Path -replace '"', ''
@@ -63,6 +49,7 @@ elseif ($OS = uname) {
             $Global:vmwarepath = $VMware_Path
             [version]$Fusion_Version = defaults read $VMware_Path/Contents/Info.plist CFBundleShortVersionString
             $VMware_BIN_Path = Join-Path $VMware_Path  '/Contents/Library'
+            $preferences_file = "$HOME/Library/Preferences/VMware Fusion/preferences"
             try {
                 $webrequestor = (get-command curl).Path
             }
@@ -170,6 +157,26 @@ elseif ($OS = uname) {
 else {
     write-host "error detecting OS"
 }
+
+if (Test-Path $preferences_file) {
+        Write-Verbose "Found VMware Preferences file"
+        Write-Verbose "trying to get vmx path from preferences"
+        $defaultVMPath = get-content $preferences_file | Select-String prefvmx.defaultVMPath
+        if ($defaultVMPath) {
+            $defaultVMPath = $defaultVMPath -replace "`""
+            $defaultVMPath = ($defaultVMPath -split "=")[-1]
+            $defaultVMPath = $defaultVMPath.TrimStart(" ")
+            Write-Verbose "default vmpath from preferences is $defaultVMPath"
+            $VMX_default_Path = $defaultVMPath
+            $defaultselection = "preferences.ini"
+        }
+        else {
+            Write-Verbose "no defaultVMPath in prefernces.ini"
+        }
+    }
+
+
+
 
 if (!$VMX_Path) {
     if (!$VMX_default_Path) {
