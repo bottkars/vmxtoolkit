@@ -82,8 +82,9 @@ elseif ($OS = uname) {
         }
         'Linux' {
             $Global:vmxtoolkit_type = "LINUX"
-            #$OS_Version = (sw_vers)
+            $OS_Version = (uname -o)
             #$OS_Version = $OS_Version -join " "
+            $preferences_file = "$HOME/.vmware/preferences"
             $VMX_BasePath = '/var/lib/vmware/Shared VMs'
             try {
                 $webrequestor = (get-command curl).Path
@@ -168,10 +169,10 @@ if (Test-Path $preferences_file) {
             $defaultVMPath = $defaultVMPath.TrimStart(" ")
             Write-Verbose "default vmpath from preferences is $defaultVMPath"
             $VMX_default_Path = $defaultVMPath
-            $defaultselection = "preferences.ini"
+            $defaultselection = "preferences"
         }
         else {
-            Write-Verbose "no defaultVMPath in prefernces.ini"
+            Write-Verbose "no defaultVMPath in prefernces"
         }
     }
 
