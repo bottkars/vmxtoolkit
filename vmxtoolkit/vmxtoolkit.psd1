@@ -10,7 +10,7 @@
 RootModule = 'vmxtoolkit.psm1'
 # ModuletoProcess = 'vmxtoolkit.psm1'
 # Die Versionsnummer dieses Moduls
-ModuleVersion = '4.5.2'
+ModuleVersion = '4.5.3'
 # ID zur eindeutigen Kennzeichnung dieses Moduls
 GUID = 'abe3797c-5a42-4e80-a1fb-9e648872ee14'
 # Autor dieses Moduls
