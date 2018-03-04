@@ -28,15 +28,10 @@ Copyright = '(c) 2014 Karsten Bott. Alle Rechte vorbehalten.
 
        http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
 '
 
 # Beschreibung der von diesem Modul bereitgestellten Funktionen
-Description = 'Powershell Modules for VMware Workstation on Windows/Linux and VMware Fusion on OSX'
+Description = 'Powershell Modules for VMware Workstation on Windows/Linux and VMware Fusion on OSX, see https://github.com/bottkars/vmxtoolkit for details'
 
 # Die für dieses Modul mindestens erforderliche Version des Windows PowerShell-Moduls
 PowerShellVersion = '3.0'
