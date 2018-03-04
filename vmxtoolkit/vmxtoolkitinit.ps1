@@ -8,7 +8,7 @@ write-Host "trying to get os type ... "
 if  ($env:windir)
 	{
 	$OS_Version  = Get-Command "$env:windir\system32\ntdll.dll"
-	$OS_Version = "Product Name: Windows $($OS.Version)"
+	$OS_Version = "Product Name: Windows $($OS_Version.Version)"
 	$Global:vmxtoolkit_type ="win_x86_64"
     write-verbose "getting VMware Path from Registry"
     if (!(Test-Path "HKCR:\")) { $NewPSDrive = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT }
