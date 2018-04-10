@@ -12,8 +12,8 @@ https://github.com/bottkars/labbuildr/wiki
 
 ![logo](https://cloud.githubusercontent.com/assets/8255007/17695850/ce034d40-63aa-11e6-8cb7-69a9b914334d.gif)
 
-simply follow @sddc_guy on twitter for updates
-## Installation  
+simply follow [@sddc_guy](https://twitter.com/sddc_guy) on twitter for updates
+## Installation
 ===========
 for powershell 5 of higher, you can use
 ```Powershell
@@ -25,17 +25,17 @@ to install on earlier versions, simply extract the vmxttoolkit into a folder whe
 Per Default, vmxtoolkit searches from that path
 Otherwise, specifythe path to your vm when doing a get-vmx
 
-## Installation on OSX 
-to run vmxtoolkit on OSX, you need to have PowerShell for OSX installed  
+## Installation on OSX
+to run vmxtoolkit on OSX, you need to have PowerShell for OSX installed
 see [PowerShell for OSX](https://github.com/PowerShell/PowerShell/blob/master/docs/installation/linux.md#os-x-1011) for instructions
-it is also recommended to install .NET Core for OSX from for details on installation of .NET Core LIBS see [.NET Core on MACOS](https://www.microsoft.com/net/core#macos)   
-OSX port is currently only available via Git clone, no auto installer  
+it is also recommended to install .NET Core for OSX from for details on installation of .NET Core LIBS see [.NET Core on MACOS](https://www.microsoft.com/net/core#macos)
+OSX port is currently only available via Git clone, no auto installer
 use
-```Bash```
-git clone https://github.com/bottkars/vmxtoolkit
-``````
-current exposed commands
-===========  
+`Bash`
+```git clone https://github.com/bottkars/vmxtoolkit```
+
+## Exposed Commands
+
 ```Powershell
  PS E:\GitHub> Get-Command -Module vmxtoolkit
 
@@ -113,10 +113,12 @@ Function        Set-VMXVnet                                        vmxtoolkit
 Function        Start-VMX                                          vmxtoolkit
 Function        Stop-VMX                                           vmxtoolkit
 Function        Suspend-VMX                                        vmxtoolkit
-``` 
+```
+
 Help
 ==========
-while commands are self explaining, there is an online help available get-help [command] -online
+While commands are self explaining, there is an online help available get-help [command] -online
+
 Contributing
 ==========
 Please contribute in any way to the project. Specifically, normalizing differnet image sizes, locations, and intance types would be easy adds to enhance the usefulness of the project.
