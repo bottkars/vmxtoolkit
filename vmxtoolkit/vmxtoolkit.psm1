@@ -3342,7 +3342,7 @@ function Start-VMX
 		if (($vmx) -and ($vmx.state -ne "running"))
 		{
             [int]$vmxhwversion = (Get-VMXHWVersion -config $vmx.config).hwversion
-            if ($vmxHWversion -le $vmwareversion.major)
+            if ($vmxHWversion -eq (Get-MatchingHWVersion -VMwareMajorVersion $($vmwareversion.Major)))
             {
                 Write-Verbose "Checking State for $vmxname : $($vmx.vmxname)  : $($vmx.state)"
                 Write-Verbose "creating Backup of $($vmx.config)"
@@ -3400,9 +3400,9 @@ function Start-VMX
                     Write-Warning "There was an error starting the VM: $cmdresult"
                     }
 		    }
-            else { Write-Error "Vmware version does not match, need version $vmxhwversion "	}
+            else { Write-Error "Vmware version does not match, update vmx hardware version to $(Get-MatchingHWVersion -VMwareMajorVersion $($vmwareversion.Major)) "	}
 		}
-		elseif ($vmx.state -eq "running") { Write-Verbose "VM $VMXname already running" } # end elseif
+		elseif ($vmx.state -eq "running") { Write-Host "VM $VMXname already running" } # end elseif
 		
 		else { Write-Verbose "VM $VMXname not found" } # end if-vmx
 	}	
@@ -6441,4 +6441,27 @@ Write-Host	-ForegroundColor Green "[success]"
     $Object | Add-Member -MemberType NoteProperty -Name User -Value $testuser
     $Object | Add-Member -MemberType NoteProperty -Name LoggedIn -Value $true
 	Write-Output $Object
+}
+
+function Get-MatchingHWVersion{
+[CmdletBinding(HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
+param (
+[Parameter(Mandatory = $true, ValueFromPipeline = $true)][int]$VMwareMajorVersion)
+begin{
+}
+process{
+
+Write-Verbose "VM ware major version: $VMwareMajorVersion"
+
+switch ($VMwareMajorVersion)
+{
+    16 { return 18 }
+    15 { return 16 }
+    Default {
+        return $VMwareMajorVersion
+    }
+}
+}
+end { }
+
 }
