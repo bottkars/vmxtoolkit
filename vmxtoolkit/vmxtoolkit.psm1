@@ -3342,7 +3342,7 @@ function Start-VMX
 		if (($vmx) -and ($vmx.state -ne "running"))
 		{
             [int]$vmxhwversion = (Get-VMXHWVersion -config $vmx.config).hwversion
-            if ($vmxHWversion -eq (Get-MatchingHWVersion -VMwareMajorVersion $($vmwareversion.Major)))
+            if (Is-MatchingHWVersion -VMwareMajorVersion $($vmwareversion.Major) -VMXHWversion $vmxHWversion)
             {
                 Write-Verbose "Checking State for $vmxname : $($vmx.vmxname)  : $($vmx.state)"
                 Write-Verbose "creating Backup of $($vmx.config)"
@@ -3400,7 +3400,7 @@ function Start-VMX
                     Write-Warning "There was an error starting the VM: $cmdresult"
                     }
 		    }
-            else { Write-Error "Vmware version does not match, update vmx hardware version to $(Get-MatchingHWVersion -VMwareMajorVersion $($vmwareversion.Major)) "	}
+            else { Write-Error "Vmware version does not match, update vmx hardware version as per https://kb.vmware.com/s/article/1003746 "	}
 		}
 		elseif ($vmx.state -eq "running") { Write-Host "VM $VMXname already running" } # end elseif
 		
@@ -6443,24 +6443,28 @@ Write-Host	-ForegroundColor Green "[success]"
 	Write-Output $Object
 }
 
-function Get-MatchingHWVersion{
+function Is-MatchingHWVersion{
 [CmdletBinding(HelpUri = "https://github.com/bottkars/vmxtoolkit/wiki")]
 param (
-[Parameter(Mandatory = $true, ValueFromPipeline = $true)][int]$VMwareMajorVersion)
+[Parameter(Mandatory = $true, ValueFromPipeline = $true)][int]$VMwareMajorVersion,
+[Parameter(Mandatory = $true, ValueFromPipeline = $true)][int]$VMXHWversion
+)
 begin{
 }
 process{
 
 Write-Verbose "VM ware major version: $VMwareMajorVersion"
+Write-Verbose "VMX HW version: $VMXHWversion"
 
 switch ($VMwareMajorVersion)
 {
-    16 { return 18 }
-    15 { return 16 }
+    16 { if(($VMXHWversion -eq 18) -or ($VMXHWversion -eq 19)){ return $true } }
+    15 { if(($VMXHWversion -eq 16) -or ($VMXHWversion -eq 16)){ return $true } }
     Default {
-        return $VMwareMajorVersion
-    }
+        if($VMXHWversion -eq $VMwareMajorVersion){ return $true }
+    }    
 }
+return $false
 }
 end { }
 
